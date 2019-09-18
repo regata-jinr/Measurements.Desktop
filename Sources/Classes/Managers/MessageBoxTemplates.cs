@@ -9,5 +9,9 @@ namespace Measurements.UI.Managers
         {
             MessageBox.Show(message, $"Error in Regata Measurements UI", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
         }
+        public static void Success(string message)
+        {
+            MessageBox.Show(message, $"Action has completed in Regata Measurements UI", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
     }
 }

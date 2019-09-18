@@ -1,29 +1,78 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Diagnostics;
+using Measurements.UI.Managers;
 
 namespace Measurements.UI.Forms
 {
     public partial class LoginForm : Form
     {
+        private string _connectionStringBase;
         public LoginForm()
         {
+            var config = new Measurements.Core.Configurator.ConfigManager();
+            _connectionStringBase = config.GenConnectionStringBase;
             InitializeComponent();
+            Text = $"Regata Measurements UI - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
+            textBoxLoginFormUser.Focus();
         }
+
         public TextBox textboxPin;
         public Button  addPinCodeButton;
         public Label pinLabel;
         private bool isPinButtonClicked = false;
+        private string _user;
+        private string _password;
+        private string _pin;
+        private bool _isPin = false;
+
+        private void CheckIfUserHasPin(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(textBoxLoginFormUser.Text))
+                return;
+            var sm = SecurityManager.GetCredential($"Pin_{textBoxLoginFormUser.Text}");
+            if (sm == null)
+                return;
+            label2.Text = "Пин код:";
+            _isPin = true;
+        }
 
         private void ButtonLoginFormEnter_Click(object sender, EventArgs e)
         {
+
+            var isPinCorrect = false;
+            if (_isPin)
+            {
+                _pin = textBoxLoginFormPassword.Text;
+                _user = textBoxLoginFormUser.Text;
+                isPinCorrect =  CheckPin();
+            }
+
+            if (isPinCorrect)
+            {
+                var sm = SecurityManager.GetCredential($"Password_{_user}");
+                if (sm == null)
+                {
+                    MessageBoxTemplates.Error("Пароль связанный с пин-кодом не найден. Попробуйте создать пин-код заново");
+                    return;
+                }
+                _password = sm.Password;
+            }
+            else
+            {
+                MessageBoxTemplates.Error("Неправильный логин или пин-код");
+                return;
+            }
+
+            if (CheckPassword())
+            {
+                var scpf = new SessionControlPanel();
+                scpf.Show();
+                Hide();
+            }
+            else
+                MessageBoxTemplates.Error("Неправильный логин или пароль");
 
         }
 
@@ -33,6 +82,7 @@ namespace Measurements.UI.Forms
             {
                 this.Controls.Clear();
                 this.InitializeComponent();
+                Text = $"Regata Measurements UI - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
                 isPinButtonClicked = false;
             }
             else
@@ -58,6 +108,7 @@ namespace Measurements.UI.Forms
             pinLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             pinLabel.Size = new System.Drawing.Size(75, 28);
             pinLabel.Text = "Пин-код:";
+            label2.Text = "Пароль:";
             pinLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.Controls.Add(pinLabel);
 
@@ -86,18 +137,65 @@ namespace Measurements.UI.Forms
                 return;
             if (string.IsNullOrEmpty(textboxPin.Text) || string.IsNullOrEmpty(textBoxLoginFormUser.Text) || string.IsNullOrEmpty(textBoxLoginFormPassword.Text))
             {
-                Managers.MessageBoxTemplates.Error("При создании пин-кода все поля должны быть заполнены");
+                MessageBoxTemplates.Error("При создании пин-кода все поля должны быть заполнены");
                 return;
             }
 
             if (int.TryParse(textboxPin.Text, out _) && textboxPin.Text.Length == 4)
             {
+                _user = textBoxLoginFormUser.Text;
+                _password = textBoxLoginFormPassword.Text;
+                _pin = textboxPin.Text;
+
+                if (CheckPassword())
+                {
+                    if (SecurityManager.SetCredential($"Password_{textBoxLoginFormUser.Text}", textBoxLoginFormUser.Text, textBoxLoginFormPassword.Text) && SecurityManager.SetCredential($"Pin_{textBoxLoginFormUser.Text}", textBoxLoginFormUser.Text, textboxPin.Text))
+                    {
+                        MessageBoxTemplates.Success("Пин-код успешно сохранен");
+                        _isPin = true;
+                        this.Controls.Clear();
+                        this.InitializeComponent();
+                        Text = $"Regata Measurements UI - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
+                        isPinButtonClicked = false;
+                        textBoxLoginFormUser.Text = _user;
+                        textBoxLoginFormPassword.Text = _pin;
+                    }
+                    else
+                        MessageBoxTemplates.Error("Проблема с установкой пин-кода. Возможно, Вы уже создавали пин-код"); 
+                }
+                else
+                    MessageBoxTemplates.Error("Программа не может установить соединение с базой данных. Проверьте указанный логин или пароль.");
 
 
             }
             else
-                Managers.MessageBoxTemplates.Error("Пин-код должен быть целым четырехзначным числом");
+                MessageBoxTemplates.Error("Пин-код должен быть целым четырехзначным числом");
+        }
 
+
+        private bool CheckPassword()
+        {
+            var isConnected = false;
+            using (var sqlCon = new SqlConnection($"{_connectionStringBase}User Id={_user};Password={_password};"))
+            {
+                sqlCon.Open();
+                isConnected = true;
+            }
+            return isConnected;
+        }
+
+        private bool CheckPin()
+        {
+            var isCorrect = false;
+
+            var sm = SecurityManager.GetCredential($"Pin_{_user}");
+            if (sm == null)
+                return false;
+
+            if (_pin == sm.Password && _user == sm.Login)
+                isCorrect = true;
+
+            return isCorrect;
         }
 
 

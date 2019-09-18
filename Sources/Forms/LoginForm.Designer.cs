@@ -64,6 +64,7 @@
             this.textBoxLoginFormUser.Name = "textBoxLoginFormUser";
             this.textBoxLoginFormUser.Size = new System.Drawing.Size(136, 22);
             this.textBoxLoginFormUser.TabIndex = 2;
+            this.textBoxLoginFormUser.LostFocus += new System.EventHandler(this.CheckIfUserHasPin);
             // 
             // textBoxLoginFormPassword
             // 
@@ -113,7 +114,6 @@
             this.MinimizeBox = false;
             this.Name = "LoginForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = $"Regata Measurements UI - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
             this.ResumeLayout(false);
             this.PerformLayout();
 
