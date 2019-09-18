@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Measurements.Core;
 
@@ -29,7 +22,6 @@ namespace Measurements.UI.Forms
 
             SessionControlPaneldataGridViewSessions.DataSource = source;
             
-
         }
 
         private void ShowAbout(object sender, EventArgs eventArgs)
@@ -41,5 +33,20 @@ namespace Measurements.UI.Forms
         {
             Application.Exit();
         }
+
+        private void SessionControlPanelButtonLoadSession_Click(object sender, EventArgs e)
+        {
+            ISession session = SessionControllerSingleton.Load(SessionControlPaneldataGridViewSessions.SelectedRows[0].Cells[0].Value.ToString());
+            var sessionForm = new SessionForm(session);
+            sessionForm.Show();
+
+        }
+
+        private void SessionControlPanelButtonCreateSession_Click(object sender, EventArgs e)
+        {
+            var sessionForm = new SessionForm();
+            sessionForm.Show();
+        }
+
     }
 }

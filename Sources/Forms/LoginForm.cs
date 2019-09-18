@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.Windows.Forms;
 using Measurements.UI.Managers;
+using System.Linq;
 
 namespace Measurements.UI.Forms
 {
@@ -15,11 +16,19 @@ namespace Measurements.UI.Forms
 
         public LoginForm()
         {
+
+            MessageBoxTemplates.CallStaticCtor();
             var config = new Measurements.Core.Configurator.ConfigManager();
             _connectionStringBase = config.GenConnectionStringBase;
             InitializeComponent();
             Text = $"Regata Measurements UI - {CurrentVersion}";
             textBoxLoginFormUser.Focus();
+
+            if (System.Diagnostics.Process.GetProcesses().Count(p => p.ProcessName == System.Diagnostics.Process.GetCurrentProcess().ProcessName) >= 2)
+            {
+                MessageBoxTemplates.Error("Программа измерений уже запущена");
+                Application.Exit();
+            }
         }
 
         public TextBox textboxPin;

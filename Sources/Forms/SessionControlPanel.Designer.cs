@@ -45,7 +45,7 @@
             this.SessionControlPaneldataGridViewSessions = new System.Windows.Forms.DataGridView();
             this.SessionControlPanelButtonLoadSession = new System.Windows.Forms.Button();
             this.SessionControlPanelLabelTable = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.SessionControlPanelButtonCreateSession = new System.Windows.Forms.Button();
             this.SessionContorllerPanelMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SessionControlPaneldataGridViewSessions)).BeginInit();
             this.SuspendLayout();
@@ -170,11 +170,13 @@
             this.SessionControlPaneldataGridViewSessions.Location = new System.Drawing.Point(12, 59);
             this.SessionControlPaneldataGridViewSessions.MultiSelect = false;
             this.SessionControlPaneldataGridViewSessions.Name = "SessionControlPaneldataGridViewSessions";
+            this.SessionControlPaneldataGridViewSessions.ReadOnly = true;
             this.SessionControlPaneldataGridViewSessions.RowHeadersVisible = false;
             this.SessionControlPaneldataGridViewSessions.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.SessionControlPaneldataGridViewSessions.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.SessionControlPaneldataGridViewSessions.Size = new System.Drawing.Size(774, 301);
             this.SessionControlPaneldataGridViewSessions.TabIndex = 1;
+            this.SessionControlPaneldataGridViewSessions.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SessionControlPanelButtonLoadSession_Click);
             // 
             // SessionControlPanelButtonLoadSession
             // 
@@ -185,6 +187,7 @@
             this.SessionControlPanelButtonLoadSession.TabIndex = 2;
             this.SessionControlPanelButtonLoadSession.Text = "Загрузить выделенную сессию";
             this.SessionControlPanelButtonLoadSession.UseVisualStyleBackColor = true;
+            this.SessionControlPanelButtonLoadSession.Click += new System.EventHandler(this.SessionControlPanelButtonLoadSession_Click);
             // 
             // SessionControlPanelLabelTable
             // 
@@ -196,22 +199,23 @@
             this.SessionControlPanelLabelTable.TabIndex = 4;
             this.SessionControlPanelLabelTable.Text = "Список сессий доступных для загрузки";
             // 
-            // button1
+            // SessionControlPanelButtonCreateSession
             // 
-            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(593, 376);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(193, 44);
-            this.button1.TabIndex = 5;
-            this.button1.Text = "Создать новую сессию";
-            this.button1.UseVisualStyleBackColor = true;
+            this.SessionControlPanelButtonCreateSession.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SessionControlPanelButtonCreateSession.Location = new System.Drawing.Point(593, 376);
+            this.SessionControlPanelButtonCreateSession.Name = "SessionControlPanelButtonCreateSession";
+            this.SessionControlPanelButtonCreateSession.Size = new System.Drawing.Size(193, 44);
+            this.SessionControlPanelButtonCreateSession.TabIndex = 5;
+            this.SessionControlPanelButtonCreateSession.Text = "Создать новую сессию";
+            this.SessionControlPanelButtonCreateSession.UseVisualStyleBackColor = true;
+            this.SessionControlPanelButtonCreateSession.Click += new System.EventHandler(this.SessionControlPanelButtonCreateSession_Click);
             // 
             // SessionControlPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(798, 432);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.SessionControlPanelButtonCreateSession);
             this.Controls.Add(this.SessionControlPanelLabelTable);
             this.Controls.Add(this.SessionControlPanelButtonLoadSession);
             this.Controls.Add(this.SessionControlPaneldataGridViewSessions);
@@ -248,6 +252,6 @@
         private System.Windows.Forms.DataGridView SessionControlPaneldataGridViewSessions;
         private System.Windows.Forms.Button SessionControlPanelButtonLoadSession;
         private System.Windows.Forms.Label SessionControlPanelLabelTable;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button SessionControlPanelButtonCreateSession;
     }
 }
