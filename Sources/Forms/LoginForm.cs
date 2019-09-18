@@ -9,12 +9,16 @@ namespace Measurements.UI.Forms
     public partial class LoginForm : Form
     {
         private string _connectionStringBase;
+        private string _connectionStringFull;
+        public static string CurrentVersion => $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.Major}.{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.Minor}.{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.Build}";
+
+
         public LoginForm()
         {
             var config = new Measurements.Core.Configurator.ConfigManager();
             _connectionStringBase = config.GenConnectionStringBase;
             InitializeComponent();
-            Text = $"Regata Measurements UI - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
+            Text = $"Regata Measurements UI - {CurrentVersion}";
             textBoxLoginFormUser.Focus();
         }
 
@@ -67,13 +71,19 @@ namespace Measurements.UI.Forms
 
             if (CheckPassword())
             {
-                var scpf = new SessionControlPanel();
+                var scpf = new SessionControlPanel(_connectionStringFull);
                 scpf.Show();
                 Hide();
             }
             else
                 MessageBoxTemplates.Error("Неправильный логин или пароль");
 
+        }
+
+        private void LoginFormPressEnterOnPasswordFocused(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+                buttonLoginFormEnter.PerformClick();
         }
 
         private void ButtonLoginFormCreatePin_Click(object sender, EventArgs e)
@@ -176,7 +186,8 @@ namespace Measurements.UI.Forms
         private bool CheckPassword()
         {
             var isConnected = false;
-            using (var sqlCon = new SqlConnection($"{_connectionStringBase}User Id={_user};Password={_password};"))
+            _connectionStringFull = $"{_connectionStringBase}User Id={_user};Password={_password};";
+            using (var sqlCon = new SqlConnection(_connectionStringFull))
             {
                 sqlCon.Open();
                 isConnected = true;

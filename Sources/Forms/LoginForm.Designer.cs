@@ -74,6 +74,7 @@
             this.textBoxLoginFormPassword.PasswordChar = 'x';
             this.textBoxLoginFormPassword.Size = new System.Drawing.Size(136, 22);
             this.textBoxLoginFormPassword.TabIndex = 3;
+            this.textBoxLoginFormPassword.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.LoginFormPressEnterOnPasswordFocused);
             // 
             // buttonLoginFormCreatePin
             // 
