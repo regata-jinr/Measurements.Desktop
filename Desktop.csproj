@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Measurements.UI.Forms.Program</StartupObject>
+    <StartupObject>Measurements.UI.Desktop.Forms.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>logosmooth.ico</ApplicationIcon>
@@ -132,6 +132,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sources\Classes\Components\DropDownMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Sources\Classes\Managers\MessageBoxTemplates.cs" />
     <Compile Include="Sources\Classes\Managers\ProcessManager.cs" />
     <Compile Include="Sources\Classes\Managers\SecurityManager.cs" />
@@ -196,6 +199,9 @@
     <EmbeddedResource Include="Sources\Forms\SessionForm.resx">
       <DependentUpon>SessionForm.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Sources\Tests\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
