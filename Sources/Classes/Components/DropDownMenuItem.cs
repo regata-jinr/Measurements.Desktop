@@ -9,7 +9,8 @@ namespace Measurements.UI.Desktop.Components
     {
         private bool _isMultiCheked;
         private ToolStripMenuItem clickedItem;
-        public DropDownMenuItem(string displayedName, string[] options, bool isMultiCheked) : base()
+
+        public DropDownMenuItem(string displayedName, string[] options, bool isMultiCheked = false) : base()
         {
             Name = $"SessionFormMenu{displayedName}";
             Text = displayedName;
@@ -37,6 +38,9 @@ namespace Measurements.UI.Desktop.Components
         private void ClearCheckings(object sender, EventArgs eventArgs)
         {
             if (_isMultiCheked) return;
+
+            if (DropDownItems == null && DropDownItems.Count == 0)
+                return;
 
             foreach (var childItem in DropDownItems)
             {
