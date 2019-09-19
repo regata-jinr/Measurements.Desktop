@@ -1,4 +1,4 @@
-﻿namespace Measurements.UI.Forms
+﻿namespace Measurements.UI.Desktop.Forms
 {
     partial class LoginForm
     {

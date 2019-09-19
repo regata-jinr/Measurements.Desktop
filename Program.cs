@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Measurements.UI.Forms
+namespace Measurements.UI.Desktop.Forms
 {
     static class Program
     {

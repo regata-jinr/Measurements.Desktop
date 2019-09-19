@@ -2,7 +2,7 @@
 using System.Windows.Forms;
 using Measurements.Core;
 
-namespace Measurements.UI.Forms
+namespace Measurements.UI.Desktop.Forms
 {
     public partial class SessionControlPanel : Form
     {

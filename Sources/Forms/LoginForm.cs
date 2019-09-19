@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using Measurements.UI.Managers;
 using System.Linq;
 
-namespace Measurements.UI.Forms
+namespace Measurements.UI.Desktop.Forms
 {
     public partial class LoginForm : Form
     {
@@ -18,7 +18,7 @@ namespace Measurements.UI.Forms
         {
 
             MessageBoxTemplates.CallStaticCtor();
-            var config = new Measurements.Core.Configurator.ConfigManager();
+            var config = new Measurements.Configurator.ConfigManager();
             _connectionStringBase = config.GenConnectionStringBase;
             InitializeComponent();
             Text = $"Regata Measurements UI - {CurrentVersion}";
