@@ -16,9 +16,11 @@ namespace Measurements.UI.Managers
         //       this is correct behaviour, user should decide what he wants to do retry or cancel and change something
         //       but for warnings and successes it should has timeout
 
+        //TODO:  add icons to AutoClosingMessageBox
+
         public static void Error(string message)
         {
-            var result =  MessageBox.Show(message, $"Error!", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+            var result =  AutoClosingMessageBox.Show(message, $"Error! Window will close in 5 sec.",5000, MessageBoxButtons.RetryCancel);
 
             if (result == DialogResult.Cancel)
             {
@@ -31,15 +33,9 @@ namespace Measurements.UI.Managers
 
         }
 
-        public static void TimeOutMessage(string message, int timeOutSec = 5)
-        {
-
-            
-        }
-
-        public static void Success(string message) => MessageBox.Show(message, $"Success!", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-        public static void Warning(string message) => MessageBox.Show(message, $"Warning!", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-        public static void Info(string message)    => MessageBox.Show(message, $"Info!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        public static void Success(string message) => AutoClosingMessageBox.Show(message, $"Success! Window will close in 3 sec.", 3000, MessageBoxButtons.OK);
+        public static void Warning(string message) => AutoClosingMessageBox.Show(message, $"Warning! Window will close in 3 sec.", 3000, MessageBoxButtons.OK);
+        public static void Info(string message)    => AutoClosingMessageBox.Show(message, $"Info! Window will close in 3 sec.",    3000, MessageBoxButtons.OK);
 
         public static void CallStaticCtor() { }
 
@@ -59,13 +55,13 @@ namespace Measurements.UI.Managers
 
         public static void WrapExceptionToMessageBox(ExceptionEventsArgs eventsArgs)
         {
-            if (eventsArgs.Level == ExceptionLevel.error)
+            if (eventsArgs.Level == ExceptionLevel.Error)
                 Error(MessageTemplate(ref eventsArgs));
 
-            if (eventsArgs.Level == ExceptionLevel.warning)
+            if (eventsArgs.Level == ExceptionLevel.Warn)
                 Warning(MessageTemplate(ref eventsArgs));
 
-            if (eventsArgs.Level == ExceptionLevel.info)
+            if (eventsArgs.Level == ExceptionLevel.Info)
                 Info(MessageTemplate(ref eventsArgs));
         }
     }

@@ -35,6 +35,7 @@ namespace Measurements.UI.Desktop.Components
         }
 
 
+        //TODO: re-think mechanism for keeping only one cheked item
         private void ClearCheckings(object sender, EventArgs eventArgs)
         {
             if (_isMultiCheked) return;
@@ -46,7 +47,10 @@ namespace Measurements.UI.Desktop.Components
             {
                 ToolStripMenuItem curTM = (ToolStripMenuItem)childItem;
                 if (childItem.Equals(clickedItem))
+                {
+                    curTM.Checked = true;
                     continue;
+                }
                 curTM.Checked = false;
             }
 

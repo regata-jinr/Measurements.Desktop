@@ -33,14 +33,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SessionForm));
             this.SessionFormMenuStrip = new System.Windows.Forms.MenuStrip();
             this.SessionFormMenuMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this.SessionFormMenuDetectors = new System.Windows.Forms.ToolStripMenuItem();
-            this.SessionFormMenuType = new System.Windows.Forms.ToolStripMenuItem();
-            this.SessionFormMenuOptions = new System.Windows.Forms.ToolStripMenuItem();
-            this.SessionFormMenuOptionsCountModes = new System.Windows.Forms.ToolStripMenuItem();
-            this.SessionFormMenuOptionsSpreading = new System.Windows.Forms.ToolStripMenuItem();
-            this.SessionFormStatusStrip = new System.Windows.Forms.StatusStrip();
             this.сохранитьСессиюToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.сброситьПараметрыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SessionFormStatusStrip = new System.Windows.Forms.StatusStrip();
             this.SessionFormListBoxIrrDates = new System.Windows.Forms.ListBox();
             this.SessionFormDataGridViewIrradiations = new System.Windows.Forms.DataGridView();
             this.SessionFormButtonStart = new System.Windows.Forms.Button();
@@ -48,12 +43,6 @@
             this.SessionFormIrradiationsDataLabel = new System.Windows.Forms.Label();
             this.SessionFormButtonStop = new System.Windows.Forms.Button();
             this.SessionFormButtonClear = new System.Windows.Forms.Button();
-            this.SessionFormMenuOptionsSamplesDisplaying = new System.Windows.Forms.ToolStripMenuItem();
-            this.поДетекторуToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.поПартиямToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.поОблучениюToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.поНомеруToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.поКонтейнеруToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.SessionFormMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SessionFormDataGridViewIrradiations)).BeginInit();
             this.SuspendLayout();
@@ -61,10 +50,7 @@
             // SessionFormMenuStrip
             // 
             this.SessionFormMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.SessionFormMenuMenu,
-            this.SessionFormMenuDetectors,
-            this.SessionFormMenuType,
-            this.SessionFormMenuOptions});
+            this.SessionFormMenuMenu});
             this.SessionFormMenuStrip.Location = new System.Drawing.Point(0, 0);
             this.SessionFormMenuStrip.Name = "SessionFormMenuStrip";
             this.SessionFormMenuStrip.Size = new System.Drawing.Size(1365, 24);
@@ -80,50 +66,6 @@
             this.SessionFormMenuMenu.Size = new System.Drawing.Size(53, 20);
             this.SessionFormMenuMenu.Text = "Меню";
             // 
-            // SessionFormMenuDetectors
-            // 
-            this.SessionFormMenuDetectors.Name = "SessionFormMenuDetectors";
-            this.SessionFormMenuDetectors.Size = new System.Drawing.Size(78, 20);
-            this.SessionFormMenuDetectors.Text = "Детекторы";
-            // 
-            // SessionFormMenuType
-            // 
-            this.SessionFormMenuType.CheckOnClick = true;
-            this.SessionFormMenuType.Name = "SessionFormMenuType";
-            this.SessionFormMenuType.Size = new System.Drawing.Size(39, 20);
-            this.SessionFormMenuType.Text = "Тип";
-            // 
-            // SessionFormMenuOptions
-            // 
-            this.SessionFormMenuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.SessionFormMenuOptionsCountModes,
-            this.SessionFormMenuOptionsSpreading,
-            this.SessionFormMenuOptionsSamplesDisplaying});
-            this.SessionFormMenuOptions.Name = "SessionFormMenuOptions";
-            this.SessionFormMenuOptions.Size = new System.Drawing.Size(56, 20);
-            this.SessionFormMenuOptions.Text = "Опции";
-            // 
-            // SessionFormMenuOptionsCountModes
-            // 
-            this.SessionFormMenuOptionsCountModes.Name = "SessionFormMenuOptionsCountModes";
-            this.SessionFormMenuOptionsCountModes.Size = new System.Drawing.Size(256, 22);
-            this.SessionFormMenuOptionsCountModes.Text = "Режим отсчета";
-            // 
-            // SessionFormMenuOptionsSpreading
-            // 
-            this.SessionFormMenuOptionsSpreading.CheckOnClick = true;
-            this.SessionFormMenuOptionsSpreading.Name = "SessionFormMenuOptionsSpreading";
-            this.SessionFormMenuOptionsSpreading.Size = new System.Drawing.Size(256, 22);
-            this.SessionFormMenuOptionsSpreading.Text = "Режим распределения";
-            // 
-            // SessionFormStatusStrip
-            // 
-            this.SessionFormStatusStrip.Location = new System.Drawing.Point(0, 428);
-            this.SessionFormStatusStrip.Name = "SessionFormStatusStrip";
-            this.SessionFormStatusStrip.Size = new System.Drawing.Size(1365, 22);
-            this.SessionFormStatusStrip.TabIndex = 1;
-            this.SessionFormStatusStrip.Text = "statusStrip1";
-            // 
             // сохранитьСессиюToolStripMenuItem
             // 
             this.сохранитьСессиюToolStripMenuItem.Name = "сохранитьСессиюToolStripMenuItem";
@@ -135,6 +77,14 @@
             this.сброситьПараметрыToolStripMenuItem.Name = "сброситьПараметрыToolStripMenuItem";
             this.сброситьПараметрыToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.сброситьПараметрыToolStripMenuItem.Text = "Сбросить параметры";
+            // 
+            // SessionFormStatusStrip
+            // 
+            this.SessionFormStatusStrip.Location = new System.Drawing.Point(0, 428);
+            this.SessionFormStatusStrip.Name = "SessionFormStatusStrip";
+            this.SessionFormStatusStrip.Size = new System.Drawing.Size(1365, 22);
+            this.SessionFormStatusStrip.TabIndex = 1;
+            this.SessionFormStatusStrip.Text = "statusStrip1";
             // 
             // SessionFormListBoxIrrDates
             // 
@@ -237,48 +187,6 @@
             this.SessionFormButtonClear.Text = "Clear";
             this.SessionFormButtonClear.UseVisualStyleBackColor = false;
             // 
-            // SessionFormMenuOptionsSamplesDisplaying
-            // 
-            this.SessionFormMenuOptionsSamplesDisplaying.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.поДетекторуToolStripMenuItem,
-            this.поПартиямToolStripMenuItem,
-            this.поОблучениюToolStripMenuItem,
-            this.поНомеруToolStripMenuItem,
-            this.поКонтейнеруToolStripMenuItem1});
-            this.SessionFormMenuOptionsSamplesDisplaying.Name = "SessionFormMenuOptionsSamplesDisplaying";
-            this.SessionFormMenuOptionsSamplesDisplaying.Size = new System.Drawing.Size(256, 22);
-            this.SessionFormMenuOptionsSamplesDisplaying.Text = "Отображение таблицы образцов";
-            // 
-            // поДетекторуToolStripMenuItem
-            // 
-            this.поДетекторуToolStripMenuItem.Name = "поДетекторуToolStripMenuItem";
-            this.поДетекторуToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.поДетекторуToolStripMenuItem.Text = "По детектору";
-            // 
-            // поПартиямToolStripMenuItem
-            // 
-            this.поПартиямToolStripMenuItem.Name = "поПартиямToolStripMenuItem";
-            this.поПартиямToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.поПартиямToolStripMenuItem.Text = "По партиям";
-            // 
-            // поОблучениюToolStripMenuItem
-            // 
-            this.поОблучениюToolStripMenuItem.Name = "поОблучениюToolStripMenuItem";
-            this.поОблучениюToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.поОблучениюToolStripMenuItem.Text = "По облучению";
-            // 
-            // поНомеруToolStripMenuItem
-            // 
-            this.поНомеруToolStripMenuItem.Name = "поНомеруToolStripMenuItem";
-            this.поНомеруToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.поНомеруToolStripMenuItem.Text = "По номеру";
-            // 
-            // поКонтейнеруToolStripMenuItem1
-            // 
-            this.поКонтейнеруToolStripMenuItem1.Name = "поКонтейнеруToolStripMenuItem1";
-            this.поКонтейнеруToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
-            this.поКонтейнеруToolStripMenuItem1.Text = "По контейнеру";
-            // 
             // SessionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -309,11 +217,6 @@
 
         private System.Windows.Forms.MenuStrip SessionFormMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem SessionFormMenuMenu;
-        private System.Windows.Forms.ToolStripMenuItem SessionFormMenuDetectors;
-        private System.Windows.Forms.ToolStripMenuItem SessionFormMenuType;
-        private System.Windows.Forms.ToolStripMenuItem SessionFormMenuOptions;
-        private System.Windows.Forms.ToolStripMenuItem SessionFormMenuOptionsCountModes;
-        private System.Windows.Forms.ToolStripMenuItem SessionFormMenuOptionsSpreading;
         private System.Windows.Forms.StatusStrip SessionFormStatusStrip;
         private System.Windows.Forms.ToolStripMenuItem сохранитьСессиюToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem сброситьПараметрыToolStripMenuItem;
@@ -324,11 +227,5 @@
         private System.Windows.Forms.Label SessionFormIrradiationsDataLabel;
         private System.Windows.Forms.Button SessionFormButtonStop;
         private System.Windows.Forms.Button SessionFormButtonClear;
-        private System.Windows.Forms.ToolStripMenuItem SessionFormMenuOptionsSamplesDisplaying;
-        private System.Windows.Forms.ToolStripMenuItem поДетекторуToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem поПартиямToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem поОблучениюToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem поНомеруToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem поКонтейнеруToolStripMenuItem1;
     }
 }
