@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using Measurements.Core.Handlers;
 
 namespace Measurements.UI.Desktop.Components
 {
@@ -16,9 +17,25 @@ namespace Measurements.UI.Desktop.Components
             Text = displayedName;
             CheckOnClick = true;
             _isMultiCheked = isMultiCheked;
-            CheckedChanged += ClearCheckings;
 
             DropDownItems.AddRange(ConvertStringToItems(options));
+        }
+
+        public ToolStripMenuItem this[string name]
+        {
+            get
+            {
+                try
+                {
+                    return DropDownItems.OfType<ToolStripMenuItem>().First(ti => ti.Text == name);
+                }
+                catch (Exception e)
+                {
+                    ExceptionHandler.ExceptionNotify(this, e, ExceptionLevel.Error);
+                    return null;
+                }
+
+            }
         }
 
         private ToolStripMenuItem[] ConvertStringToItems(string[] options)
@@ -28,40 +45,31 @@ namespace Measurements.UI.Desktop.Components
             foreach (var option in options)
             {
                 toolStripMenuItems.Add(new ToolStripMenuItem { Name = $"{this.Name}{option}", Text = option, CheckOnClick = true});
-                toolStripMenuItems.Last().CheckedChanged += WhichCheked;
+                toolStripMenuItems.Last().Click += ItemClick;
             }
 
             return toolStripMenuItems.ToArray();
         }
 
 
-        //TODO: re-think mechanism for keeping only one cheked item
-        private void ClearCheckings(object sender, EventArgs eventArgs)
+        private void ItemClick(object sender, EventArgs eventArgs)
         {
-            if (_isMultiCheked) return;
-
-            if (DropDownItems == null && DropDownItems.Count == 0)
-                return;
-
-            foreach (var childItem in DropDownItems)
+            if (_isMultiCheked)
             {
-                ToolStripMenuItem curTM = (ToolStripMenuItem)childItem;
-                if (childItem.Equals(clickedItem))
-                {
-                    curTM.Checked = true;
-                    continue;
-                }
-                curTM.Checked = false;
+                ShowDropDown();
+                return;
             }
 
-        }
+            var currentItem = sender as ToolStripMenuItem;
 
-        private void WhichCheked(object sender, EventArgs eventArgs)
-        {
-            if (_isMultiCheked) return;
-
-            if (sender is ToolStripMenuItem)
-                clickedItem = (ToolStripMenuItem)sender;
+            foreach (ToolStripMenuItem item in DropDownItems)
+            {
+                if (item == currentItem)
+                    item.Checked = true;
+                else
+                    item.Checked = false;
+            }
+            ShowDropDown();
         }
 
     }

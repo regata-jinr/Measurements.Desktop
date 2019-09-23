@@ -76,7 +76,7 @@ namespace Measurements.UI.Desktop.Forms
         {
             try
             {
-                var sessionForm = new SessionForm();
+                var sessionForm = new SessionForm(new Session());
                 sessionForm.Show();
             }
             catch (Exception ex)

@@ -74,7 +74,6 @@
             this.textBoxLoginFormPassword.PasswordChar = 'x';
             this.textBoxLoginFormPassword.Size = new System.Drawing.Size(136, 22);
             this.textBoxLoginFormPassword.TabIndex = 3;
-            this.textBoxLoginFormPassword.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.LoginFormPressEnterOnPasswordFocused);
             // 
             // buttonLoginFormCreatePin
             // 
@@ -93,13 +92,14 @@
             this.buttonLoginFormEnter.Location = new System.Drawing.Point(162, 111);
             this.buttonLoginFormEnter.Name = "buttonLoginFormEnter";
             this.buttonLoginFormEnter.Size = new System.Drawing.Size(75, 45);
-            this.buttonLoginFormEnter.TabIndex = 5;
+            this.buttonLoginFormEnter.TabIndex = 4;
             this.buttonLoginFormEnter.Text = "Войти";
             this.buttonLoginFormEnter.UseVisualStyleBackColor = true;
             this.buttonLoginFormEnter.Click += new System.EventHandler(this.ButtonLoginFormEnter_Click);
             // 
             // LoginForm
             // 
+            this.AcceptButton = this.buttonLoginFormEnter;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(262, 164);

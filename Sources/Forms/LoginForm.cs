@@ -89,12 +89,6 @@ namespace Measurements.UI.Desktop.Forms
 
         }
 
-        private void LoginFormPressEnterOnPasswordFocused(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == (char)Keys.Enter)
-                buttonLoginFormEnter.PerformClick();
-        }
-
         private void ButtonLoginFormCreatePin_Click(object sender, EventArgs e)
         {
             if (isPinButtonClicked)
