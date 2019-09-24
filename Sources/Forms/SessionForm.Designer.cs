@@ -46,6 +46,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormIrradiationsDataLabel = new System.Windows.Forms.Label();
             this.SessionFormButtonStop = new System.Windows.Forms.Button();
             this.SessionFormButtonClear = new System.Windows.Forms.Button();
+            this.MenuOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.SessionFormMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SessionFormDataGridViewIrradiations)).BeginInit();
             this.SuspendLayout();
@@ -190,6 +191,12 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormButtonClear.Text = "Clear";
             this.SessionFormButtonClear.UseVisualStyleBackColor = false;
             // 
+            // MenuOptions
+            // 
+            this.MenuOptions.Name = "MenuOptions";
+            this.MenuOptions.Size = new System.Drawing.Size(32, 19);
+            this.MenuOptions.Text = "Опции";
+            // 
             // SessionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -233,9 +240,8 @@ namespace Measurements.UI.Desktop.Forms
 
 
         // custom components
-        private DropDownMenuItem DetectorsDropDownMenu;
-        private DropDownMenuItem TypesDropDownMenu;
-        private System.Windows.Forms.ToolStripMenuItem MenuOptions = new System.Windows.Forms.ToolStripMenuItem();
-
+        private System.Windows.Forms.ToolStripMenuItem DetectorsDropDownMenu;
+        private System.Windows.Forms.ToolStripMenuItem MenuOptions;
+        private System.Windows.Forms.ToolStripStatusLabel DetectorsLabel;
     }
 }

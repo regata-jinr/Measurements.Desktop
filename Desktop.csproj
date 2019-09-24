@@ -135,9 +135,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sources\Classes\Components\DropDownMenuItem.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Sources\Classes\Components\EnumItem.cs" />
+    <Compile Include="Sources\Classes\Components\DetectorItem.cs" />
     <Compile Include="Sources\Classes\Managers\MessageBoxTemplates.cs" />
     <Compile Include="Sources\Classes\Managers\ProcessManager.cs" />
     <Compile Include="Sources\Classes\Managers\SecurityManager.cs" />
