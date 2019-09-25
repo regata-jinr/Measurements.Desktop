@@ -26,7 +26,7 @@ namespace Measurements.UI.Desktop.Forms
 
             if (System.Diagnostics.Process.GetProcesses().Count(p => p.ProcessName == System.Diagnostics.Process.GetCurrentProcess().ProcessName) >= 2)
             {
-                MessageBoxTemplates.Error("Программа измерений уже запущена");
+                MessageBoxTemplates.ErrorSync("Программа измерений уже запущена");
                 Application.Exit();
             }
         }
@@ -67,14 +67,14 @@ namespace Measurements.UI.Desktop.Forms
                 var sm = SecurityManager.GetCredential($"Password_{_user}");
                 if (sm == null)
                 {
-                    MessageBoxTemplates.Error("Пароль связанный с пин-кодом не найден. Попробуйте создать пин-код заново");
+                    MessageBoxTemplates.ErrorSync("Пароль связанный с пин-кодом не найден. Попробуйте создать пин-код заново");
                     return;
                 }
                 _password = sm.Password;
             }
             else
             {
-                MessageBoxTemplates.Error("Неправильный логин или пин-код");
+                MessageBoxTemplates.ErrorSync("Неправильный логин или пин-код");
                 return;
             }
 
@@ -85,7 +85,7 @@ namespace Measurements.UI.Desktop.Forms
                 Hide();
             }
             else
-                MessageBoxTemplates.Error("Неправильный логин или пароль");
+                MessageBoxTemplates.ErrorSync("Неправильный логин или пароль");
 
         }
 
@@ -150,7 +150,7 @@ namespace Measurements.UI.Desktop.Forms
                 return;
             if (string.IsNullOrEmpty(textboxPin.Text) || string.IsNullOrEmpty(textBoxLoginFormUser.Text) || string.IsNullOrEmpty(textBoxLoginFormPassword.Text))
             {
-                MessageBoxTemplates.Error("При создании пин-кода все поля должны быть заполнены");
+                MessageBoxTemplates.ErrorSync("При создании пин-кода все поля должны быть заполнены");
                 return;
             }
 
@@ -164,7 +164,7 @@ namespace Measurements.UI.Desktop.Forms
                 {
                     if (SecurityManager.SetCredential($"Password_{textBoxLoginFormUser.Text}", textBoxLoginFormUser.Text, textBoxLoginFormPassword.Text) && SecurityManager.SetCredential($"Pin_{textBoxLoginFormUser.Text}", textBoxLoginFormUser.Text, textboxPin.Text))
                     {
-                        MessageBoxTemplates.Success("Пин-код успешно сохранен");
+                        MessageBoxTemplates.InfoAsync("Пин-код успешно сохранен");
                         _isPin = true;
                         this.Controls.Clear();
                         this.InitializeComponent();
@@ -174,15 +174,15 @@ namespace Measurements.UI.Desktop.Forms
                         textBoxLoginFormPassword.Text = _pin;
                     }
                     else
-                        MessageBoxTemplates.Error("Проблема с установкой пин-кода. Возможно, Вы уже создавали пин-код"); 
+                        MessageBoxTemplates.ErrorSync("Проблема с установкой пин-кода. Возможно, Вы уже создавали пин-код"); 
                 }
                 else
-                    MessageBoxTemplates.Error("Программа не может установить соединение с базой данных. Проверьте указанный логин или пароль.");
+                    MessageBoxTemplates.ErrorSync("Программа не может установить соединение с базой данных. Проверьте указанный логин или пароль.");
 
 
             }
             else
-                MessageBoxTemplates.Error("Пин-код должен быть целым четырехзначным числом");
+                MessageBoxTemplates.ErrorSync("Пин-код должен быть целым четырехзначным числом");
         }
 
 

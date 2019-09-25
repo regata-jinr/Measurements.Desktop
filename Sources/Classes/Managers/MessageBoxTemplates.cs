@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 using Measurements.Core.Handlers;
 
 namespace Measurements.UI.Managers
@@ -9,33 +10,48 @@ namespace Measurements.UI.Managers
     {
         static MessageBoxTemplates()
         {
-            ExceptionHandler.ExceptionEvent += WrapExceptionToMessageBox;
+            ExceptionHandler.ExceptionEvent += WrapExceptionToMessageBoxAsync;
         }
 
         //FIXME: now such notification (via message box) paused measurements process. In case of errors
         //       this is correct behaviour, user should decide what he wants to do retry or cancel and change something
         //       but for warnings and successes it should has timeout
 
-        //TODO:  add icons to AutoClosingMessageBox
-
-        public static void Error(string message)
+        private static Task ErrorTask(string message)
         {
-            var result =  AutoClosingMessageBox.Show(message, $"Error! Window will close in 5 sec.",5000, MessageBoxButtons.RetryCancel);
-
-            if (result == DialogResult.Cancel)
-            {
-
-            }
-            else
-            {
-
-            }
-
+            return Task.Run(() => MessageBox.Show(message, $"Error!", MessageBoxButtons.OK, MessageBoxIcon.Error));
         }
 
-        public static void Success(string message) => AutoClosingMessageBox.Show(message, $"Success! Window will close in 3 sec.", 3000, MessageBoxButtons.OK);
-        public static void Warning(string message) => AutoClosingMessageBox.Show(message, $"Warning! Window will close in 3 sec.", 3000, MessageBoxButtons.OK);
-        public static void Info(string message)    => AutoClosingMessageBox.Show(message, $"Info! Window will close in 3 sec.",    3000, MessageBoxButtons.OK);
+        private static Task WarningTask(string message)
+        {
+            return Task.Run( () => MessageBox.Show(message, $"Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning));
+        }
+        private static Task InfoTask(string message)
+        {
+            return Task.Run( () => MessageBox.Show(message, $"Info!", MessageBoxButtons.OK, MessageBoxIcon.Asterisk));
+        }
+
+        public static async void InfoAsync(string message)
+        {
+            await InfoTask(message);
+        }
+
+        public static async void WarningAsync(string message)
+        {
+            await WarningTask(message);
+        }
+
+        public static async void ErrorAsync(string message)
+        {
+            await ErrorTask(message);
+        }
+        
+        //TODO: add retry abort mechanic
+        public static void ErrorSync(string message)
+        {
+            ErrorTask(message).Wait();
+        }
+
 
         public static void CallStaticCtor() { }
 
@@ -53,16 +69,16 @@ namespace Measurements.UI.Managers
             return stringBuilder.ToString();
         }
 
-        public static void WrapExceptionToMessageBox(ExceptionEventsArgs eventsArgs)
+        public static async void WrapExceptionToMessageBoxAsync(ExceptionEventsArgs eventsArgs)
         {
             if (eventsArgs.Level == ExceptionLevel.Error)
-                Error(MessageTemplate(ref eventsArgs));
+               await ErrorTask(MessageTemplate(ref eventsArgs));
 
             if (eventsArgs.Level == ExceptionLevel.Warn)
-                Warning(MessageTemplate(ref eventsArgs));
+               await WarningTask(MessageTemplate(ref eventsArgs));
 
             if (eventsArgs.Level == ExceptionLevel.Info)
-                Info(MessageTemplate(ref eventsArgs));
+               await InfoTask(MessageTemplate(ref eventsArgs));
         }
     }
 }

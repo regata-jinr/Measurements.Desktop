@@ -194,6 +194,7 @@ namespace Measurements.UI.Desktop.Forms
             // MenuOptions
             // 
             this.MenuOptions.Name = "MenuOptions";
+            this.MenuOptions.CheckOnClick = false;
             this.MenuOptions.Size = new System.Drawing.Size(32, 19);
             this.MenuOptions.Text = "Опции";
             // 
@@ -242,6 +243,11 @@ namespace Measurements.UI.Desktop.Forms
         // custom components
         private System.Windows.Forms.ToolStripMenuItem DetectorsDropDownMenu;
         private System.Windows.Forms.ToolStripMenuItem MenuOptions;
-        private System.Windows.Forms.ToolStripStatusLabel DetectorsLabel;
+
+        private System.Windows.Forms.ToolStripStatusLabel DetectorsLabelStart;
+        private System.Windows.Forms.ToolStripStatusLabel DetectorsLabelEnd;
+        private System.Windows.Forms.ToolStripStatusLabel ConnectionStatus;
+        private EnumItem CountsOptionsItem;
+        private EnumItem SpreadOptionsItem;
     }
 }

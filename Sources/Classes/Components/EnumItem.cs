@@ -10,11 +10,13 @@ namespace Measurements.UI.Desktop.Components
     {
         public ToolStripMenuItem EnumMenuItem;
         public ToolStripStatusLabel EnumStatusLabel;
-        public event Action DropDownItemClick;
+        public event Action<string> DropDownItemClick;
+        private string _optionName;
         public string CheckedItemText { get; set; }
 
         public EnumItem(string[] values, string name)
         {
+            _optionName = name;
             EnumMenuItem = new ToolStripMenuItem();
             EnumStatusLabel = new ToolStripStatusLabel();
 
@@ -27,7 +29,7 @@ namespace Measurements.UI.Desktop.Components
             }
 
             EnumStatusLabel.Name = $"{name}StatusLabel";
-            EnumStatusLabel.Text = $"";
+            EnumStatusLabel.Text = "";
             EnumStatusLabel.ToolTipText = $"Текущий {name}";
 
             EnumMenuItem.Text = name;
@@ -44,15 +46,15 @@ namespace Measurements.UI.Desktop.Components
                 if (item == currentItem)
                 {
                     item.Checked = true;
-                    EnumStatusLabel.Text = currentItem.Text;
-                    CheckedItemText = currentItem.Text;
-                    DropDownItemClick?.Invoke();
+                    EnumStatusLabel.Text = $"{currentItem.Text}||";
+                    CheckedItemText = $"{_optionName}: {currentItem.Text}||"; 
+                    DropDownItemClick?.Invoke(currentItem.Text);
                 }
                 else
                     item.Checked = false;
             }
 
-            EnumMenuItem.ShowDropDown();
+            //EnumMenuItem.ShowDropDown();
 
         }
 

@@ -9,7 +9,6 @@ namespace Measurements.UI.Desktop.Forms
 {
     public partial class SessionControlPanel : Form
     {
-        
         public SessionControlPanel(string connectionString)
         {
             try
@@ -38,9 +37,32 @@ namespace Measurements.UI.Desktop.Forms
             var ab = new About();
             ab.Show();
         }
-        private void CloseClick(object sender, EventArgs eventArgs)
+
+        private bool _isExiting = false;
+        private void CloseClick(object sender, System.ComponentModel.CancelEventArgs eventArgs)
         {
-            Application.Exit();
+            if (!_isExiting)
+            {
+                if (SessionControllerSingleton.ManagedSessions.Count != 0)
+                {
+                    var result = MessageBox.Show($"Панель управления сессиями конртолирует некоторые сессии. Вы уверены, что хотите выйти?{Environment.NewLine}Это повлечет за собой удаление всех данных, которые не сохранены.", "Warning", MessageBoxButtons.YesNo,MessageBoxIcon.Exclamation);
+                    if (result == DialogResult.Yes)
+                    {
+                        for(var i = SessionControllerSingleton.ManagedSessions.Count - 1; i >=0; --i)
+                            SessionControllerSingleton.ManagedSessions[i].Dispose();
+
+                        SessionControllerSingleton.ManagedSessions.Clear();
+                        _isExiting = true;
+                        Application.Exit();
+                    }
+                    else eventArgs.Cancel = true;
+                }
+                else
+                {
+                    _isExiting = true;
+                    Application.Exit();
+                }
+            }
         }
 
         private void SessionControlPanelButtonLoadSession_Click(object sender, EventArgs e)
@@ -48,7 +70,7 @@ namespace Measurements.UI.Desktop.Forms
             try
             {
                 if (SessionControlPaneldataGridViewSessions.SelectedRows.Count == 0)
-                    MessageBoxTemplates.Warning("Выделите сессию для загрузки!");
+                    MessageBoxTemplates.WarningAsync("Выделите сессию для загрузки!");
 
                 var dNames = SessionControlPaneldataGridViewSessions.SelectedRows[0].Cells[1].Value.ToString().Split(',');
 
@@ -56,7 +78,7 @@ namespace Measurements.UI.Desktop.Forms
                 {
                     if (!SessionControllerSingleton.AvailableDetectors.Any(d => d.Name == dName))
                     {
-                        MessageBoxTemplates.Warning($"Детектор {dName} недоступен. Вероятно, он контролируется другой сессией.");
+                        MessageBoxTemplates.WarningAsync($"Детектор {dName} недоступен. Вероятно, он контролируется другой сессией.");
                         return;
                     }
                 }
@@ -69,7 +91,6 @@ namespace Measurements.UI.Desktop.Forms
             {
                 ExceptionHandler.ExceptionNotify(this, ex, ExceptionLevel.Error); 
             }
-
         }
 
         private void SessionControlPanelButtonCreateSession_Click(object sender, EventArgs e)

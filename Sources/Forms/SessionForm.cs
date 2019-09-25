@@ -1,27 +1,90 @@
 ﻿using System.Windows.Forms;
 using System;
+using System.Collections.Generic;
 using Measurements.Core;
 using System.Linq;
 using Measurements.UI.Desktop.Components;
 
 namespace Measurements.UI.Desktop.Forms
 {
+    //TODO: add test
+    //TODO: add try - catch
+    //TODO: rethink exception handler for ui to load async
     public partial class SessionForm : Form
     {
         private ISession _session;
         private bool _isInitialized;
+        private Dictionary<bool, System.Drawing.Color> ConnectionStatusColor;
         public SessionForm(ISession session) 
         {
+            ConnectionStatusColor = new Dictionary<bool, System.Drawing.Color>() { { false, System.Drawing.Color.Red }, { true, System.Drawing.Color.Green } };
             _session = session;
             _isInitialized = true;
             InitializeComponent();
+            Text = $"Сессия измерений [{session.Name}]| Regata Measurements UI - {LoginForm.CurrentVersion} | [{SessionControllerSingleton.ConnectionStringBuilder.UserID}]";
             SessionFormStatusStrip.ShowItemToolTips = true;
+            ConnectionStatus = new ToolStripStatusLabel() { Name = "ConnectionStatusItem", Text = " ", ToolTipText = "Состояние соединения с БД", BackColor = ConnectionStatusColor[SessionControllerSingleton.TestDBConnection()] };
+            SessionControllerSingleton.ConnectionFallen += ConnectionStatusHandler;
+            SessionFormStatusStrip.Items.Add(ConnectionStatus);
 
             InitializeDetectorDropDownItems();
             SessionControllerSingleton.AvailableDetectorsListHasChanged += InitializeDetectorDropDownItems;
+            InitializeTypeDropDownItems();
 
-            Text = $"Сессия измерений [{session.Name}]| Regata Measurements UI - {LoginForm.CurrentVersion} | [{SessionControllerSingleton.ConnectionStringBuilder.UserID}]";
+            CountsOptionsItem = new EnumItem(Enum.GetNames(typeof(CanberraDeviceAccessLib.AcquisitionModes)), "Режим набора");
+            InitializeOptionsMenu(CountsOptionsItem, SetCountMode);
+            CountsOptionsItem.EnumMenuItem.DropDownItems.OfType<ToolStripMenuItem>().Where(t => t.Text == _session.CountMode.ToString()).First().PerformClick();
 
+            SpreadOptionsItem = new EnumItem(Enum.GetNames(typeof(SpreadOptions)), "Распределение образцов");
+            InitializeOptionsMenu(SpreadOptionsItem, SetSpreadMode);
+            SpreadOptionsItem.EnumMenuItem.DropDownItems.OfType<ToolStripMenuItem>().Where(t => t.Text == _session.SpreadOption.ToString()).First().PerformClick();
+
+            SessionFormMenuStrip.Items.Add(MenuOptions);
+
+
+        }
+
+        //TODO: test connection should be async in the other case latency is possible
+        private void ConnectionStatusHandler()
+        {
+            ConnectionStatus.BackColor = ConnectionStatusColor[SessionControllerSingleton.TestDBConnection()];
+        }
+
+        private void InitializeTypeDropDownItems()
+        {
+            var detEndPostition = SessionFormStatusStrip.Items.IndexOf(DetectorsLabelEnd) + 1;
+            var typesItems = new EnumItem(Session.MeasurementTypes, "Тип");
+            typesItems.DropDownItemClick += SetType;
+            SessionFormMenuStrip.Items.Add(typesItems.EnumMenuItem);
+            SessionFormStatusStrip.Items.Insert(detEndPostition, typesItems.EnumStatusLabel);
+            if (!string.IsNullOrEmpty(_session.Type))
+                typesItems.EnumMenuItem.DropDownItems.OfType<ToolStripMenuItem>().Where(t => t.Text == _session.Type).First().PerformClick();
+        }
+
+        private void InitializeOptionsMenu(EnumItem OptionsItem, Action<string> del)
+        {
+            OptionsItem.DropDownItemClick += del;
+            MenuOptions.DropDownItems.Add(OptionsItem.EnumMenuItem);
+            SessionFormStatusStrip.Items.Add(OptionsItem.EnumStatusLabel);
+        }
+
+        private void SetType(string type) => _session.Type = type;
+        private void SetCountMode(string option)
+        {
+            CanberraDeviceAccessLib.AcquisitionModes am;
+            if (Enum.TryParse(option, out am))
+                _session.CountMode = am;
+            else
+                _session.CountMode = CanberraDeviceAccessLib.AcquisitionModes.aCountToRealTime;
+        }
+
+        private void SetSpreadMode(string option)
+        {
+            SpreadOptions so;
+            if (Enum.TryParse(option, out so))
+                _session.SpreadOption = so;
+            else
+                _session.SpreadOption = SpreadOptions.container;
         }
 
 
@@ -32,7 +95,8 @@ namespace Measurements.UI.Desktop.Forms
             if (_isInitialized)
             {
                 DetectorsDropDownMenu = new ToolStripMenuItem() { Text = "Детекторы", CheckOnClick = false };
-                DetectorsLabel = new ToolStripStatusLabel() { Name = "DetectorBegan", Text = "Детекторы: ", ToolTipText = "Список детекторов подключенных к сессии" };
+                DetectorsLabelStart = new ToolStripStatusLabel() { Name = "DetectorBegan", Text = "||Детекторы: ", ToolTipText = "Список детекторов подключенных к сессии" };
+                DetectorsLabelEnd = new ToolStripStatusLabel() { Name = "DetectorEnd", Text = "||" };
             }
             else
             {
@@ -40,9 +104,10 @@ namespace Measurements.UI.Desktop.Forms
                 RemoveDetectorsFromStatusLabel();
             }
 
-            SessionFormStatusStrip.Items.Add(DetectorsLabel);
+            SessionFormStatusStrip.Items.Insert(1, DetectorsLabelStart);
+            SessionFormStatusStrip.Items.Insert(2, DetectorsLabelEnd);
 
-            var detectorsPosition = SessionFormStatusStrip.Items.IndexOf(DetectorsLabel) + 1;
+            var detectorsPosition = SessionFormStatusStrip.Items.IndexOf(DetectorsLabelEnd);
 
             foreach (var det in allDetectors)
             {
@@ -51,7 +116,7 @@ namespace Measurements.UI.Desktop.Forms
                 DetectorsDropDownMenu.DropDownItems.Add(detItem.DetectorMenuItem);
                 if (_session.ManagedDetectors.Contains(det))
                 {
-                    SessionFormStatusStrip.Items.Insert(detectorsPosition, detItem.DetectorStatusLabel);
+                    SessionFormStatusStrip.Items.Insert(SessionFormStatusStrip.Items.IndexOf(DetectorsLabelEnd), detItem.DetectorStatusLabel);
                     DetectorsDropDownMenu.DropDownItems.OfType<ToolStripMenuItem>().Last().Checked = true;
                 }
             }
@@ -62,10 +127,15 @@ namespace Measurements.UI.Desktop.Forms
                 detectorsPosition++;
             }
 
-            SessionFormStatusStrip.Items.Insert(detectorsPosition + _session.ManagedDetectors.Count,new ToolStripStatusLabel() { Name = "DetectorEnd", Text = "||" });
+            SessionFormStatusStrip.Items.Insert(detectorsPosition + _session.ManagedDetectors.Count, DetectorsLabelEnd);
 
             if (_isInitialized)
                 SessionFormMenuStrip.Items.Add(DetectorsDropDownMenu);
+
+            //TODO: detectors menu close after click
+            //      such implementation show menu on inactive session when available detectors have occurred
+            //if (!_isInitialized)
+            //    DetectorsDropDownMenu.ShowDropDown();
 
             _isInitialized = false;
         }

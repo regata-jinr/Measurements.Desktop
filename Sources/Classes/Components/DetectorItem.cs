@@ -36,7 +36,6 @@ namespace Measurements.UI.Desktop.Components
             DetectorMenuItem.Text = _det.Name;
             DetectorMenuItem.Name = $"{_det.Name}Item";
 
-
         }
 
         private void Det_StatusChanged(object sender, EventArgs e)
@@ -52,8 +51,6 @@ namespace Measurements.UI.Desktop.Components
                 _session.AttachDetector(_det.Name);
             else
                 _session.DetachDetector(_det.Name);
-
-            DetectorMenuItem.ShowDropDown();
         }
 
     }
