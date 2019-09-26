@@ -60,6 +60,7 @@ namespace Measurements.UI.Desktop.Forms
                 else
                 {
                     _isExiting = true;
+                    Dispose();
                     Application.Exit();
                 }
             }

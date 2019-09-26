@@ -15,7 +15,7 @@ namespace Measurements.UI.Desktop.Forms
         private ISession _session;
         private bool _isInitialized;
         private Dictionary<bool, System.Drawing.Color> ConnectionStatusColor;
-        public SessionForm(ISession session) 
+        public SessionForm(ISession session)
         {
             ConnectionStatusColor = new Dictionary<bool, System.Drawing.Color>() { { false, System.Drawing.Color.Red }, { true, System.Drawing.Color.Green } };
             _session = session;
@@ -35,12 +35,13 @@ namespace Measurements.UI.Desktop.Forms
             InitializeOptionsMenu(CountsOptionsItem, SetCountMode);
             CountsOptionsItem.EnumMenuItem.DropDownItems.OfType<ToolStripMenuItem>().Where(t => t.Text == _session.CountMode.ToString()).First().PerformClick();
 
-            SpreadOptionsItem = new EnumItem(Enum.GetNames(typeof(SpreadOptions)), "Распределение образцов");
+            SpreadOptionsItem = new EnumItem(Enum.GetNames(typeof(SpreadOptions)), "Режим распределения образцов");
             InitializeOptionsMenu(SpreadOptionsItem, SetSpreadMode);
             SpreadOptionsItem.EnumMenuItem.DropDownItems.OfType<ToolStripMenuItem>().Where(t => t.Text == _session.SpreadOption.ToString()).First().PerformClick();
 
             SessionFormMenuStrip.Items.Add(MenuOptions);
 
+            SessionFormListBoxIrrDates.SelectedValueChanged += IrrDateSelectionHandler;
 
         }
 
@@ -48,6 +49,14 @@ namespace Measurements.UI.Desktop.Forms
         private void ConnectionStatusHandler()
         {
             ConnectionStatus.BackColor = ConnectionStatusColor[SessionControllerSingleton.TestDBConnection()];
+        }
+
+
+        private void IrrDateSelectionHandler(object sender, EventArgs eventArgs)
+        {
+            _session.CurrentIrradiationDate = (DateTime)SessionFormListBoxIrrDates.SelectedItem;
+            SessionFormDataGridViewIrradiations.DataSource = null;
+            SessionFormDataGridViewIrradiations.DataSource = _session.IrradiationList;
         }
 
         private void InitializeTypeDropDownItems()
@@ -68,7 +77,12 @@ namespace Measurements.UI.Desktop.Forms
             SessionFormStatusStrip.Items.Add(OptionsItem.EnumStatusLabel);
         }
 
-        private void SetType(string type) => _session.Type = type;
+        private void SetType(string type)
+        {
+            _session.Type = type;
+            SessionFormListBoxIrrDates.DataSource = null; 
+            SessionFormListBoxIrrDates.DataSource = _session.IrradiationDateList;
+        }
         private void SetCountMode(string option)
         {
             CanberraDeviceAccessLib.AcquisitionModes am;

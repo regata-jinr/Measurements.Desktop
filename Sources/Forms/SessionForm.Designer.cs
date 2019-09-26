@@ -20,6 +20,7 @@ namespace Measurements.UI.Desktop.Forms
                 components.Dispose();
             }
             _session.Dispose();
+            Measurements.Core.SessionControllerSingleton.AvailableDetectorsListHasChanged -= InitializeDetectorDropDownItems;
             base.Dispose(disposing);
         }
 
@@ -98,7 +99,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormListBoxIrrDates.ItemHeight = 16;
             this.SessionFormListBoxIrrDates.Location = new System.Drawing.Point(12, 56);
             this.SessionFormListBoxIrrDates.Name = "SessionFormListBoxIrrDates";
-            this.SessionFormListBoxIrrDates.Size = new System.Drawing.Size(120, 306);
+            this.SessionFormListBoxIrrDates.Size = new System.Drawing.Size(116, 306);
             this.SessionFormListBoxIrrDates.TabIndex = 2;
             // 
             // SessionFormDataGridViewIrradiations
@@ -126,13 +127,13 @@ namespace Measurements.UI.Desktop.Forms
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.SessionFormDataGridViewIrradiations.DefaultCellStyle = dataGridViewCellStyle2;
-            this.SessionFormDataGridViewIrradiations.Location = new System.Drawing.Point(156, 56);
+            this.SessionFormDataGridViewIrradiations.Location = new System.Drawing.Point(134, 56);
             this.SessionFormDataGridViewIrradiations.Name = "SessionFormDataGridViewIrradiations";
             this.SessionFormDataGridViewIrradiations.ReadOnly = true;
             this.SessionFormDataGridViewIrradiations.RowHeadersVisible = false;
             this.SessionFormDataGridViewIrradiations.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.SessionFormDataGridViewIrradiations.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.SessionFormDataGridViewIrradiations.Size = new System.Drawing.Size(1197, 306);
+            this.SessionFormDataGridViewIrradiations.Size = new System.Drawing.Size(1219, 306);
             this.SessionFormDataGridViewIrradiations.TabIndex = 4;
             // 
             // SessionFormButtonStart
@@ -194,7 +195,6 @@ namespace Measurements.UI.Desktop.Forms
             // MenuOptions
             // 
             this.MenuOptions.Name = "MenuOptions";
-            this.MenuOptions.CheckOnClick = false;
             this.MenuOptions.Size = new System.Drawing.Size(32, 19);
             this.MenuOptions.Text = "Опции";
             // 

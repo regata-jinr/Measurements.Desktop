@@ -141,7 +141,6 @@
     <Compile Include="Sources\Classes\Managers\ProcessManager.cs" />
     <Compile Include="Sources\Classes\Managers\SecurityManager.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Sources\Classes\Tools.cs" />
     <Compile Include="Sources\Forms\About.cs">
       <SubType>Form</SubType>
     </Compile>
