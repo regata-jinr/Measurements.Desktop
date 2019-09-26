@@ -147,6 +147,12 @@
     <Compile Include="Sources\Forms\About.Designer.cs">
       <DependentUpon>About.cs</DependentUpon>
     </Compile>
+    <Compile Include="Sources\Forms\CountsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Sources\Forms\CountsForm.Designer.cs">
+      <DependentUpon>CountsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Sources\Forms\LoginForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -191,6 +197,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Sources\Forms\About.resx">
       <DependentUpon>About.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Sources\Forms\CountsForm.resx">
+      <DependentUpon>CountsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Sources\Forms\LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>

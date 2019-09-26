@@ -19,6 +19,8 @@ namespace Measurements.UI.Desktop.Forms
             {
                 components.Dispose();
             }
+            _countsForm.SaveCountsEvent -= SaveCounts;
+            _countsForm.Dispose();
             _session.Dispose();
             Measurements.Core.SessionControllerSingleton.AvailableDetectorsListHasChanged -= InitializeDetectorDropDownItems;
             base.Dispose(disposing);
@@ -249,5 +251,9 @@ namespace Measurements.UI.Desktop.Forms
         private System.Windows.Forms.ToolStripStatusLabel ConnectionStatus;
         private EnumItem CountsOptionsItem;
         private EnumItem SpreadOptionsItem;
+        private System.Windows.Forms.ToolStripStatusLabel CountsStatusLabel;
+        private CountsForm _countsForm;
+        private System.Windows.Forms.ToolStripDropDownButton HeightDropDownButton;
+
     }
 }

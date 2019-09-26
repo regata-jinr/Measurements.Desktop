@@ -42,7 +42,35 @@ namespace Measurements.UI.Desktop.Forms
             SessionFormMenuStrip.Items.Add(MenuOptions);
 
             SessionFormListBoxIrrDates.SelectedValueChanged += IrrDateSelectionHandler;
+            
+            _countsForm = new CountsForm(_session.Counts);
+            _countsForm.SaveCountsEvent += SaveCounts;
 
+            CountsStatusLabel = new ToolStripStatusLabel() { Name = "CountsStatusLabel", Text = $"{_session.Counts}||", ToolTipText = "Продолжительность измерений. Кликните, чтобы изменить." };
+            CountsStatusLabel.Click += CountsStatusLabel_Click;
+            SessionFormStatusStrip.Items.Add(CountsStatusLabel);
+
+
+
+        }
+
+        //TODO: add heights list and dead time value
+        private void InitializeHeightDropDownButton()
+        {
+            HeightDropDownButton = new ToolStripDropDownButton();
+            HeightDropDownButton.Text = _session.Height.ToString();
+            HeightDropDownButton.ToolTipText = "Высота над детектором";
+        }
+
+        private void CountsStatusLabel_Click(object sender, EventArgs e)
+        {
+            _countsForm.Show();
+        }
+
+        private void SaveCounts(int counts)
+        {
+            _session.Counts = counts;
+            CountsStatusLabel.Text = $"{counts}||";
         }
 
         //TODO: test connection should be async in the other case latency is possible
@@ -109,7 +137,7 @@ namespace Measurements.UI.Desktop.Forms
             if (_isInitialized)
             {
                 DetectorsDropDownMenu = new ToolStripMenuItem() { Text = "Детекторы", CheckOnClick = false };
-                DetectorsLabelStart = new ToolStripStatusLabel() { Name = "DetectorBegan", Text = "||Детекторы: ", ToolTipText = "Список детекторов подключенных к сессии" };
+                DetectorsLabelStart = new ToolStripStatusLabel() { Name = "DetectorBegun", Text = "||Детекторы: ", ToolTipText = "Список детекторов подключенных к сессии" };
                 DetectorsLabelEnd = new ToolStripStatusLabel() { Name = "DetectorEnd", Text = "||" };
             }
             else
@@ -162,7 +190,5 @@ namespace Measurements.UI.Desktop.Forms
                     SessionFormStatusStrip.Items.RemoveAt(i);
             }
         }
-
-
     }
 }
