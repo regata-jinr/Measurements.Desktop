@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Measurements.Core;
 using System.Linq;
 using Measurements.UI.Desktop.Components;
+using Measurements.UI.Managers;
 
 namespace Measurements.UI.Desktop.Forms
 {
@@ -13,10 +14,12 @@ namespace Measurements.UI.Desktop.Forms
     public partial class SessionForm : Form
     {
         private ISession _session;
+        private List<DisplayedMeasurementsList> _displayedList;
         private bool _isInitialized;
         private Dictionary<bool, System.Drawing.Color> ConnectionStatusColor;
         public SessionForm(ISession session)
         {
+            _displayedList = new List<DisplayedMeasurementsList>();
             ConnectionStatusColor = new Dictionary<bool, System.Drawing.Color>() { { false, System.Drawing.Color.Red }, { true, System.Drawing.Color.Green } };
             _session = session;
             _isInitialized = true;
@@ -50,8 +53,21 @@ namespace Measurements.UI.Desktop.Forms
             CountsStatusLabel.Click += CountsStatusLabel_Click;
             SessionFormStatusStrip.Items.Add(CountsStatusLabel);
 
+        }
 
 
+        private void FillDisplayedList()
+        {
+
+            _displayedList.Clear();
+
+            foreach (var detName in _session.SpreadSamples.Keys)
+            {
+                foreach (var ir in _session.SpreadSamples[detName])
+                {
+                    _displayedList.Add(new DisplayedMeasurementsList() { SetKey = ir.SetKey, SampleNumber = ir.SampleNumber, Container = ir.Container.Value, PositionInContainer = ir.Position.Value, DetName = detName, QueueNumber = _session.SpreadSamples[detName].IndexOf(ir), DeadTime = 0, Height = 0, File = "", Note = "" });
+                }
+            }
         }
 
         //TODO: add heights list and dead time value
@@ -84,7 +100,8 @@ namespace Measurements.UI.Desktop.Forms
         {
             _session.CurrentIrradiationDate = (DateTime)SessionFormListBoxIrrDates.SelectedItem;
             SessionFormDataGridViewIrradiations.DataSource = null;
-            SessionFormDataGridViewIrradiations.DataSource = _session.IrradiationList;
+            FillDisplayedList();
+            SessionFormDataGridViewIrradiations.DataSource = _displayedList;
         }
 
         private void InitializeTypeDropDownItems()
@@ -190,5 +207,33 @@ namespace Measurements.UI.Desktop.Forms
                     SessionFormStatusStrip.Items.RemoveAt(i);
             }
         }
+
+        private void MenuSaveSession_Click(object sender, EventArgs e)
+        {
+            var savesessionform = new SaveSessionForm(_session.Name);
+            savesessionform.SaveSessionEvent += SaveSessionHandler;
+            savesessionform.Show();
+        }
+
+        private void SaveSessionHandler(string name, bool isPublic)
+        {
+            var ic = new InfoContext();
+
+            if (ic.Sessions.Where(s => s.Name == name).Any())
+            {
+                var res = MessageBox.Show($"Сессия с таким именем '{name}' уже существует в базе данных. Вы хотите обновить параметры сессии?", "Info", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk);
+                if (res == DialogResult.No)
+                    return;
+            }
+
+            _session.SaveSession(name, isPublic);
+
+
+            Text = $"Сессия измерений [{_session.Name}]| Regata Measurements UI - {LoginForm.CurrentVersion} | [{SessionControllerSingleton.ConnectionStringBuilder.UserID}]";
+
+            SessionControllerSingleton.SessionsInfoListsChangedHaveOccurred();
+
+        }
+
     }
 }

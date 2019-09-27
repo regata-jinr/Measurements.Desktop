@@ -25,11 +25,21 @@ namespace Measurements.UI.Desktop.Forms
                 source.DataSource = SessionControllerSingleton.AvailableSessions;
 
                 SessionControlPaneldataGridViewSessions.DataSource = source;
+
+                SessionControllerSingleton.SessionsInfoListHasChanged += UpdateSessionsTable;
             }
             catch (Exception ex)
             {
                 ExceptionHandler.ExceptionNotify(this, ex, ExceptionLevel.Error);
             }
+        }
+
+        private void UpdateSessionsTable()
+        {
+            var source = new BindingSource();
+            source.DataSource = SessionControllerSingleton.AvailableSessions;
+            SessionControlPaneldataGridViewSessions.DataSource = null;
+            SessionControlPaneldataGridViewSessions.DataSource = source;
         }
 
         private void ShowAbout(object sender, EventArgs eventArgs)
@@ -73,16 +83,16 @@ namespace Measurements.UI.Desktop.Forms
                 if (SessionControlPaneldataGridViewSessions.SelectedRows.Count == 0)
                     MessageBoxTemplates.WarningAsync("Выделите сессию для загрузки!");
 
-                var dNames = SessionControlPaneldataGridViewSessions.SelectedRows[0].Cells[1].Value.ToString().Split(',');
+                //var dNames = SessionControlPaneldataGridViewSessions.SelectedRows[0].Cells[1].Value.ToString().Split(',');
 
-                foreach (var dName in dNames)
-                {
-                    if (!SessionControllerSingleton.AvailableDetectors.Any(d => d.Name == dName))
-                    {
-                        MessageBoxTemplates.WarningAsync($"Детектор {dName} недоступен. Вероятно, он контролируется другой сессией.");
-                        return;
-                    }
-                }
+                //foreach (var dName in dNames)
+                //{
+                //    if (!SessionControllerSingleton.AvailableDetectors.Any(d => d.Name == dName))
+                //    {
+                //        MessageBoxTemplates.WarningAsync($"Детектор {dName} недоступен. Вероятно, он контролируется другой сессией.");
+                //        return;
+                //    }
+                //}
 
                 ISession session = SessionControllerSingleton.Load(SessionControlPaneldataGridViewSessions.SelectedRows[0].Cells[0].Value.ToString());
                 var sessionForm = new SessionForm(session);

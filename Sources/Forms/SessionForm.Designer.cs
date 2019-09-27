@@ -40,7 +40,6 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormMenuStrip = new System.Windows.Forms.MenuStrip();
             this.MenuMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuSaveSession = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuResetAll = new System.Windows.Forms.ToolStripMenuItem();
             this.SessionFormStatusStrip = new System.Windows.Forms.StatusStrip();
             this.SessionFormListBoxIrrDates = new System.Windows.Forms.ListBox();
             this.SessionFormDataGridViewIrradiations = new System.Windows.Forms.DataGridView();
@@ -67,8 +66,7 @@ namespace Measurements.UI.Desktop.Forms
             // MenuMenu
             // 
             this.MenuMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.MenuSaveSession,
-            this.MenuResetAll});
+            this.MenuSaveSession});
             this.MenuMenu.Name = "MenuMenu";
             this.MenuMenu.Size = new System.Drawing.Size(53, 20);
             this.MenuMenu.Text = "Меню";
@@ -76,14 +74,9 @@ namespace Measurements.UI.Desktop.Forms
             // MenuSaveSession
             // 
             this.MenuSaveSession.Name = "MenuSaveSession";
-            this.MenuSaveSession.Size = new System.Drawing.Size(192, 22);
+            this.MenuSaveSession.Size = new System.Drawing.Size(180, 22);
             this.MenuSaveSession.Text = "Сохранить сессию";
-            // 
-            // MenuResetAll
-            // 
-            this.MenuResetAll.Name = "MenuResetAll";
-            this.MenuResetAll.Size = new System.Drawing.Size(192, 22);
-            this.MenuResetAll.Text = "Сбросить параметры";
+            this.MenuSaveSession.Click += new System.EventHandler(this.MenuSaveSession_Click);
             // 
             // SessionFormStatusStrip
             // 
@@ -232,7 +225,6 @@ namespace Measurements.UI.Desktop.Forms
         private System.Windows.Forms.ToolStripMenuItem MenuMenu;
         private System.Windows.Forms.StatusStrip SessionFormStatusStrip;
         private System.Windows.Forms.ToolStripMenuItem MenuSaveSession;
-        private System.Windows.Forms.ToolStripMenuItem MenuResetAll;
         private System.Windows.Forms.ListBox SessionFormListBoxIrrDates;
         private System.Windows.Forms.DataGridView SessionFormDataGridViewIrradiations;
         private System.Windows.Forms.Button SessionFormButtonStart;

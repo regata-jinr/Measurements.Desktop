@@ -17,6 +17,7 @@
             {
                 components.Dispose();
             }
+            Measurements.Core.SessionControllerSingleton.SessionsInfoListHasChanged -= UpdateSessionsTable;
             base.Dispose(disposing);
         }
 
