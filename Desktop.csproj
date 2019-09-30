@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Measurements.UI.Desktop.Forms.Program</StartupObject>
+    <StartupObject>Measurements.UI.Desktop.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>logosmooth.ico</ApplicationIcon>

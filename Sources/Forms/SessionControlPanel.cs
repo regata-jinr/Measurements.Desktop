@@ -14,11 +14,7 @@ namespace Measurements.UI.Desktop.Forms
             try
             {
                 InitializeComponent();
-#if DEBUG
-                SessionControllerSingleton.InitializeDBConnectionString(@"Server=RUMLAB\REGATALOCAL;Database=NAA_DB_TEST;Trusted_Connection=True;User Id=bdrum");
-#else
-            SessionControllerSingleton.InitializeDBConnectionString(connectionString);
-#endif
+                SessionControllerSingleton.InitializeDBConnectionString(connectionString);
 
                 Text = $"Панель управления сессиями | Regata Measurements UI - {LoginForm.CurrentVersion} | [{SessionControllerSingleton.ConnectionStringBuilder.UserID}]";
                 var source = new BindingSource();

@@ -8,11 +8,6 @@ namespace Measurements.UI.Managers
 {
     public static class MessageBoxTemplates
     {
-        static MessageBoxTemplates()
-        {
-            ExceptionHandler.ExceptionEvent += WrapExceptionToMessageBoxAsync;
-        }
-
         //FIXME: now such notification (via message box) paused measurements process. In case of errors
         //       this is correct behaviour, user should decide what he wants to do retry or cancel and change something
         //       but for warnings and successes it should has timeout
@@ -53,7 +48,7 @@ namespace Measurements.UI.Managers
         }
 
 
-        public static void CallStaticCtor() { }
+        public static void UIHandleException() => ExceptionHandler.ExceptionEvent += WrapExceptionToMessageBoxAsync;
 
         private static string MessageTemplate(ref ExceptionEventsArgs exceptionEventsArgs)
         {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Measurements.UI.Desktop.Forms
+namespace Measurements.UI.Desktop
 {
     static class Program
     {
@@ -10,7 +10,7 @@ namespace Measurements.UI.Desktop.Forms
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new LoginForm());
+            Application.Run(new Measurements.UI.Desktop.Forms.LoginForm());
         }
     }
 }

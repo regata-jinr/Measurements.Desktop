@@ -45,6 +45,8 @@ namespace Measurements.UI.Desktop.Forms
             SessionFormMenuStrip.Items.Add(MenuOptions);
 
             SessionFormListBoxIrrDates.SelectedValueChanged += IrrDateSelectionHandler;
+            if (_session.ManagedDetectors.Any())
+                SessionFormListBoxIrrDates.SetSelected(0, true);
             
             _countsForm = new CountsForm(_session.Counts);
             _countsForm.SaveCountsEvent += SaveCounts;
@@ -53,21 +55,27 @@ namespace Measurements.UI.Desktop.Forms
             CountsStatusLabel.Click += CountsStatusLabel_Click;
             SessionFormStatusStrip.Items.Add(CountsStatusLabel);
 
+            _session.MeasurementOfSampleDone += MeasurementDoneHandler;
+
+        }
+
+
+        private void MeasurementDoneHandler(MeasurementInfo currentMeasurement)
+        {
+            FillDisplayedList();
+            HighlightCurrentSample();
         }
 
 
         private void FillDisplayedList()
         {
-
             _displayedList.Clear();
 
-            foreach (var detName in _session.SpreadSamples.Keys)
-            {
-                foreach (var ir in _session.SpreadSamples[detName])
+                foreach (var ir in _session.IrradiationList)
                 {
-                    _displayedList.Add(new DisplayedMeasurementsList() { SetKey = ir.SetKey, SampleNumber = ir.SampleNumber, Container = ir.Container.Value, PositionInContainer = ir.Position.Value, DetName = detName, QueueNumber = _session.SpreadSamples[detName].IndexOf(ir), DeadTime = 0, Height = 0, File = "", Note = "" });
+                    var m = _session.MeasurementList.Where(mi => mi.IrradiationId == ir.Id).First();
+                    _displayedList.Add(new DisplayedMeasurementsList() { SetKey = ir.SetKey, SampleNumber = ir.SampleNumber, Container = ir.Container.HasValue ? ir.Container.Value : 0, PositionInContainer = ir.Position.HasValue ? ir.Position.Value : 0, DetName = m.Detector, QueueNumber = _session.SpreadSamples[m.Detector].IndexOf(ir), DeadTime = 0, Height = m.Height.Value, File = m.FileSpectra ?? "", Note = m.Note ?? "" });
                 }
-            }
         }
 
         //TODO: add heights list and dead time value
@@ -233,6 +241,44 @@ namespace Measurements.UI.Desktop.Forms
 
             SessionControllerSingleton.SessionsInfoListsChangedHaveOccurred();
 
+        }
+
+        private void SessionFormButtonStart_Click(object sender, EventArgs e)
+        {
+            if (_displayedList == null || !_displayedList.Any())
+            {
+                MessageBoxTemplates.ErrorSync("Образцы для измерений не выбраны!");
+                return;
+            }
+
+            if(!_session.ManagedDetectors.Any())
+            {
+                MessageBoxTemplates.ErrorSync("Ни один детектор не подключен к сессии");
+                return;
+            }
+
+            if (_session.Type == null)
+            {
+                MessageBoxTemplates.ErrorSync("Выбирете тип проводимых измерений!");
+                return;
+            }
+
+            if (_session.Counts == 0)
+            {
+                MessageBoxTemplates.ErrorSync("Задайте необходимую продолжительность измерений каждого образца!");
+                return;
+            }
+
+            HighlightCurrentSample();
+            _session.StartMeasurements();
+
+
+        }
+
+
+        private void HighlightCurrentSample()
+        {
+            
         }
 
     }

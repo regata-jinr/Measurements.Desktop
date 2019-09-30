@@ -74,7 +74,7 @@ namespace Measurements.UI.Desktop.Forms
             // MenuSaveSession
             // 
             this.MenuSaveSession.Name = "MenuSaveSession";
-            this.MenuSaveSession.Size = new System.Drawing.Size(180, 22);
+            this.MenuSaveSession.Size = new System.Drawing.Size(177, 22);
             this.MenuSaveSession.Text = "Сохранить сессию";
             this.MenuSaveSession.Click += new System.EventHandler(this.MenuSaveSession_Click);
             // 
@@ -142,6 +142,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormButtonStart.TabIndex = 5;
             this.SessionFormButtonStart.Text = "Start";
             this.SessionFormButtonStart.UseVisualStyleBackColor = false;
+            this.SessionFormButtonStart.Click += new System.EventHandler(this.SessionFormButtonStart_Click);
             // 
             // SessionFormListBoxLabel
             // 

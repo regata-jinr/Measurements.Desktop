@@ -16,10 +16,12 @@ namespace Measurements.UI.Desktop.Forms
 
         public LoginForm()
         {
-
-            MessageBoxTemplates.CallStaticCtor();
+            MessageBoxTemplates.UIHandleException();
             var config = new Measurements.Configurator.ConfigManager();
             _connectionStringBase = config.GenConnectionStringBase;
+#if DEBUG
+            _connectionStringBase = @"Server=RUMLAB\REGATALOCAL;Database=NAA_DB_TEST;Trusted_Connection=True;";
+#endif
             InitializeComponent();
             Text = $"Regata Measurements UI - {CurrentVersion}";
             textBoxLoginFormUser.Focus();
