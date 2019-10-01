@@ -11,6 +11,9 @@ namespace Measurements.UI.Desktop.Forms
     //TODO: add test
     //TODO: add try - catch
     //TODO: rethink exception handler for ui to load async
+    //TODO: change detectors should re draw datagrid view
+    //TODO: change type should re draw datagrid view
+    //TODO: change spread option should re draw datagrid view
     public partial class SessionForm : Form
     {
         private ISession _session;
@@ -40,7 +43,14 @@ namespace Measurements.UI.Desktop.Forms
 
             SpreadOptionsItem = new EnumItem(Enum.GetNames(typeof(SpreadOptions)), "Режим распределения образцов");
             InitializeOptionsMenu(SpreadOptionsItem, SetSpreadMode);
-            SpreadOptionsItem.EnumMenuItem.DropDownItems.OfType<ToolStripMenuItem>().Where(t => t.Text == _session.SpreadOption.ToString()).First().PerformClick();
+            SpreadOptionsItem.EnumMenuItem.DropDownItems.OfType<ToolStripMenuItem>().Where(t => t.Text == _session.SpreadOption.ToString()).First().PerformClick(); 
+            
+            MeasurementsProgressBar = new ToolStripProgressBar();
+            MeasurementsProgressBar.Value = 0;
+            MeasurementsProgressBar.Alignment = ToolStripItemAlignment.Right;
+            SessionFormStatusStrip.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
+            MeasurementsProgressBar.ToolTipText = $"Прогресс измерений по образцам";
+
 
             SessionFormMenuStrip.Items.Add(MenuOptions);
 
@@ -57,25 +67,39 @@ namespace Measurements.UI.Desktop.Forms
 
             _session.MeasurementOfSampleDone += MeasurementDoneHandler;
 
+               
+            SessionFormStatusStrip.Items.Add(MeasurementsProgressBar);
+
+            _session.SessionComplete += SessionCompleteHandler;
         }
 
+        private void SessionCompleteHandler()
+        {
+            EnableControls();
+            MessageBoxTemplates.InfoSync($"Сессия {_session.Name} завершила измерения всех образцов!");
+        }
 
         private void MeasurementDoneHandler(MeasurementInfo currentMeasurement)
         {
             FillDisplayedList();
             HighlightCurrentSample();
-        }
 
+        }
 
         private void FillDisplayedList()
         {
             _displayedList.Clear();
+            if (_session.MeasurementList.Any())
+            {
+                MeasurementsProgressBar.Value = _session.MeasurementList.Count - _session.MeasurementList.Where(m => string.IsNullOrEmpty(m.FileSpectra)).Count();
+                MeasurementsProgressBar.Maximum = _session.MeasurementList.Count();
+            }
 
-                foreach (var ir in _session.IrradiationList)
-                {
-                    var m = _session.MeasurementList.Where(mi => mi.IrradiationId == ir.Id).First();
-                    _displayedList.Add(new DisplayedMeasurementsList() { SetKey = ir.SetKey, SampleNumber = ir.SampleNumber, Container = ir.Container.HasValue ? ir.Container.Value : 0, PositionInContainer = ir.Position.HasValue ? ir.Position.Value : 0, DetName = m.Detector, QueueNumber = _session.SpreadSamples[m.Detector].IndexOf(ir), DeadTime = 0, Height = m.Height.Value, File = m.FileSpectra ?? "", Note = m.Note ?? "" });
-                }
+            foreach (var ir in _session.IrradiationList)
+            {
+                var m = _session.MeasurementList.Where(mi => mi.IrradiationId == ir.Id).First();
+                _displayedList.Add(new DisplayedMeasurementsList() { SetKey = ir.SetKey, SampleNumber = ir.SampleNumber, Container = ir.Container.HasValue ? ir.Container.Value : 0, PositionInContainer = ir.Position.HasValue ? ir.Position.Value : 0, DetName = m.Detector, QueueNumber = _session.SpreadSamples[m.Detector].IndexOf(ir), DeadTime = Math.Round(_session.ManagedDetectors.Where(d => d.Name == m.Detector).First().DeadTime,2), Height = m.Height.Value, File = m.FileSpectra ?? "", Note = m.Note ?? "" });
+            }
         }
 
         //TODO: add heights list and dead time value
@@ -243,6 +267,22 @@ namespace Measurements.UI.Desktop.Forms
 
         }
 
+        private void DisableControls()
+        {
+            SessionFormListBoxIrrDates.Enabled = false;
+            SessionFormMenuStrip.Enabled = false;
+            CountsStatusLabel.Enabled = false;
+
+        }
+
+        private void EnableControls()
+        {
+            SessionFormListBoxIrrDates.Enabled = true;
+            SessionFormMenuStrip.Enabled = true;
+            CountsStatusLabel.Enabled = true;
+
+        }
+
         private void SessionFormButtonStart_Click(object sender, EventArgs e)
         {
             if (_displayedList == null || !_displayedList.Any())
@@ -269,9 +309,9 @@ namespace Measurements.UI.Desktop.Forms
                 return;
             }
 
+            DisableControls();
             HighlightCurrentSample();
             _session.StartMeasurements();
-
 
         }
 
@@ -281,5 +321,10 @@ namespace Measurements.UI.Desktop.Forms
             
         }
 
+        private void SessionFormButtonPause_Click(object sender, EventArgs e)
+        {
+            _session.PauseMeasurements();
+            EnableControls();
+        }
     }
 }

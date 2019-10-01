@@ -19,7 +19,8 @@ namespace Measurements.UI.Desktop.Forms
             {
                 components.Dispose();
             }
-            _countsForm.SaveCountsEvent -= SaveCounts;
+            if (_countsForm != null)
+                _countsForm.SaveCountsEvent -= SaveCounts;
             _countsForm.Dispose();
             _session.Dispose();
             Measurements.Core.SessionControllerSingleton.AvailableDetectorsListHasChanged -= InitializeDetectorDropDownItems;
@@ -46,8 +47,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormButtonStart = new System.Windows.Forms.Button();
             this.SessionFormListBoxLabel = new System.Windows.Forms.Label();
             this.SessionFormIrradiationsDataLabel = new System.Windows.Forms.Label();
-            this.SessionFormButtonStop = new System.Windows.Forms.Button();
-            this.SessionFormButtonClear = new System.Windows.Forms.Button();
+            this.SessionFormButtonPause = new System.Windows.Forms.Button();
             this.MenuOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.SessionFormMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SessionFormDataGridViewIrradiations)).BeginInit();
@@ -88,6 +88,8 @@ namespace Measurements.UI.Desktop.Forms
             // 
             // SessionFormListBoxIrrDates
             // 
+            this.SessionFormListBoxIrrDates.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.SessionFormListBoxIrrDates.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.SessionFormListBoxIrrDates.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SessionFormListBoxIrrDates.FormattingEnabled = true;
@@ -103,6 +105,9 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormDataGridViewIrradiations.AllowUserToDeleteRows = false;
             this.SessionFormDataGridViewIrradiations.AllowUserToResizeColumns = false;
             this.SessionFormDataGridViewIrradiations.AllowUserToResizeRows = false;
+            this.SessionFormDataGridViewIrradiations.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.SessionFormDataGridViewIrradiations.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.SessionFormDataGridViewIrradiations.BackgroundColor = System.Drawing.Color.White;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
@@ -133,6 +138,7 @@ namespace Measurements.UI.Desktop.Forms
             // 
             // SessionFormButtonStart
             // 
+            this.SessionFormButtonStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.SessionFormButtonStart.BackColor = System.Drawing.Color.Green;
             this.SessionFormButtonStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SessionFormButtonStart.ForeColor = System.Drawing.SystemColors.ButtonFace;
@@ -156,6 +162,8 @@ namespace Measurements.UI.Desktop.Forms
             // 
             // SessionFormIrradiationsDataLabel
             // 
+            this.SessionFormIrradiationsDataLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.SessionFormIrradiationsDataLabel.AutoSize = true;
             this.SessionFormIrradiationsDataLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SessionFormIrradiationsDataLabel.Location = new System.Drawing.Point(586, 33);
@@ -164,29 +172,19 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormIrradiationsDataLabel.TabIndex = 8;
             this.SessionFormIrradiationsDataLabel.Text = "Таблица образцов для измерений";
             // 
-            // SessionFormButtonStop
+            // SessionFormButtonPause
             // 
-            this.SessionFormButtonStop.BackColor = System.Drawing.Color.Maroon;
-            this.SessionFormButtonStop.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SessionFormButtonStop.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.SessionFormButtonStop.Location = new System.Drawing.Point(1069, 382);
-            this.SessionFormButtonStop.Name = "SessionFormButtonStop";
-            this.SessionFormButtonStop.Size = new System.Drawing.Size(75, 43);
-            this.SessionFormButtonStop.TabIndex = 9;
-            this.SessionFormButtonStop.Text = "Stop";
-            this.SessionFormButtonStop.UseVisualStyleBackColor = false;
-            // 
-            // SessionFormButtonClear
-            // 
-            this.SessionFormButtonClear.BackColor = System.Drawing.Color.LightGray;
-            this.SessionFormButtonClear.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SessionFormButtonClear.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.SessionFormButtonClear.Location = new System.Drawing.Point(1175, 382);
-            this.SessionFormButtonClear.Name = "SessionFormButtonClear";
-            this.SessionFormButtonClear.Size = new System.Drawing.Size(75, 43);
-            this.SessionFormButtonClear.TabIndex = 10;
-            this.SessionFormButtonClear.Text = "Clear";
-            this.SessionFormButtonClear.UseVisualStyleBackColor = false;
+            this.SessionFormButtonPause.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.SessionFormButtonPause.BackColor = System.Drawing.Color.Maroon;
+            this.SessionFormButtonPause.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SessionFormButtonPause.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.SessionFormButtonPause.Location = new System.Drawing.Point(1197, 382);
+            this.SessionFormButtonPause.Name = "SessionFormButtonPause";
+            this.SessionFormButtonPause.Size = new System.Drawing.Size(75, 43);
+            this.SessionFormButtonPause.TabIndex = 9;
+            this.SessionFormButtonPause.Text = "Pause";
+            this.SessionFormButtonPause.UseVisualStyleBackColor = false;
+            this.SessionFormButtonPause.Click += new System.EventHandler(this.SessionFormButtonPause_Click);
             // 
             // MenuOptions
             // 
@@ -199,8 +197,7 @@ namespace Measurements.UI.Desktop.Forms
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1365, 450);
-            this.Controls.Add(this.SessionFormButtonClear);
-            this.Controls.Add(this.SessionFormButtonStop);
+            this.Controls.Add(this.SessionFormButtonPause);
             this.Controls.Add(this.SessionFormIrradiationsDataLabel);
             this.Controls.Add(this.SessionFormListBoxLabel);
             this.Controls.Add(this.SessionFormButtonStart);
@@ -231,8 +228,7 @@ namespace Measurements.UI.Desktop.Forms
         private System.Windows.Forms.Button SessionFormButtonStart;
         private System.Windows.Forms.Label SessionFormListBoxLabel;
         private System.Windows.Forms.Label SessionFormIrradiationsDataLabel;
-        private System.Windows.Forms.Button SessionFormButtonStop;
-        private System.Windows.Forms.Button SessionFormButtonClear;
+        private System.Windows.Forms.Button SessionFormButtonPause;
 
 
         // custom components
@@ -247,6 +243,7 @@ namespace Measurements.UI.Desktop.Forms
         private System.Windows.Forms.ToolStripStatusLabel CountsStatusLabel;
         private CountsForm _countsForm;
         private System.Windows.Forms.ToolStripDropDownButton HeightDropDownButton;
-
+        private System.Windows.Forms.ToolStripProgressBar MeasurementsProgressBar;
+    
     }
 }

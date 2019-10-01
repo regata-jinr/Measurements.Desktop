@@ -31,6 +31,11 @@ namespace Measurements.UI.Managers
             await InfoTask(message);
         }
 
+        public static void InfoSync(string message)
+        {
+            InfoTask(message).Wait();
+        }
+
         public static async void WarningAsync(string message)
         {
             await WarningTask(message);
