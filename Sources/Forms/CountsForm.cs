@@ -40,6 +40,7 @@ namespace Measurements.UI.Desktop.Forms
                 return;
             }
             SaveCountsEvent?.Invoke(counts);
+            Hide();
         }
 
         

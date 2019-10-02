@@ -21,6 +21,8 @@ namespace Measurements.UI.Desktop.Forms
             }
             if (_countsForm != null)
                 _countsForm.SaveCountsEvent -= SaveCounts;
+              
+          
             _countsForm.Dispose();
             _session.Dispose();
             Measurements.Core.SessionControllerSingleton.AvailableDetectorsListHasChanged -= InitializeDetectorDropDownItems;
@@ -44,6 +46,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormStatusStrip = new System.Windows.Forms.StatusStrip();
             this.SessionFormListBoxIrrDates = new System.Windows.Forms.ListBox();
             this.SessionFormDataGridViewIrradiations = new System.Windows.Forms.DataGridView();
+            //this.SessionFormDataGridViewIrradiations = new System.Windows.Forms.DataGridView();
             this.SessionFormButtonStart = new System.Windows.Forms.Button();
             this.SessionFormListBoxLabel = new System.Windows.Forms.Label();
             this.SessionFormIrradiationsDataLabel = new System.Windows.Forms.Label();

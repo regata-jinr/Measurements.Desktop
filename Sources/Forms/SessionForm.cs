@@ -8,21 +8,23 @@ using Measurements.UI.Managers;
 
 namespace Measurements.UI.Desktop.Forms
 {
-    //TODO: add test
+    //TODO: add tests
     //TODO: add try - catch
     //TODO: rethink exception handler for ui to load async
     //TODO: change detectors should re draw datagrid view
     //TODO: change type should re draw datagrid view
     //TODO: change spread option should re draw datagrid view
+    //TODO: reorganize the code
+
     public partial class SessionForm : Form
     {
         private ISession _session;
-        private List<DisplayedMeasurementsList> _displayedList;
+        private SortableBindingList<DisplayedMeasurementsList> _displayedList;
         private bool _isInitialized;
         private Dictionary<bool, System.Drawing.Color> ConnectionStatusColor;
         public SessionForm(ISession session)
         {
-            _displayedList = new List<DisplayedMeasurementsList>();
+            _displayedList = new SortableBindingList<DisplayedMeasurementsList>();
             ConnectionStatusColor = new Dictionary<bool, System.Drawing.Color>() { { false, System.Drawing.Color.Red }, { true, System.Drawing.Color.Green } };
             _session = session;
             _isInitialized = true;
@@ -81,6 +83,8 @@ namespace Measurements.UI.Desktop.Forms
 
         private void MeasurementDoneHandler(MeasurementInfo currentMeasurement)
         {
+            if (_session.MeasurementList.Any())
+                MeasurementsProgressBar.Value++;
             FillDisplayedList();
             HighlightCurrentSample();
 
@@ -90,10 +94,7 @@ namespace Measurements.UI.Desktop.Forms
         {
             _displayedList.Clear();
             if (_session.MeasurementList.Any())
-            {
-                MeasurementsProgressBar.Value = _session.MeasurementList.Count - _session.MeasurementList.Where(m => string.IsNullOrEmpty(m.FileSpectra)).Count();
                 MeasurementsProgressBar.Maximum = _session.MeasurementList.Count();
-            }
 
             foreach (var ir in _session.IrradiationList)
             {
