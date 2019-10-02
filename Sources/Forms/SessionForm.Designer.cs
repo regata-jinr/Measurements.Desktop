@@ -37,6 +37,7 @@ namespace Measurements.UI.Desktop.Forms
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SessionForm));
@@ -45,15 +46,16 @@ namespace Measurements.UI.Desktop.Forms
             this.MenuSaveSession = new System.Windows.Forms.ToolStripMenuItem();
             this.SessionFormStatusStrip = new System.Windows.Forms.StatusStrip();
             this.SessionFormListBoxIrrDates = new System.Windows.Forms.ListBox();
-            this.SessionFormDataGridViewIrradiations = new System.Windows.Forms.DataGridView();
-            //this.SessionFormDataGridViewIrradiations = new System.Windows.Forms.DataGridView();
             this.SessionFormButtonStart = new System.Windows.Forms.Button();
             this.SessionFormListBoxLabel = new System.Windows.Forms.Label();
             this.SessionFormIrradiationsDataLabel = new System.Windows.Forms.Label();
             this.SessionFormButtonPause = new System.Windows.Forms.Button();
             this.MenuOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.SessionFormadvancedDataGridView = new Zuby.ADGV.AdvancedDataGridView();
+            this.SessionFormDisplayedDataBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.SessionFormMenuStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SessionFormDataGridViewIrradiations)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SessionFormadvancedDataGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SessionFormDisplayedDataBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // SessionFormMenuStrip
@@ -101,43 +103,6 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormListBoxIrrDates.Name = "SessionFormListBoxIrrDates";
             this.SessionFormListBoxIrrDates.Size = new System.Drawing.Size(116, 306);
             this.SessionFormListBoxIrrDates.TabIndex = 2;
-            // 
-            // SessionFormDataGridViewIrradiations
-            // 
-            this.SessionFormDataGridViewIrradiations.AllowUserToAddRows = false;
-            this.SessionFormDataGridViewIrradiations.AllowUserToDeleteRows = false;
-            this.SessionFormDataGridViewIrradiations.AllowUserToResizeColumns = false;
-            this.SessionFormDataGridViewIrradiations.AllowUserToResizeRows = false;
-            this.SessionFormDataGridViewIrradiations.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.SessionFormDataGridViewIrradiations.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.SessionFormDataGridViewIrradiations.BackgroundColor = System.Drawing.Color.White;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.SessionFormDataGridViewIrradiations.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            this.SessionFormDataGridViewIrradiations.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.SessionFormDataGridViewIrradiations.DefaultCellStyle = dataGridViewCellStyle2;
-            this.SessionFormDataGridViewIrradiations.Location = new System.Drawing.Point(134, 56);
-            this.SessionFormDataGridViewIrradiations.Name = "SessionFormDataGridViewIrradiations";
-            this.SessionFormDataGridViewIrradiations.ReadOnly = true;
-            this.SessionFormDataGridViewIrradiations.RowHeadersVisible = false;
-            this.SessionFormDataGridViewIrradiations.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.SessionFormDataGridViewIrradiations.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.SessionFormDataGridViewIrradiations.Size = new System.Drawing.Size(1219, 306);
-            this.SessionFormDataGridViewIrradiations.TabIndex = 4;
             // 
             // SessionFormButtonStart
             // 
@@ -195,16 +160,53 @@ namespace Measurements.UI.Desktop.Forms
             this.MenuOptions.Size = new System.Drawing.Size(32, 19);
             this.MenuOptions.Text = "Опции";
             // 
+            // SessionFormadvancedDataGridView
+            // 
+            this.SessionFormadvancedDataGridView.AllowUserToAddRows = false;
+            this.SessionFormadvancedDataGridView.AllowUserToDeleteRows = false;
+            this.SessionFormadvancedDataGridView.AllowUserToResizeRows = false;
+            this.SessionFormadvancedDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.SessionFormadvancedDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.SessionFormadvancedDataGridView.BackgroundColor = System.Drawing.Color.White;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.SessionFormadvancedDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.SessionFormadvancedDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.SessionFormadvancedDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
+            this.SessionFormadvancedDataGridView.FilterAndSortEnabled = true;
+            this.SessionFormadvancedDataGridView.Location = new System.Drawing.Point(134, 56);
+            this.SessionFormadvancedDataGridView.Name = "SessionFormadvancedDataGridView";
+            this.SessionFormadvancedDataGridView.ReadOnly = true;
+            this.SessionFormadvancedDataGridView.RowHeadersVisible = false;
+            this.SessionFormadvancedDataGridView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.SessionFormadvancedDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this.SessionFormadvancedDataGridView.Size = new System.Drawing.Size(1219, 306);
+            this.SessionFormadvancedDataGridView.TabIndex = 10;
+            // 
             // SessionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1365, 450);
+            this.Controls.Add(this.SessionFormadvancedDataGridView);
             this.Controls.Add(this.SessionFormButtonPause);
             this.Controls.Add(this.SessionFormIrradiationsDataLabel);
             this.Controls.Add(this.SessionFormListBoxLabel);
             this.Controls.Add(this.SessionFormButtonStart);
-            this.Controls.Add(this.SessionFormDataGridViewIrradiations);
             this.Controls.Add(this.SessionFormListBoxIrrDates);
             this.Controls.Add(this.SessionFormStatusStrip);
             this.Controls.Add(this.SessionFormMenuStrip);
@@ -214,7 +216,8 @@ namespace Measurements.UI.Desktop.Forms
             this.Text = "SessionForm";
             this.SessionFormMenuStrip.ResumeLayout(false);
             this.SessionFormMenuStrip.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SessionFormDataGridViewIrradiations)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SessionFormadvancedDataGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SessionFormDisplayedDataBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -227,7 +230,6 @@ namespace Measurements.UI.Desktop.Forms
         private System.Windows.Forms.StatusStrip SessionFormStatusStrip;
         private System.Windows.Forms.ToolStripMenuItem MenuSaveSession;
         private System.Windows.Forms.ListBox SessionFormListBoxIrrDates;
-        private System.Windows.Forms.DataGridView SessionFormDataGridViewIrradiations;
         private System.Windows.Forms.Button SessionFormButtonStart;
         private System.Windows.Forms.Label SessionFormListBoxLabel;
         private System.Windows.Forms.Label SessionFormIrradiationsDataLabel;
@@ -247,6 +249,7 @@ namespace Measurements.UI.Desktop.Forms
         private CountsForm _countsForm;
         private System.Windows.Forms.ToolStripDropDownButton HeightDropDownButton;
         private System.Windows.Forms.ToolStripProgressBar MeasurementsProgressBar;
-    
+        private Zuby.ADGV.AdvancedDataGridView SessionFormadvancedDataGridView;
+        private System.Windows.Forms.BindingSource SessionFormDisplayedDataBindingSource;
     }
 }

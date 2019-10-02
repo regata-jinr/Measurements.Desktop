@@ -5,6 +5,7 @@ using Measurements.Core;
 using System.Linq;
 using Measurements.UI.Desktop.Components;
 using Measurements.UI.Managers;
+using System.Data;
 
 namespace Measurements.UI.Desktop.Forms
 {
@@ -19,16 +20,20 @@ namespace Measurements.UI.Desktop.Forms
     public partial class SessionForm : Form
     {
         private ISession _session;
-        private SortableBindingList<DisplayedMeasurementsList> _displayedList;
+        private DataTable _displayedDataTable;
+        private DataSet _displayedDataSet;
         private bool _isInitialized;
         private Dictionary<bool, System.Drawing.Color> ConnectionStatusColor;
         public SessionForm(ISession session)
         {
-            _displayedList = new SortableBindingList<DisplayedMeasurementsList>();
+           
             ConnectionStatusColor = new Dictionary<bool, System.Drawing.Color>() { { false, System.Drawing.Color.Red }, { true, System.Drawing.Color.Green } };
             _session = session;
             _isInitialized = true;
             InitializeComponent();
+
+            InitializeDisplayedTable();
+
             Text = $"Сессия измерений [{session.Name}]| Regata Measurements UI - {LoginForm.CurrentVersion} | [{SessionControllerSingleton.ConnectionStringBuilder.UserID}]";
             SessionFormStatusStrip.ShowItemToolTips = true;
             ConnectionStatus = new ToolStripStatusLabel() { Name = "ConnectionStatusItem", Text = " ", ToolTipText = "Состояние соединения с БД", BackColor = ConnectionStatusColor[SessionControllerSingleton.TestDBConnection()] };
@@ -73,6 +78,38 @@ namespace Measurements.UI.Desktop.Forms
             SessionFormStatusStrip.Items.Add(MeasurementsProgressBar);
 
             _session.SessionComplete += SessionCompleteHandler;
+
+            FillDisplayedTable();
+
+
+        }
+
+
+        private void InitializeDisplayedTable()
+        {
+            _displayedDataSet = new DataSet("DisplayedDataSet");
+            _displayedDataTable = new DataTable();
+            SessionFormDisplayedDataBindingSource.DataSource = _displayedDataSet;
+            SessionFormadvancedDataGridView.SetDoubleBuffered();
+            SessionFormadvancedDataGridView.DataSource = SessionFormDisplayedDataBindingSource;
+
+            _displayedDataTable = _displayedDataSet.Tables.Add("DisplayedTable");
+            _displayedDataTable.Columns.Add("SetKey", typeof(string));
+            _displayedDataTable.Columns.Add("SampleNumber", typeof(string));
+            _displayedDataTable.Columns.Add("Container", typeof(int));
+            _displayedDataTable.Columns.Add("PositionInContainer", typeof(int));
+            _displayedDataTable.Columns.Add("Detector", typeof(string));
+            _displayedDataTable.Columns.Add("DiskPosition", typeof(int));
+            _displayedDataTable.Columns.Add("DeadTime", typeof(decimal));
+            _displayedDataTable.Columns.Add("Height", typeof(decimal));
+            _displayedDataTable.Columns.Add("File", typeof(string));
+            _displayedDataTable.Columns.Add("Note", typeof(string));
+
+
+            SessionFormDisplayedDataBindingSource.DataMember = _displayedDataTable.TableName;
+
+            //advancedDataGridViewSearchToolBar_main.SetColumns(advancedDataGridView_main.Columns);
+
         }
 
         private void SessionCompleteHandler()
@@ -85,21 +122,46 @@ namespace Measurements.UI.Desktop.Forms
         {
             if (_session.MeasurementList.Any())
                 MeasurementsProgressBar.Value++;
-            FillDisplayedList();
+
+            var currentRow = _displayedDataTable.Rows.OfType<DataRow>().Where(dr => dr.ItemArray[0].ToString() == currentMeasurement.SetKey && dr.ItemArray[1].ToString() == currentMeasurement.SampleNumber).First();
+
+            int currentRowIndex = _displayedDataTable.Rows.IndexOf(currentRow);
+
+            //_displayedDataTable.Rows[currentRowIndex].ItemArray[6] = _session.ManagedDetectors.Where(d => d.Name == currentMeasurement.Detector).First().DeadTime;
+            //_displayedDataTable.Rows[currentRowIndex].ItemArray[7] = currentMeasurement.Height;
+            //_displayedDataTable.Rows[currentRowIndex].ItemArray[8] = currentMeasurement.FileSpectra;
+            SessionFormadvancedDataGridView.Rows[currentRowIndex].Cells[6].Value = Math.Round(_session.ManagedDetectors.Where(d => d.Name == currentMeasurement.Detector).First().DeadTime, 2);
+            SessionFormadvancedDataGridView.Rows[currentRowIndex].Cells[7].Value = currentMeasurement.Height;
+            SessionFormadvancedDataGridView.Rows[currentRowIndex].Cells[8].Value = currentMeasurement.FileSpectra;
+
+
             HighlightCurrentSample();
 
         }
 
-        private void FillDisplayedList()
+        private void FillDisplayedTable()
         {
-            _displayedList.Clear();
+            _displayedDataTable.Clear();
             if (_session.MeasurementList.Any())
                 MeasurementsProgressBar.Maximum = _session.MeasurementList.Count();
 
             foreach (var ir in _session.IrradiationList)
             {
                 var m = _session.MeasurementList.Where(mi => mi.IrradiationId == ir.Id).First();
-                _displayedList.Add(new DisplayedMeasurementsList() { SetKey = ir.SetKey, SampleNumber = ir.SampleNumber, Container = ir.Container.HasValue ? ir.Container.Value : 0, PositionInContainer = ir.Position.HasValue ? ir.Position.Value : 0, DetName = m.Detector, QueueNumber = _session.SpreadSamples[m.Detector].IndexOf(ir), DeadTime = Math.Round(_session.ManagedDetectors.Where(d => d.Name == m.Detector).First().DeadTime,2), Height = m.Height.Value, File = m.FileSpectra ?? "", Note = m.Note ?? "" });
+                var row = new object[] 
+                { 
+                    ir.SetKey,
+                    ir.SampleNumber,
+                    ir.Container.HasValue ? ir.Container.Value : 0,
+                    ir.Position.HasValue ? ir.Position.Value : 0,
+                    m.Detector, _session.SpreadSamples[m.Detector].IndexOf(ir),
+                    Math.Round(_session.ManagedDetectors.Where(d => d.Name == m.Detector).First().DeadTime,2),
+                    m.Height.Value,
+                    m.FileSpectra ?? "",
+                    m.Note ?? "" 
+                };
+
+                _displayedDataTable.Rows.Add(row);
             }
         }
 
@@ -132,9 +194,9 @@ namespace Measurements.UI.Desktop.Forms
         private void IrrDateSelectionHandler(object sender, EventArgs eventArgs)
         {
             _session.CurrentIrradiationDate = (DateTime)SessionFormListBoxIrrDates.SelectedItem;
-            SessionFormDataGridViewIrradiations.DataSource = null;
-            FillDisplayedList();
-            SessionFormDataGridViewIrradiations.DataSource = _displayedList;
+            //SessionFormDataGridViewIrradiations.DataSource = null;
+            FillDisplayedTable();
+            //SessionFormDataGridViewIrradiations.DataSource = _displayedList;
         }
 
         private void InitializeTypeDropDownItems()
@@ -286,7 +348,7 @@ namespace Measurements.UI.Desktop.Forms
 
         private void SessionFormButtonStart_Click(object sender, EventArgs e)
         {
-            if (_displayedList == null || !_displayedList.Any())
+            if (!_session.MeasurementList.Any() || !_displayedDataTable.Rows.OfType<object>().Any())
             {
                 MessageBoxTemplates.ErrorSync("Образцы для измерений не выбраны!");
                 return;
