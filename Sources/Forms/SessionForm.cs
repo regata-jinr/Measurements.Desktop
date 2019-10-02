@@ -6,6 +6,7 @@ using System.Linq;
 using Measurements.UI.Desktop.Components;
 using Measurements.UI.Managers;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace Measurements.UI.Desktop.Forms
 {
@@ -346,7 +347,7 @@ namespace Measurements.UI.Desktop.Forms
 
         }
 
-        private void SessionFormButtonStart_Click(object sender, EventArgs e)
+        private async void SessionFormButtonStart_Click(object sender, EventArgs e)
         {
             if (!_session.MeasurementList.Any() || !_displayedDataTable.Rows.OfType<object>().Any())
             {
@@ -372,9 +373,15 @@ namespace Measurements.UI.Desktop.Forms
                 return;
             }
 
+           await ProcessManager.RunMvcg();
+
             DisableControls();
             HighlightCurrentSample();
+
             _session.StartMeasurements();
+
+            foreach (var d in _session.ManagedDetectors)
+               await ProcessManager.ShowDetectorInMvcg(d.Name);
 
         }
 
@@ -388,6 +395,42 @@ namespace Measurements.UI.Desktop.Forms
         {
             _session.PauseMeasurements();
             EnableControls();
+        }
+
+        private async void SessionFormButtonStop_Click(object sender, EventArgs e)
+        {
+            var r = MessageBox.Show($"Вы пытаетесь остановить измерения.{Environment.NewLine}Если Вы хотите сохранить файл спектра, а также информацию о текущих измерениях в базу данных, а затем остановить измерения, нажмите Yes.{Environment.NewLine}Если Вы хотите сохранить файл спектра, но не хотите сохранять информацию в базу данных и при этом хотите остановить измерения нажмите - No.{Environment.NewLine}Если Вы хотите продолжить измерения нажмите - Cancel.", "Прерывание процесса измерений",MessageBoxButtons.YesNoCancel,MessageBoxIcon.Exclamation);
+            if (r == DialogResult.Yes)
+            {
+                foreach (var d in _session.ManagedDetectors)
+                {
+                    var cd = d;
+                    _session.SaveSpectra(ref cd);
+                    _session.SaveMeasurement(ref cd);
+                }
+                _session.StopMeasurements();
+                EnableControls();
+                await ProcessManager.CloseMvcg();
+                return;
+            }
+
+            if (r == DialogResult.No)
+            {
+                foreach (var d in _session.ManagedDetectors)
+                {
+                    var cd = d;
+                    _session.SaveSpectra(ref cd);
+                }
+                _session.StopMeasurements();
+                EnableControls();
+                await ProcessManager.CloseMvcg();
+                return;
+            }
+        }
+
+        private void SessionFormButtonClear_Click(object sender, EventArgs e)
+        {
+            _session.ClearMeasurements();
         }
     }
 }

@@ -53,6 +53,8 @@ namespace Measurements.UI.Desktop.Forms
             this.MenuOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.SessionFormadvancedDataGridView = new Zuby.ADGV.AdvancedDataGridView();
             this.SessionFormDisplayedDataBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.SessionFormButtonStop = new System.Windows.Forms.Button();
+            this.SessionFormButtonClear = new System.Windows.Forms.Button();
             this.SessionFormMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SessionFormadvancedDataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SessionFormDisplayedDataBindingSource)).BeginInit();
@@ -143,7 +145,7 @@ namespace Measurements.UI.Desktop.Forms
             // SessionFormButtonPause
             // 
             this.SessionFormButtonPause.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.SessionFormButtonPause.BackColor = System.Drawing.Color.Maroon;
+            this.SessionFormButtonPause.BackColor = System.Drawing.Color.DimGray;
             this.SessionFormButtonPause.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SessionFormButtonPause.ForeColor = System.Drawing.SystemColors.ButtonFace;
             this.SessionFormButtonPause.Location = new System.Drawing.Point(1197, 382);
@@ -197,11 +199,41 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormadvancedDataGridView.Size = new System.Drawing.Size(1219, 306);
             this.SessionFormadvancedDataGridView.TabIndex = 10;
             // 
+            // SessionFormButtonStop
+            // 
+            this.SessionFormButtonStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.SessionFormButtonStop.BackColor = System.Drawing.Color.Maroon;
+            this.SessionFormButtonStop.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SessionFormButtonStop.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.SessionFormButtonStop.Location = new System.Drawing.Point(1035, 382);
+            this.SessionFormButtonStop.Name = "SessionFormButtonStop";
+            this.SessionFormButtonStop.Size = new System.Drawing.Size(75, 43);
+            this.SessionFormButtonStop.TabIndex = 11;
+            this.SessionFormButtonStop.Text = "Stop";
+            this.SessionFormButtonStop.UseVisualStyleBackColor = false;
+            this.SessionFormButtonStop.Click += new System.EventHandler(this.SessionFormButtonStop_Click);
+            // 
+            // SessionFormButtonClear
+            // 
+            this.SessionFormButtonClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.SessionFormButtonClear.BackColor = System.Drawing.Color.White;
+            this.SessionFormButtonClear.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SessionFormButtonClear.ForeColor = System.Drawing.Color.Black;
+            this.SessionFormButtonClear.Location = new System.Drawing.Point(1116, 382);
+            this.SessionFormButtonClear.Name = "SessionFormButtonClear";
+            this.SessionFormButtonClear.Size = new System.Drawing.Size(75, 43);
+            this.SessionFormButtonClear.TabIndex = 12;
+            this.SessionFormButtonClear.Text = "Clear";
+            this.SessionFormButtonClear.UseVisualStyleBackColor = false;
+            this.SessionFormButtonClear.Click += new System.EventHandler(this.SessionFormButtonClear_Click);
+            // 
             // SessionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1365, 450);
+            this.Controls.Add(this.SessionFormButtonClear);
+            this.Controls.Add(this.SessionFormButtonStop);
             this.Controls.Add(this.SessionFormadvancedDataGridView);
             this.Controls.Add(this.SessionFormButtonPause);
             this.Controls.Add(this.SessionFormIrradiationsDataLabel);
@@ -251,5 +283,7 @@ namespace Measurements.UI.Desktop.Forms
         private System.Windows.Forms.ToolStripProgressBar MeasurementsProgressBar;
         private Zuby.ADGV.AdvancedDataGridView SessionFormadvancedDataGridView;
         private System.Windows.Forms.BindingSource SessionFormDisplayedDataBindingSource;
+        private System.Windows.Forms.Button SessionFormButtonStop;
+        private System.Windows.Forms.Button SessionFormButtonClear;
     }
 }

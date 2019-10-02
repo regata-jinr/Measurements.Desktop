@@ -5,26 +5,26 @@ using System.Text;
 
 namespace Measurements.UI.Managers
 {
-    public class ProcessManager
+    public static class ProcessManager
     {
         private const int _timeOut = 5;
 
         //TODO: find out how to check if it open so don't open it again
+        public static async Task<ProcessResult> RunMvcg()
+        {
+            var result = await ExecuteShellCommand("putview.exe", @"/NO_DATASRC");
+            return result;  
+        }
+
         public static async Task<ProcessResult> ShowDetectorInMvcg(string det)
         {
-            var result = await ExecuteShellCommand("putview.exe", $"DET:{det} /READ_ONLY");
+            var result = await ExecuteShellCommand("pvopen.exe", $"DET:{det} //READ_ONLY");
             return result;  
         }
 
-        public static async Task<ProcessResult> OpenDetector(string det)
+        public static async Task<ProcessResult> CloseMvcg()
         {
-            var result = await ExecuteShellCommand("pvopen.exe", $"DET:{det} /READ_ONLY");
-            return result;  
-        }
-
-        public static async Task<ProcessResult> CloseDetector(string det)
-        {
-            var result = await  ExecuteShellCommand("pvclose.exe", $"DET:{det}");
+            var result = await  ExecuteShellCommand("endview.exe", "");
             return result;  
         }
 
