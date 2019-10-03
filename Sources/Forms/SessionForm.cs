@@ -223,6 +223,7 @@ namespace Measurements.UI.Desktop.Forms
             _session.Type = type;
             SessionFormListBoxIrrDates.DataSource = null; 
             SessionFormListBoxIrrDates.DataSource = _session.IrradiationDateList;
+            FillDisplayedTable();
         }
         private void SetCountMode(string option)
         {
@@ -240,6 +241,7 @@ namespace Measurements.UI.Desktop.Forms
                 _session.SpreadOption = so;
             else
                 _session.SpreadOption = SpreadOptions.container;
+            FillDisplayedTable();
         }
 
 
@@ -287,12 +289,8 @@ namespace Measurements.UI.Desktop.Forms
             if (_isInitialized)
                 SessionFormMenuStrip.Items.Add(DetectorsDropDownMenu);
 
-            //TODO: detectors menu close after click
-            //      such implementation show menu on inactive session when available detectors have occurred
-            //if (!_isInitialized)
-            //    DetectorsDropDownMenu.ShowDropDown();
-
             _isInitialized = false;
+
         }
 
         private void RemoveDetectorsFromStatusLabel()
@@ -344,10 +342,9 @@ namespace Measurements.UI.Desktop.Forms
             SessionFormListBoxIrrDates.Enabled = true;
             SessionFormMenuStrip.Enabled = true;
             CountsStatusLabel.Enabled = true;
-
         }
 
-        private async void SessionFormButtonStart_Click(object sender, EventArgs e)
+        private void SessionFormButtonStart_Click(object sender, EventArgs e)
         {
             if (!_session.MeasurementList.Any() || !_displayedDataTable.Rows.OfType<object>().Any())
             {
@@ -373,16 +370,20 @@ namespace Measurements.UI.Desktop.Forms
                 return;
             }
 
-           await ProcessManager.RunMvcg();
+            ProcessManager.RunMvcg();
+            System.Threading.Thread.Sleep(1000);
+            foreach (var d in _session.ManagedDetectors)
+            {
+                d.Disconnect();
+                ProcessManager.ShowDetectorInMvcg(d.Name);
+                System.Threading.Thread.Sleep(1000);
+                d.Connect();
+            }
 
             DisableControls();
             HighlightCurrentSample();
 
             _session.StartMeasurements();
-
-            foreach (var d in _session.ManagedDetectors)
-               await ProcessManager.ShowDetectorInMvcg(d.Name);
-
         }
 
 
@@ -397,33 +398,40 @@ namespace Measurements.UI.Desktop.Forms
             EnableControls();
         }
 
-        private async void SessionFormButtonStop_Click(object sender, EventArgs e)
+        private void SessionFormButtonStop_Click(object sender, EventArgs e)
         {
             var r = MessageBox.Show($"Вы пытаетесь остановить измерения.{Environment.NewLine}Если Вы хотите сохранить файл спектра, а также информацию о текущих измерениях в базу данных, а затем остановить измерения, нажмите Yes.{Environment.NewLine}Если Вы хотите сохранить файл спектра, но не хотите сохранять информацию в базу данных и при этом хотите остановить измерения нажмите - No.{Environment.NewLine}Если Вы хотите продолжить измерения нажмите - Cancel.", "Прерывание процесса измерений",MessageBoxButtons.YesNoCancel,MessageBoxIcon.Exclamation);
             if (r == DialogResult.Yes)
             {
+                _session.PauseMeasurements();
                 foreach (var d in _session.ManagedDetectors)
                 {
                     var cd = d;
                     _session.SaveSpectra(ref cd);
                     _session.SaveMeasurement(ref cd);
+                    ProcessManager.CloseDetector(d.Name);
                 }
                 _session.StopMeasurements();
                 EnableControls();
-                await ProcessManager.CloseMvcg();
+                
+                ProcessManager.CloseMvcg();
+                System.Threading.Thread.Sleep(2000);
                 return;
             }
 
             if (r == DialogResult.No)
             {
+                _session.PauseMeasurements();
                 foreach (var d in _session.ManagedDetectors)
                 {
                     var cd = d;
                     _session.SaveSpectra(ref cd);
+                    ProcessManager.CloseDetector(d.Name);
                 }
                 _session.StopMeasurements();
                 EnableControls();
-                await ProcessManager.CloseMvcg();
+                ProcessManager.CloseMvcg();
+                System.Threading.Thread.Sleep(2000);
                 return;
             }
         }

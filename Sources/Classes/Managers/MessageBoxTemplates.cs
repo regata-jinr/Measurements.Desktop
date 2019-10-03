@@ -57,16 +57,27 @@ namespace Measurements.UI.Managers
 
         private static string MessageTemplate(ref ExceptionEventsArgs exceptionEventsArgs)
         {
-            var stringBuilder = new StringBuilder();
-            var ex = exceptionEventsArgs.exception;
-            stringBuilder.Append($"Assembly name: {ex.Data["Assembly"].ToString()}{Environment.NewLine}");
-            stringBuilder.Append($"Instanse name: {ex.TargetSite.DeclaringType}{Environment.NewLine}");
-            stringBuilder.Append($"Member type:   {ex.TargetSite.MemberType}{Environment.NewLine}");
-            stringBuilder.Append($"Member name:   {ex.TargetSite.Name}{Environment.NewLine}");
-            stringBuilder.Append($"Message:       {ex.Message}{Environment.NewLine}");
-            stringBuilder.Append($"Stack trace:   {ex.StackTrace}");
+            try
+            {
+                var stringBuilder = new StringBuilder();
+                var ex = exceptionEventsArgs.exception;
+                if (ex.Data != null)
+                    stringBuilder.Append($"Assembly name: {ex.Data["Assembly"].ToString()}{Environment.NewLine}");
+                if (ex.TargetSite != null)
+                {
+                    stringBuilder.Append($"Instanse name: {ex.TargetSite.DeclaringType}{Environment.NewLine}");
+                    stringBuilder.Append($"Member type:   {ex.TargetSite.MemberType}{Environment.NewLine}");
+                    stringBuilder.Append($"Member name:   {ex.TargetSite.Name}{Environment.NewLine}");
+                }
+                stringBuilder.Append($"Message:       {ex.Message}{Environment.NewLine}");
+                stringBuilder.Append($"Stack trace:   {ex.StackTrace}");
 
-            return stringBuilder.ToString();
+                return stringBuilder.ToString();
+            }
+            catch (Exception e)
+            {
+                return $"Something wrong with exception handlers!{Environment.NewLine}{e.ToString()}";
+            }
         }
 
         public static async void WrapExceptionToMessageBoxAsync(ExceptionEventsArgs eventsArgs)

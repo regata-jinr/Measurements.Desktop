@@ -7,22 +7,23 @@ namespace Measurements.UI.Managers
 {
     public static class ProcessManager
     {
+        //TODO: async code doesn't work!
+
         private const int _timeOut = 5;
 
-        //TODO: find out how to check if it open so don't open it again
-        public static async Task<ProcessResult> RunMvcg()
+        public static async Task<ProcessResult> RunMvcgAsync()
         {
             var result = await ExecuteShellCommand("putview.exe", @"/NO_DATASRC");
             return result;  
         }
 
-        public static async Task<ProcessResult> ShowDetectorInMvcg(string det)
+        public static async Task<ProcessResult> ShowDetectorInMvcgAsync(string det)
         {
             var result = await ExecuteShellCommand("pvopen.exe", $"DET:{det} //READ_ONLY");
             return result;  
         }
 
-        public static async Task<ProcessResult> CloseMvcg()
+        public static async Task<ProcessResult> CloseMvcgAsync()
         {
             var result = await  ExecuteShellCommand("endview.exe", "");
             return result;  
@@ -142,13 +143,41 @@ namespace Measurements.UI.Managers
             return Task.Run(() => process.WaitForExit(timeout));
         }
 
-
         public struct ProcessResult
         {
             public bool Completed;
             public int? ExitCode;
             public string Output;
         }
+
+
+        public static void Run(string command, string arguments)
+        {
+            using (var process = new Process())
+            { 
+                process.StartInfo.FileName = command;
+                process.StartInfo.Arguments = arguments;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardInput = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.WorkingDirectory = @"C:\GENIE2K\EXEFILES";
+                process.Start();
+            }
+            //catch (Exception ex)
+            //{
+            //    MessageBoxTemplates.ErrorSync(ex.ToString()); 
+            //}
+            
+        }
+
+        public static void RunMvcg() => Run("putview.exe", @"/NO_DATASRC");
+        
+        public static void ShowDetectorInMvcg(string det) =>  Run("pvopen.exe", $"DET:{det} /READ_ONLY");
+
+        public static void CloseDetector(string det) => Run("pvclose.exe", $"DET:{det}");
+        public static void CloseMvcg() => Run("endview.exe", "");
 
     }
 }

@@ -21,8 +21,9 @@ namespace Measurements.UI.Desktop.Forms
             }
             if (_countsForm != null)
                 _countsForm.SaveCountsEvent -= SaveCounts;
-              
-          
+
+
+            Measurements.UI.Managers.ProcessManager.CloseMvcg();
             _countsForm.Dispose();
             _session.Dispose();
             Measurements.Core.SessionControllerSingleton.AvailableDetectorsListHasChanged -= InitializeDetectorDropDownItems;
