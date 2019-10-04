@@ -289,10 +289,9 @@ namespace Measurements.UI.Desktop.Forms
         {
             try
             {
+                if (SessionFormListBoxIrrDates.SelectedItem == null) return;
                 _session.CurrentIrradiationDate = (DateTime)SessionFormListBoxIrrDates.SelectedItem;
-                //SessionFormDataGridViewIrradiations.DataSource = null;
                 FillDisplayedTable();
-                //SessionFormDataGridViewIrradiations.DataSource = _displayedList;
             }
             catch (Exception ex)
             {

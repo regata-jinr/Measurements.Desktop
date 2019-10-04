@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CountsForm));
             this.labelHours = new System.Windows.Forms.Label();
             this.labelMinutes = new System.Windows.Forms.Label();
             this.labelSeconds = new System.Windows.Forms.Label();
@@ -140,8 +141,9 @@
             this.Controls.Add(this.labelSeconds);
             this.Controls.Add(this.labelMinutes);
             this.Controls.Add(this.labelHours);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "CountsForm";
-            this.Text = "CountsForm";
+            this.Text = "Задайте продолжительность измерений";
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHours)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMinutes)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSeconds)).EndInit();

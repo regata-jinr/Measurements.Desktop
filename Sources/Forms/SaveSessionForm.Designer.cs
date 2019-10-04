@@ -102,7 +102,7 @@
             this.MinimizeBox = false;
             this.Name = "SaveSessionForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "SaveSessionForm";
+            this.Text = "Сохранение сессии измерений";
             this.ResumeLayout(false);
             this.PerformLayout();
 
