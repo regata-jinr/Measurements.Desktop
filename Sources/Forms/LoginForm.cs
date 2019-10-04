@@ -16,20 +16,31 @@ namespace Measurements.UI.Desktop.Forms
 
         public LoginForm()
         {
-            MessageBoxTemplates.UIHandleException();
-            var config = new Measurements.Configurator.ConfigManager();
-            _connectionStringBase = config.GenConnectionStringBase;
-#if DEBUG
-            _connectionStringBase = @"Server=RUMLAB\REGATALOCAL;Database=NAA_DB_TEST;Trusted_Connection=True;";
-#endif
-            InitializeComponent();
-            Text = $"Regata Measurements UI - {CurrentVersion}";
-            textBoxLoginFormUser.Focus();
-
-            if (System.Diagnostics.Process.GetProcesses().Count(p => p.ProcessName == System.Diagnostics.Process.GetCurrentProcess().ProcessName) >= 2)
+            try
             {
-                MessageBoxTemplates.ErrorSync("Программа измерений уже запущена");
-                Application.Exit();
+                MessageBoxTemplates.UIHandleException();
+                var config = new Measurements.Configurator.ConfigManager();
+                _connectionStringBase = config.GenConnectionStringBase;
+#if DEBUG
+                _connectionStringBase = @"Server=RUMLAB\REGATALOCAL;Database=NAA_DB_TEST;Trusted_Connection=True;";
+#endif
+                InitializeComponent();
+                Text = $"Regata Measurements UI - {CurrentVersion}";
+                textBoxLoginFormUser.Focus();
+
+                if (System.Diagnostics.Process.GetProcesses().Count(p => p.ProcessName == System.Diagnostics.Process.GetCurrentProcess().ProcessName) >= 2)
+                {
+                    MessageBoxTemplates.ErrorSync("Программа измерений уже запущена");
+                    Application.Exit();
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = e,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
             }
         }
 
@@ -44,103 +55,147 @@ namespace Measurements.UI.Desktop.Forms
 
         private void CheckIfUserHasPin(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(textBoxLoginFormUser.Text))
-                return;
-            var sm = SecurityManager.GetCredential($"Pin_{textBoxLoginFormUser.Text}");
-            if (sm == null)
-                return;
-            label2.Text = "Пин код:";
-            _isPin = true;
+            try
+            {
+
+                if (string.IsNullOrEmpty(textBoxLoginFormUser.Text))
+                    return;
+                var sm = SecurityManager.GetCredential($"Pin_{textBoxLoginFormUser.Text}");
+                if (sm == null)
+                    return;
+                label2.Text = "Пин код:";
+                _isPin = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
         }
 
         private void ButtonLoginFormEnter_Click(object sender, EventArgs e)
         {
-
-            var isPinCorrect = false;
-            if (_isPin)
+            try
             {
-                _pin = textBoxLoginFormPassword.Text;
-                _user = textBoxLoginFormUser.Text;
-                isPinCorrect =  CheckPin();
-            }
 
-            if (isPinCorrect)
-            {
-                var sm = SecurityManager.GetCredential($"Password_{_user}");
-                if (sm == null)
+                var isPinCorrect = false;
+                if (_isPin)
                 {
-                    MessageBoxTemplates.ErrorSync("Пароль связанный с пин-кодом не найден. Попробуйте создать пин-код заново");
+                    _pin = textBoxLoginFormPassword.Text;
+                    _user = textBoxLoginFormUser.Text;
+                    isPinCorrect = CheckPin();
+                }
+
+                if (isPinCorrect)
+                {
+                    var sm = SecurityManager.GetCredential($"Password_{_user}");
+                    if (sm == null)
+                    {
+                        MessageBoxTemplates.ErrorSync("Пароль связанный с пин-кодом не найден. Попробуйте создать пин-код заново");
+                        return;
+                    }
+                    _password = sm.Password;
+                }
+                else
+                {
+                    MessageBoxTemplates.ErrorSync("Неправильный логин или пин-код");
                     return;
                 }
-                _password = sm.Password;
-            }
-            else
-            {
-                MessageBoxTemplates.ErrorSync("Неправильный логин или пин-код");
-                return;
-            }
 
-            if (CheckPassword())
-            {
-                var scpf = new SessionControlPanel(_connectionStringFull);
-                scpf.Show();
-                Hide();
+                if (CheckPassword())
+                {
+                    var scpf = new SessionControlPanel(_connectionStringFull);
+                    scpf.Show();
+                    Hide();
+                }
+                else
+                    MessageBoxTemplates.ErrorSync("Неправильный логин или пароль");
             }
-            else
-                MessageBoxTemplates.ErrorSync("Неправильный логин или пароль");
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
 
         }
 
         private void ButtonLoginFormCreatePin_Click(object sender, EventArgs e)
         {
-            if (isPinButtonClicked)
+            try
             {
-                this.Controls.Clear();
-                this.InitializeComponent();
-                Text = $"Regata Measurements UI - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
-                isPinButtonClicked = false;
+                if (isPinButtonClicked)
+                {
+                    this.Controls.Clear();
+                    this.InitializeComponent();
+                    Text = $"Regata Measurements UI - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
+                    isPinButtonClicked = false;
+                }
+                else
+                    CreatePinExtensions();
             }
-            else
-                CreatePinExtensions();
-
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
 
         }
 
         private void CreatePinExtensions()
         {
-            int x = this.Size.Height - buttonLoginFormCreatePin.Location.Y - buttonLoginFormCreatePin.Size.Height; // distance between textboxes and buttons
-            int y = textBoxLoginFormPassword.Location.Y - textBoxLoginFormUser.Location.Y - textBoxLoginFormUser.Size.Height; //distance between textboxes
-            this.Size = new Size(this.Size.Width, this.Size.Height + y + textBoxLoginFormPassword.Size.Height);
+            try
+            {
+                int x = this.Size.Height - buttonLoginFormCreatePin.Location.Y - buttonLoginFormCreatePin.Size.Height; // distance between textboxes and buttons
+                int y = textBoxLoginFormPassword.Location.Y - textBoxLoginFormUser.Location.Y - textBoxLoginFormUser.Size.Height; //distance between textboxes
+                this.Size = new Size(this.Size.Width, this.Size.Height + y + textBoxLoginFormPassword.Size.Height);
 
 
-            textboxPin = new TextBox();
-            textboxPin.Location = new System.Drawing.Point(textBoxLoginFormPassword.Location.X, textBoxLoginFormPassword.Location.Y + y + textBoxLoginFormPassword.Size.Height);
-            textboxPin.Size = new System.Drawing.Size(136, 22);
-            this.Controls.Add(textboxPin);
+                textboxPin = new TextBox();
+                textboxPin.Location = new System.Drawing.Point(textBoxLoginFormPassword.Location.X, textBoxLoginFormPassword.Location.Y + y + textBoxLoginFormPassword.Size.Height);
+                textboxPin.Size = new System.Drawing.Size(136, 22);
+                this.Controls.Add(textboxPin);
 
-            pinLabel = new Label();
-            pinLabel.Location = new System.Drawing.Point(label1.Location.X, textBoxLoginFormPassword.Location.Y + y + textBoxLoginFormPassword.Size.Height);
-            pinLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            pinLabel.Size = new System.Drawing.Size(75, 28);
-            pinLabel.Text = "Пин-код:";
-            label2.Text = "Пароль:";
-            pinLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            this.Controls.Add(pinLabel);
+                pinLabel = new Label();
+                pinLabel.Location = new System.Drawing.Point(label1.Location.X, textBoxLoginFormPassword.Location.Y + y + textBoxLoginFormPassword.Size.Height);
+                pinLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                pinLabel.Size = new System.Drawing.Size(75, 28);
+                pinLabel.Text = "Пин-код:";
+                label2.Text = "Пароль:";
+                pinLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+                this.Controls.Add(pinLabel);
 
-            buttonLoginFormCreatePin.Location = new System.Drawing.Point(buttonLoginFormCreatePin.Location.X - 15, buttonLoginFormCreatePin.Location.Y +  x );
+                buttonLoginFormCreatePin.Location = new System.Drawing.Point(buttonLoginFormCreatePin.Location.X - 15, buttonLoginFormCreatePin.Location.Y + x);
 
-            buttonLoginFormEnter.Location = new System.Drawing.Point(buttonLoginFormEnter.Location.X + 20, buttonLoginFormEnter.Location.Y + x);
-            isPinButtonClicked = true;
-            buttonLoginFormCreatePin.Text = "Скрыть";
+                buttonLoginFormEnter.Location = new System.Drawing.Point(buttonLoginFormEnter.Location.X + 20, buttonLoginFormEnter.Location.Y + x);
+                isPinButtonClicked = true;
+                buttonLoginFormCreatePin.Text = "Скрыть";
 
-            addPinCodeButton = new Button();
-            addPinCodeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            addPinCodeButton.Location = new System.Drawing.Point(-15 + (-buttonLoginFormCreatePin.Location.X - buttonLoginFormCreatePin.Size.Width + buttonLoginFormEnter.Location.X), buttonLoginFormEnter.Location.Y);
-            addPinCodeButton.Size = new System.Drawing.Size(85, 45);
-            addPinCodeButton.Text = "Сохранить пин-код";
-            addPinCodeButton.UseVisualStyleBackColor = true;
-            addPinCodeButton.Click += new System.EventHandler(addPinCodeButton_Click);
-            this.Controls.Add(addPinCodeButton);
+                addPinCodeButton = new Button();
+                addPinCodeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                addPinCodeButton.Location = new System.Drawing.Point(-15 + (-buttonLoginFormCreatePin.Location.X - buttonLoginFormCreatePin.Size.Width + buttonLoginFormEnter.Location.X), buttonLoginFormEnter.Location.Y);
+                addPinCodeButton.Size = new System.Drawing.Size(85, 45);
+                addPinCodeButton.Text = "Сохранить пин-код";
+                addPinCodeButton.UseVisualStyleBackColor = true;
+                addPinCodeButton.Click += new System.EventHandler(addPinCodeButton_Click);
+                this.Controls.Add(addPinCodeButton);
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
 
         }
         // TODO: add password checks function
@@ -148,70 +203,106 @@ namespace Measurements.UI.Desktop.Forms
         // TODO: check if pin exist then instead password check pin
         private void addPinCodeButton_Click(object sender, EventArgs e)
         {
-            if (textboxPin == null)
-                return;
-            if (string.IsNullOrEmpty(textboxPin.Text) || string.IsNullOrEmpty(textBoxLoginFormUser.Text) || string.IsNullOrEmpty(textBoxLoginFormPassword.Text))
+            try
             {
-                MessageBoxTemplates.ErrorSync("При создании пин-кода все поля должны быть заполнены");
-                return;
-            }
-
-            if (int.TryParse(textboxPin.Text, out _) && textboxPin.Text.Length == 4)
-            {
-                _user = textBoxLoginFormUser.Text;
-                _password = textBoxLoginFormPassword.Text;
-                _pin = textboxPin.Text;
-
-                if (CheckPassword())
+                if (textboxPin == null)
+                    return;
+                if (string.IsNullOrEmpty(textboxPin.Text) || string.IsNullOrEmpty(textBoxLoginFormUser.Text) || string.IsNullOrEmpty(textBoxLoginFormPassword.Text))
                 {
-                    if (SecurityManager.SetCredential($"Password_{textBoxLoginFormUser.Text}", textBoxLoginFormUser.Text, textBoxLoginFormPassword.Text) && SecurityManager.SetCredential($"Pin_{textBoxLoginFormUser.Text}", textBoxLoginFormUser.Text, textboxPin.Text))
+                    MessageBoxTemplates.ErrorSync("При создании пин-кода все поля должны быть заполнены");
+                    return;
+                }
+
+                if (int.TryParse(textboxPin.Text, out _) && textboxPin.Text.Length == 4)
+                {
+                    _user = textBoxLoginFormUser.Text;
+                    _password = textBoxLoginFormPassword.Text;
+                    _pin = textboxPin.Text;
+
+                    if (CheckPassword())
                     {
-                        MessageBoxTemplates.InfoAsync("Пин-код успешно сохранен");
-                        _isPin = true;
-                        this.Controls.Clear();
-                        this.InitializeComponent();
-                        Text = $"Regata Measurements UI - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
-                        isPinButtonClicked = false;
-                        textBoxLoginFormUser.Text = _user;
-                        textBoxLoginFormPassword.Text = _pin;
+                        if (SecurityManager.SetCredential($"Password_{textBoxLoginFormUser.Text}", textBoxLoginFormUser.Text, textBoxLoginFormPassword.Text) && SecurityManager.SetCredential($"Pin_{textBoxLoginFormUser.Text}", textBoxLoginFormUser.Text, textboxPin.Text))
+                        {
+                            MessageBoxTemplates.InfoAsync("Пин-код успешно сохранен");
+                            _isPin = true;
+                            this.Controls.Clear();
+                            this.InitializeComponent();
+                            Text = $"Regata Measurements UI - {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
+                            isPinButtonClicked = false;
+                            textBoxLoginFormUser.Text = _user;
+                            textBoxLoginFormPassword.Text = _pin;
+                        }
+                        else
+                            MessageBoxTemplates.ErrorSync("Проблема с установкой пин-кода. Возможно, Вы уже создавали пин-код");
                     }
                     else
-                        MessageBoxTemplates.ErrorSync("Проблема с установкой пин-кода. Возможно, Вы уже создавали пин-код"); 
+                        MessageBoxTemplates.ErrorSync("Программа не может установить соединение с базой данных. Проверьте указанный логин или пароль.");
+
+
                 }
                 else
-                    MessageBoxTemplates.ErrorSync("Программа не может установить соединение с базой данных. Проверьте указанный логин или пароль.");
-
-
+                    MessageBoxTemplates.ErrorSync("Пин-код должен быть целым четырехзначным числом");
             }
-            else
-                MessageBoxTemplates.ErrorSync("Пин-код должен быть целым четырехзначным числом");
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
         }
 
 
         private bool CheckPassword()
         {
-            var isConnected = false;
-            _connectionStringFull = $"{_connectionStringBase}User Id={_user};Password={_password};";
-            using (var sqlCon = new SqlConnection(_connectionStringFull))
+            try
             {
-                sqlCon.Open();
-                isConnected = true;
+                var isConnected = false;
+                _connectionStringFull = $"{_connectionStringBase}User Id={_user};Password={_password};";
+                using (var sqlCon = new SqlConnection(_connectionStringFull))
+                {
+                    sqlCon.Open();
+                    isConnected = true;
+                }
+                return isConnected;
             }
-            return isConnected;
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+                return false;
+            }
+
         }
 
         private bool CheckPin()
         {
-            var isCorrect = false;
+            try
+            {
+                var isCorrect = false;
 
-            var sm = SecurityManager.GetCredential($"Pin_{_user}");
-            if (sm == null)
+                var sm = SecurityManager.GetCredential($"Pin_{_user}");
+                if (sm == null)
+                    return false;
+
+                if (_pin == sm.Password && _user == sm.Login)
+                    isCorrect = true;
+
+                return isCorrect;
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
                 return false;
-
-            if (_pin == sm.Password && _user == sm.Login)
-                isCorrect = true;
-
-            return isCorrect;
+            }
         }
 
 

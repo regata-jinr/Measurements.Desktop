@@ -13,7 +13,7 @@ namespace Measurements.UI.Managers
 
         public static async Task<ProcessResult> RunMvcgAsync()
         {
-            var result = await ExecuteShellCommand("putview.exe", @"/NO_DATASRC");
+            var result = await ExecuteShellCommand("putview.exe", @"/CXCY=-100,-100 /NO_DATASRC");
             return result;  
         }
 
@@ -172,7 +172,7 @@ namespace Measurements.UI.Managers
             
         }
 
-        public static void RunMvcg() => Run("putview.exe", @"/NO_DATASRC");
+        public static void RunMvcg() => Run("putview.exe", @"/CXCY=-100,-100 /NO_DATASRC");
         
         public static void ShowDetectorInMvcg(string det) =>  Run("pvopen.exe", $"DET:{det} /READ_ONLY");
 

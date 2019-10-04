@@ -32,43 +32,76 @@ namespace Measurements.UI.Desktop.Forms
 
         private void UpdateSessionsTable()
         {
-            var source = new BindingSource();
-            source.DataSource = SessionControllerSingleton.AvailableSessions;
-            SessionControlPaneldataGridViewSessions.DataSource = null;
-            SessionControlPaneldataGridViewSessions.DataSource = source;
+            try
+            {
+                var source = new BindingSource();
+                source.DataSource = SessionControllerSingleton.AvailableSessions;
+                SessionControlPaneldataGridViewSessions.DataSource = null;
+                SessionControlPaneldataGridViewSessions.DataSource = source;
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
         }
 
         private void ShowAbout(object sender, EventArgs eventArgs)
         {
-            var ab = new About();
-            ab.Show();
+            try
+            {
+                var ab = new About();
+                ab.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
         }
 
         private bool _isExiting = false;
         private void CloseClick(object sender, System.ComponentModel.CancelEventArgs eventArgs)
         {
-            if (!_isExiting)
+            try
             {
-                if (SessionControllerSingleton.ManagedSessions.Count != 0)
+                if (!_isExiting)
                 {
-                    var result = MessageBox.Show($"Панель управления сессиями конртолирует некоторые сессии. Вы уверены, что хотите выйти?{Environment.NewLine}Это повлечет за собой удаление всех данных, которые не сохранены.", "Warning", MessageBoxButtons.YesNo,MessageBoxIcon.Exclamation);
-                    if (result == DialogResult.Yes)
+                    if (SessionControllerSingleton.ManagedSessions.Count != 0)
                     {
-                        for(var i = SessionControllerSingleton.ManagedSessions.Count - 1; i >=0; --i)
-                            SessionControllerSingleton.ManagedSessions[i].Dispose();
+                        var result = MessageBox.Show($"Панель управления сессиями конртолирует некоторые сессии. Вы уверены, что хотите выйти?{Environment.NewLine}Это повлечет за собой удаление всех данных, которые не сохранены.", "Warning", MessageBoxButtons.YesNo,MessageBoxIcon.Exclamation);
+                        if (result == DialogResult.Yes)
+                        {
+                            for (var i = SessionControllerSingleton.ManagedSessions.Count - 1; i >= 0; --i)
+                                SessionControllerSingleton.ManagedSessions[i].Dispose();
 
-                        SessionControllerSingleton.ManagedSessions.Clear();
+                            SessionControllerSingleton.ManagedSessions.Clear();
+                            _isExiting = true;
+                            Application.Exit();
+                        }
+                        else eventArgs.Cancel = true;
+                    }
+                    else
+                    {
                         _isExiting = true;
+                        Dispose();
                         Application.Exit();
                     }
-                    else eventArgs.Cancel = true;
                 }
-                else
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
                 {
-                    _isExiting = true;
-                    Dispose();
-                    Application.Exit();
-                }
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+    });
             }
         }
 

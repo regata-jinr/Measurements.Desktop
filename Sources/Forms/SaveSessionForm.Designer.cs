@@ -82,6 +82,7 @@
             this.buttonSaveSessionCancel.TabIndex = 4;
             this.buttonSaveSessionCancel.Text = "Отмена";
             this.buttonSaveSessionCancel.UseVisualStyleBackColor = true;
+            this.buttonSaveSessionCancel.Click += new System.EventHandler(this.buttonSaveSessionCancel_Click);
             // 
             // SaveSessionForm
             // 
