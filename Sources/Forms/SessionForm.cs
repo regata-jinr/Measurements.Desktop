@@ -104,6 +104,12 @@ namespace Measurements.UI.Desktop.Forms
                 SessionFormadvancedDataGridView.SetDoubleBuffered();
                 SessionFormadvancedDataGridView.DataSource = SessionFormDisplayedDataBindingSource;
 
+                //DataGridViewComboBoxColumn detectorListColumn = new DataGridViewComboBoxColumn();
+                //detectorListColumn.Name = "Detector";
+                //detectorListColumn.ValueType = typeof(string);
+                //detectorListColumn.DisplayStyle = DataGridViewComboBoxDisplayStyle.DropDownButton;
+                //detectorListColumn.DataSource = _session.ManagedDetectors.Select(d => d.Name);
+
                 _displayedDataTable = _displayedDataSet.Tables.Add("DisplayedTable");
                 _displayedDataTable.Columns.Add("SetKey", typeof(string));
                 _displayedDataTable.Columns.Add("SampleNumber", typeof(string));
@@ -596,6 +602,8 @@ namespace Measurements.UI.Desktop.Forms
                     return;
                 }
 
+               
+
                 ProcessManager.RunMvcg();
                 System.Threading.Thread.Sleep(1000);
                 foreach (var d in _session.ManagedDetectors)
@@ -609,7 +617,10 @@ namespace Measurements.UI.Desktop.Forms
                 DisableControls();
                 HighlightCurrentSample();
 
-                _session.StartMeasurements();
+                var dcp = new DetectorControlPanel(ref _session);
+                dcp.Show();
+
+                //_session.StartMeasurements();
             }
             catch (Exception ex)
             {

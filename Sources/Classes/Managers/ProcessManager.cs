@@ -177,6 +177,9 @@ namespace Measurements.UI.Managers
         public static void ShowDetectorInMvcg(string det) =>  Run("pvopen.exe", $"DET:{det} /READ_ONLY");
 
         public static void CloseDetector(string det) => Run("pvclose.exe", $"DET:{det}");
+
+        public static void SelectDetector(string det) => Run("pvselect.exe", $"DET:{det}");
+
         public static void CloseMvcg() => Run("endview.exe", "");
 
     }

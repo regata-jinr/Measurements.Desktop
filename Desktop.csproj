@@ -184,6 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sources\Classes\Components\CircularList.cs" />
     <Compile Include="Sources\Classes\Components\EnumItem.cs" />
     <Compile Include="Sources\Classes\Components\DetectorItem.cs" />
     <Compile Include="Sources\Classes\Components\MeasurementsList.cs" />
@@ -203,6 +204,12 @@
     </Compile>
     <Compile Include="Sources\Forms\CountsForm.Designer.cs">
       <DependentUpon>CountsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Sources\Forms\DetectorControlPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Sources\Forms\DetectorControlPanel.Designer.cs">
+      <DependentUpon>DetectorControlPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Sources\Forms\LoginForm.cs">
       <SubType>Form</SubType>
@@ -257,6 +264,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Sources\Forms\CountsForm.resx">
       <DependentUpon>CountsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Sources\Forms\DetectorControlPanel.resx">
+      <DependentUpon>DetectorControlPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Sources\Forms\LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
