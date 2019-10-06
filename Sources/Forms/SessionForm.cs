@@ -578,6 +578,7 @@ namespace Measurements.UI.Desktop.Forms
         {
             try
             {
+                FillDisplayedTable();
                 if (!_session.MeasurementList.Any() || !_displayedDataTable.Rows.OfType<object>().Any())
                 {
                     MessageBoxTemplates.ErrorSync("Образцы для измерений не выбраны!");
