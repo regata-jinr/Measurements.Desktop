@@ -24,8 +24,8 @@ namespace Measurements.UI.Desktop.Forms
 
 
             Measurements.UI.Managers.ProcessManager.CloseMvcg();
-            _countsForm.Dispose();
-            _session.Dispose();
+            _countsForm?.Dispose();
+            _session?.Dispose();
             Measurements.Core.SessionControllerSingleton.AvailableDetectorsListHasChanged -= InitializeDetectorDropDownItems;
             base.Dispose(disposing);
         }

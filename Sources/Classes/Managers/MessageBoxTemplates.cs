@@ -53,7 +53,15 @@ namespace Measurements.UI.Managers
         }
 
 
-        public static void UIHandleException() => ExceptionHandler.ExceptionEvent += WrapExceptionToMessageBoxAsync;
+        public static void UIHandleException()
+        {
+            try
+            {
+                ExceptionHandler.ExceptionEvent += WrapExceptionToMessageBoxAsync;
+            }
+            catch
+            { }
+        }
 
         private static string MessageTemplate(ref ExceptionEventsArgs exceptionEventsArgs)
         {

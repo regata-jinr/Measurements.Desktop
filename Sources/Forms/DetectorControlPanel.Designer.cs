@@ -15,15 +15,18 @@ namespace Measurements.UI.Desktop.Forms
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
+            foreach (var d in _session.ManagedDetectors)
+            {
+                d.Pause();
+                ProcessManager.CloseDetector(d.Name);
+                System.Threading.Thread.Sleep(1000);
+            }
+            ProcessManager.CloseMvcg();
+
             if (disposing && (components != null))
             {
                 components.Dispose();
             }
-
-            foreach (var d in _session.ManagedDetectors)
-                ProcessManager.CloseDetector(d.Name);
-
-            ProcessManager.CloseMvcg();
             base.Dispose(disposing);
         }
 
@@ -62,6 +65,12 @@ namespace Measurements.UI.Desktop.Forms
             this.saveFileDialogSaveCurrentSpectra = new System.Windows.Forms.SaveFileDialog();
             this.DCPLabelPresetTitle = new System.Windows.Forms.Label();
             this.DCPTimeLeftTitle = new System.Windows.Forms.Label();
+            this.DCPLabelDeadTimeTitle = new System.Windows.Forms.Label();
+            this.DCPLabelDeadTimeValue = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.DCPNumericUpDownElapsedHours)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.DCPNumericUpDownElapsedMinutes)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.DCPNumericUpDownElapsedSeconds)).BeginInit();
@@ -165,7 +174,7 @@ namespace Measurements.UI.Desktop.Forms
             "5",
             "10",
             "20"});
-            this.DCPComboBoxHeight.Location = new System.Drawing.Point(428, 154);
+            this.DCPComboBoxHeight.Location = new System.Drawing.Point(409, 138);
             this.DCPComboBoxHeight.Name = "DCPComboBoxHeight";
             this.DCPComboBoxHeight.Size = new System.Drawing.Size(41, 24);
             this.DCPComboBoxHeight.TabIndex = 15;
@@ -175,7 +184,7 @@ namespace Measurements.UI.Desktop.Forms
             // DCPLabelHeight
             // 
             this.DCPLabelHeight.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DCPLabelHeight.Location = new System.Drawing.Point(358, 154);
+            this.DCPLabelHeight.Location = new System.Drawing.Point(339, 136);
             this.DCPLabelHeight.Name = "DCPLabelHeight";
             this.DCPLabelHeight.Size = new System.Drawing.Size(64, 24);
             this.DCPLabelHeight.TabIndex = 16;
@@ -225,78 +234,111 @@ namespace Measurements.UI.Desktop.Forms
             // 
             // DCPNumericUpDownElapsedHours
             // 
-            this.DCPNumericUpDownElapsedHours.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DCPNumericUpDownElapsedHours.Location = new System.Drawing.Point(315, 102);
+            this.DCPNumericUpDownElapsedHours.Font = new System.Drawing.Font("Microsoft Sans Serif", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DCPNumericUpDownElapsedHours.ForeColor = System.Drawing.Color.Red;
+            this.DCPNumericUpDownElapsedHours.Location = new System.Drawing.Point(549, 55);
             this.DCPNumericUpDownElapsedHours.Name = "DCPNumericUpDownElapsedHours";
             this.DCPNumericUpDownElapsedHours.ReadOnly = true;
-            this.DCPNumericUpDownElapsedHours.Size = new System.Drawing.Size(39, 44);
+            this.DCPNumericUpDownElapsedHours.Size = new System.Drawing.Size(48, 62);
             this.DCPNumericUpDownElapsedHours.TabIndex = 24;
+            this.DCPNumericUpDownElapsedHours.Value = new decimal(new int[] {
+            9,
+            0,
+            0,
+            0});
             // 
             // DCPNumericUpDownElapsedMinutes
             // 
-            this.DCPNumericUpDownElapsedMinutes.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DCPNumericUpDownElapsedMinutes.Location = new System.Drawing.Point(362, 102);
+            this.DCPNumericUpDownElapsedMinutes.Font = new System.Drawing.Font("Microsoft Sans Serif", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DCPNumericUpDownElapsedMinutes.ForeColor = System.Drawing.Color.Red;
+            this.DCPNumericUpDownElapsedMinutes.Location = new System.Drawing.Point(615, 55);
             this.DCPNumericUpDownElapsedMinutes.Name = "DCPNumericUpDownElapsedMinutes";
             this.DCPNumericUpDownElapsedMinutes.ReadOnly = true;
-            this.DCPNumericUpDownElapsedMinutes.Size = new System.Drawing.Size(61, 44);
+            this.DCPNumericUpDownElapsedMinutes.Size = new System.Drawing.Size(75, 62);
             this.DCPNumericUpDownElapsedMinutes.TabIndex = 25;
+            this.DCPNumericUpDownElapsedMinutes.Value = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
             // 
             // DCPNumericUpDownElapsedSeconds
             // 
-            this.DCPNumericUpDownElapsedSeconds.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DCPNumericUpDownElapsedSeconds.Location = new System.Drawing.Point(429, 102);
+            this.DCPNumericUpDownElapsedSeconds.Font = new System.Drawing.Font("Microsoft Sans Serif", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DCPNumericUpDownElapsedSeconds.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.DCPNumericUpDownElapsedSeconds.Location = new System.Drawing.Point(705, 55);
             this.DCPNumericUpDownElapsedSeconds.Name = "DCPNumericUpDownElapsedSeconds";
             this.DCPNumericUpDownElapsedSeconds.ReadOnly = true;
-            this.DCPNumericUpDownElapsedSeconds.Size = new System.Drawing.Size(55, 44);
+            this.DCPNumericUpDownElapsedSeconds.Size = new System.Drawing.Size(81, 62);
             this.DCPNumericUpDownElapsedSeconds.TabIndex = 26;
+            this.DCPNumericUpDownElapsedSeconds.Value = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
             // 
             // DCPNumericUpDownPresetSeconds
             // 
-            this.DCPNumericUpDownPresetSeconds.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DCPNumericUpDownPresetSeconds.Location = new System.Drawing.Point(429, 41);
+            this.DCPNumericUpDownPresetSeconds.Font = new System.Drawing.Font("Microsoft Sans Serif", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DCPNumericUpDownPresetSeconds.Location = new System.Drawing.Point(430, 54);
             this.DCPNumericUpDownPresetSeconds.Name = "DCPNumericUpDownPresetSeconds";
-            this.DCPNumericUpDownPresetSeconds.Size = new System.Drawing.Size(55, 44);
+            this.DCPNumericUpDownPresetSeconds.Size = new System.Drawing.Size(80, 62);
             this.DCPNumericUpDownPresetSeconds.TabIndex = 29;
+            this.DCPNumericUpDownPresetSeconds.Value = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
             // 
             // DCPNumericUpDownPresetMinutes
             // 
-            this.DCPNumericUpDownPresetMinutes.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DCPNumericUpDownPresetMinutes.Location = new System.Drawing.Point(361, 41);
+            this.DCPNumericUpDownPresetMinutes.Font = new System.Drawing.Font("Microsoft Sans Serif", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DCPNumericUpDownPresetMinutes.Location = new System.Drawing.Point(340, 54);
             this.DCPNumericUpDownPresetMinutes.Name = "DCPNumericUpDownPresetMinutes";
-            this.DCPNumericUpDownPresetMinutes.Size = new System.Drawing.Size(62, 44);
+            this.DCPNumericUpDownPresetMinutes.Size = new System.Drawing.Size(82, 62);
             this.DCPNumericUpDownPresetMinutes.TabIndex = 28;
+            this.DCPNumericUpDownPresetMinutes.Value = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
             // 
             // DCPNumericUpDownPresetHours
             // 
-            this.DCPNumericUpDownPresetHours.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DCPNumericUpDownPresetHours.Location = new System.Drawing.Point(315, 41);
+            this.DCPNumericUpDownPresetHours.Font = new System.Drawing.Font("Microsoft Sans Serif", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DCPNumericUpDownPresetHours.Location = new System.Drawing.Point(281, 54);
             this.DCPNumericUpDownPresetHours.Name = "DCPNumericUpDownPresetHours";
-            this.DCPNumericUpDownPresetHours.Size = new System.Drawing.Size(39, 44);
+            this.DCPNumericUpDownPresetHours.Size = new System.Drawing.Size(53, 62);
             this.DCPNumericUpDownPresetHours.TabIndex = 27;
+            this.DCPNumericUpDownPresetHours.Value = new decimal(new int[] {
+            9,
+            0,
+            0,
+            0});
             // 
             // DCPLabelHours
             // 
-            this.DCPLabelHours.Location = new System.Drawing.Point(315, 7);
+            this.DCPLabelHours.Location = new System.Drawing.Point(281, 35);
             this.DCPLabelHours.Name = "DCPLabelHours";
-            this.DCPLabelHours.Size = new System.Drawing.Size(38, 16);
+            this.DCPLabelHours.Size = new System.Drawing.Size(53, 16);
             this.DCPLabelHours.TabIndex = 30;
             this.DCPLabelHours.Text = "Часы";
             this.DCPLabelHours.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // DCPLabelMinutes
             // 
-            this.DCPLabelMinutes.Location = new System.Drawing.Point(359, 7);
+            this.DCPLabelMinutes.Location = new System.Drawing.Point(340, 35);
             this.DCPLabelMinutes.Name = "DCPLabelMinutes";
-            this.DCPLabelMinutes.Size = new System.Drawing.Size(64, 16);
+            this.DCPLabelMinutes.Size = new System.Drawing.Size(82, 16);
             this.DCPLabelMinutes.TabIndex = 31;
             this.DCPLabelMinutes.Text = "Минуты";
             this.DCPLabelMinutes.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // DCPLabelSeconds
             // 
-            this.DCPLabelSeconds.Location = new System.Drawing.Point(426, 7);
+            this.DCPLabelSeconds.Location = new System.Drawing.Point(430, 35);
             this.DCPLabelSeconds.Name = "DCPLabelSeconds";
-            this.DCPLabelSeconds.Size = new System.Drawing.Size(64, 16);
+            this.DCPLabelSeconds.Size = new System.Drawing.Size(80, 16);
             this.DCPLabelSeconds.TabIndex = 32;
             this.DCPLabelSeconds.Text = "Секунды";
             this.DCPLabelSeconds.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -310,29 +352,92 @@ namespace Measurements.UI.Desktop.Forms
             // 
             // DCPLabelPresetTitle
             // 
-            this.DCPLabelPresetTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DCPLabelPresetTitle.Location = new System.Drawing.Point(338, 25);
+            this.DCPLabelPresetTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DCPLabelPresetTitle.Location = new System.Drawing.Point(281, 9);
             this.DCPLabelPresetTitle.Name = "DCPLabelPresetTitle";
-            this.DCPLabelPresetTitle.Size = new System.Drawing.Size(137, 13);
+            this.DCPLabelPresetTitle.Size = new System.Drawing.Size(229, 21);
             this.DCPLabelPresetTitle.TabIndex = 33;
             this.DCPLabelPresetTitle.Text = "Установлено";
             this.DCPLabelPresetTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // DCPTimeLeftTitle
             // 
-            this.DCPTimeLeftTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DCPTimeLeftTitle.Location = new System.Drawing.Point(338, 86);
+            this.DCPTimeLeftTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DCPTimeLeftTitle.Location = new System.Drawing.Point(549, 10);
             this.DCPTimeLeftTitle.Name = "DCPTimeLeftTitle";
-            this.DCPTimeLeftTitle.Size = new System.Drawing.Size(137, 13);
+            this.DCPTimeLeftTitle.Size = new System.Drawing.Size(237, 21);
             this.DCPTimeLeftTitle.TabIndex = 34;
             this.DCPTimeLeftTitle.Text = "Осталось";
             this.DCPTimeLeftTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // DCPLabelDeadTimeTitle
+            // 
+            this.DCPLabelDeadTimeTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DCPLabelDeadTimeTitle.Location = new System.Drawing.Point(498, 123);
+            this.DCPLabelDeadTimeTitle.Name = "DCPLabelDeadTimeTitle";
+            this.DCPLabelDeadTimeTitle.Size = new System.Drawing.Size(111, 53);
+            this.DCPLabelDeadTimeTitle.TabIndex = 35;
+            this.DCPLabelDeadTimeTitle.Text = "Мертвое время";
+            this.DCPLabelDeadTimeTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // DCPLabelDeadTimeValue
+            // 
+            this.DCPLabelDeadTimeValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DCPLabelDeadTimeValue.Location = new System.Drawing.Point(615, 123);
+            this.DCPLabelDeadTimeValue.Name = "DCPLabelDeadTimeValue";
+            this.DCPLabelDeadTimeValue.Size = new System.Drawing.Size(170, 53);
+            this.DCPLabelDeadTimeValue.TabIndex = 36;
+            this.DCPLabelDeadTimeValue.Text = "99.99%";
+            this.DCPLabelDeadTimeValue.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label1
+            // 
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(519, 57);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(25, 54);
+            this.label1.TabIndex = 37;
+            this.label1.Text = "/";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label2
+            // 
+            this.label2.Location = new System.Drawing.Point(615, 36);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(75, 16);
+            this.label2.TabIndex = 39;
+            this.label2.Text = "Минуты";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label3
+            // 
+            this.label3.Location = new System.Drawing.Point(549, 36);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(48, 16);
+            this.label3.TabIndex = 38;
+            this.label3.Text = "Часы";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label4
+            // 
+            this.label4.Location = new System.Drawing.Point(705, 36);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(81, 16);
+            this.label4.TabIndex = 40;
+            this.label4.Text = "Секунды";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // DetectorControlPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(507, 185);
+            this.ClientSize = new System.Drawing.Size(797, 183);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.DCPLabelDeadTimeValue);
+            this.Controls.Add(this.DCPLabelDeadTimeTitle);
             this.Controls.Add(this.DCPTimeLeftTitle);
             this.Controls.Add(this.DCPLabelPresetTitle);
             this.Controls.Add(this.DCPLabelSeconds);
@@ -405,5 +510,11 @@ namespace Measurements.UI.Desktop.Forms
         private System.Windows.Forms.SaveFileDialog saveFileDialogSaveCurrentSpectra;
         private System.Windows.Forms.Label DCPLabelPresetTitle;
         private System.Windows.Forms.Label DCPTimeLeftTitle;
+        private System.Windows.Forms.Label DCPLabelDeadTimeTitle;
+        private System.Windows.Forms.Label DCPLabelDeadTimeValue;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
     }
 }

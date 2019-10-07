@@ -12,6 +12,7 @@ namespace Measurements.UI.Desktop.Forms
 {
     public partial class DetectorControlPanel : Form
     {
+        //TODO: deny decrease preset number below then elapsed time
         private ISession _session;
         private CircularList<string> _namesArray;
         private IDetector _currentDet;
@@ -66,32 +67,44 @@ namespace Measurements.UI.Desktop.Forms
             DCPNumericUpDownElapsedHours.Value = timeLeft.Hours;
             DCPNumericUpDownElapsedMinutes.Value = timeLeft.Minutes;
             DCPNumericUpDownElapsedSeconds.Value = timeLeft.Seconds;
-            
+            DCPLabelDeadTimeValue.Text = $"{_currentDet.DeadTime.ToString("f2")}%";
             await Task.Run(() => RefreshTime()); 
  
         }
 
 
+
+
+
         private void RefreshTime()
         {
-            int PresetSeconds = int.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL).ToString());
-            int ElapsedSecond = (int)Math.Round(decimal.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_EREAL).ToString()),0);
-            int LeftSeconds = PresetSeconds - ElapsedSecond;
-
-
-            while (LeftSeconds > 0 && _currentDet.Status == DetectorStatus.busy)
+            try
             {
-                System.Threading.Thread.Sleep(1000);
-                PresetSeconds = int.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL).ToString());
-                ElapsedSecond = (int)Math.Round(decimal.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_EREAL).ToString()), 0);
-                LeftSeconds = PresetSeconds - ElapsedSecond;
+                int PresetSeconds = int.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL).ToString());
+                int ElapsedSecond = (int)Math.Round(decimal.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_EREAL).ToString()),0);
+                int LeftSeconds = PresetSeconds - ElapsedSecond;
 
-                var time = TimeSpan.FromSeconds(LeftSeconds);
 
-                DCPNumericUpDownElapsedHours.Invoke(new Action(() => { DCPNumericUpDownElapsedHours.Value = time.Hours; }));
-                DCPNumericUpDownElapsedMinutes.Invoke(new Action(() => { DCPNumericUpDownElapsedMinutes.Value = time.Minutes; }));
-                DCPNumericUpDownElapsedSeconds.Invoke(new Action(() => { DCPNumericUpDownElapsedSeconds.Value = time.Seconds; }));
+                while (LeftSeconds > 0 && _currentDet.Status == DetectorStatus.busy)
+                {
+                    System.Threading.Thread.Sleep(1000);
+                    PresetSeconds = int.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL).ToString());
+                    ElapsedSecond = (int)Math.Round(decimal.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_EREAL).ToString()), 0);
+                    LeftSeconds = PresetSeconds - ElapsedSecond;
+
+                    var time = TimeSpan.FromSeconds(LeftSeconds);
+
+
+                    DCPNumericUpDownElapsedHours?.Invoke(new Action(() => { DCPNumericUpDownElapsedHours.Value = time.Hours; }));
+                    DCPNumericUpDownElapsedMinutes?.Invoke(new Action(() => { DCPNumericUpDownElapsedMinutes.Value = time.Minutes; }));
+                    DCPNumericUpDownElapsedSeconds?.Invoke(new Action(() => { DCPNumericUpDownElapsedSeconds.Value = time.Seconds; }));
+
+                    DCPLabelDeadTimeValue?.Invoke(new Action(() => { DCPLabelDeadTimeValue.Text = $"{_currentDet.DeadTime.ToString("f2")}%"; }));
+
+                }
             }
+            catch
+            { }
         }
 
 
@@ -117,7 +130,8 @@ namespace Measurements.UI.Desktop.Forms
             DCPNumericUpDownElapsedSeconds.Value = time.Seconds;
         }
 
-        private async void DCPButtonStartPause_Click(object sender, EventArgs e)
+
+        private void DCPButtonStartPause_Click(object sender, EventArgs e)
         {
             if (_currentDet.Status == DetectorStatus.busy)
             {
@@ -127,29 +141,22 @@ namespace Measurements.UI.Desktop.Forms
 
             if (_currentDet.Status == DetectorStatus.ready)
                 _currentDet.Start();
-
-            await Task.Run(() => RefreshTime()); 
         }
 
-        private void DetStatusChangedHandler(object sender, EventArgs e)
+        private async void DetStatusChangedHandler(object sender, EventArgs e)
         {
-            if (_currentDet.Status == DetectorStatus.ready && _currentDet.IsPaused)
-            {
-                DCPButtonStartPause.Text = "Продолжить";
-                return;
-            }
-
-            if (_currentDet.Status == DetectorStatus.busy && !_currentDet.IsPaused)
+            if (_currentDet.Status == DetectorStatus.busy)
             {
                 DCPButtonStartPause.Text = "Пауза";
-                return;
+                await Task.Run(() => RefreshTime());
             }
 
+            if (_currentDet.Status == DetectorStatus.ready && _currentDet.IsPaused)
+                DCPButtonStartPause.Text = "Продолжить";
+
             if (_currentDet.Status == DetectorStatus.ready && !_currentDet.IsPaused)
-            {
                 DCPButtonStartPause.Text = "Старт";
-                return;
-            }
+
         }
 
         private void HeightChangedHandler(object sender, EventArgs e)
@@ -162,28 +169,43 @@ namespace Measurements.UI.Desktop.Forms
         private void DCPButtonStop_Click(object sender, EventArgs e)
         {
             _currentDet.Stop();
-            //_currentDet.Pause();
-            //_currentDet.Save();
-            //_session.NextSample(ref _currentDet); 
-            //_currentDet.Clear();
+            System.Threading.Thread.Sleep(3000);
+            SourcesInitialize();
         }
 
         private void DCPButtonSave_Click(object sender, EventArgs e)
         {
+            var itWasBusy = false;
             if (_currentDet.Status == DetectorStatus.busy)
-                DCPButtonStartPause.PerformClick();
+            {
+                _currentDet.Pause();
+                itWasBusy = true;
+            }
 
             var dr = saveFileDialogSaveCurrentSpectra.ShowDialog();
             if(dr == DialogResult.OK)
                 _currentDet.Save(saveFileDialogSaveCurrentSpectra.FileName);
 
-            DCPButtonStartPause.PerformClick();
+            if (itWasBusy)
+                _currentDet.Start();
+
         }
 
 
         private void ChangePresetTimeHandler(object sender, EventArgs e)
         {
-            _currentDet.Pause();
+            var itWasBusy = false;
+            if (_currentDet.Status == DetectorStatus.busy)
+            {
+                _currentDet.Pause();
+                itWasBusy = true;
+            }
+
+            DCPNumericUpDownPresetHours.Enabled = false;
+            DCPNumericUpDownPresetMinutes.Enabled = false;
+            DCPNumericUpDownPresetSeconds.Enabled = false;
+
+            
             var time = new TimeSpan((int)DCPNumericUpDownPresetHours.Value, (int)DCPNumericUpDownPresetMinutes.Value, (int)DCPNumericUpDownPresetSeconds.Value);
 
             _currentDet.SetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL, time.TotalSeconds);
@@ -192,11 +214,23 @@ namespace Measurements.UI.Desktop.Forms
             int ElapsedSecond = (int)Math.Round(decimal.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_EREAL).ToString()),0);
             int LeftSeconds = PresetSeconds - ElapsedSecond;
 
+            if (LeftSeconds < 0)
+            {
+                _currentDet.Clear();
+                return;
+            }
+
             var timeLeft = TimeSpan.FromSeconds(LeftSeconds);
             DCPNumericUpDownElapsedHours.Value = timeLeft.Hours;
             DCPNumericUpDownElapsedMinutes.Value = timeLeft.Minutes;
             DCPNumericUpDownElapsedSeconds.Value = timeLeft.Seconds;
-            _currentDet.Start();
+
+            if (itWasBusy)
+                _currentDet.Start();
+
+            DCPNumericUpDownPresetHours.Enabled = true;
+            DCPNumericUpDownPresetMinutes.Enabled = true;
+            DCPNumericUpDownPresetSeconds.Enabled = true;
         }
     }
 }

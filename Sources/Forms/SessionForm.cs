@@ -6,7 +6,7 @@ using System.Linq;
 using Measurements.UI.Desktop.Components;
 using Measurements.UI.Managers;
 using System.Data;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Measurements.UI.Desktop.Forms
 {
@@ -19,8 +19,6 @@ namespace Measurements.UI.Desktop.Forms
     public partial class SessionForm : Form
     {
         private ISession _session;
-        private DataTable _displayedDataTable;
-        private DataSet _displayedDataSet;
         private bool _isInitialized;
         private Dictionary<bool, System.Drawing.Color> ConnectionStatusColor;
         public SessionForm(ISession session)
@@ -80,7 +78,11 @@ namespace Measurements.UI.Desktop.Forms
 
                 _session.SessionComplete += SessionCompleteHandler;
 
+
                 FillDisplayedTable();
+
+             
+
             }
             catch (Exception ex)
             {
@@ -98,32 +100,42 @@ namespace Measurements.UI.Desktop.Forms
         {
             try
             {
-                _displayedDataSet = new DataSet("DisplayedDataSet");
-                _displayedDataTable = new DataTable();
-                SessionFormDisplayedDataBindingSource.DataSource = _displayedDataSet;
                 SessionFormadvancedDataGridView.SetDoubleBuffered();
                 SessionFormadvancedDataGridView.DataSource = SessionFormDisplayedDataBindingSource;
 
-                //DataGridViewComboBoxColumn detectorListColumn = new DataGridViewComboBoxColumn();
-                //detectorListColumn.Name = "Detector";
-                //detectorListColumn.ValueType = typeof(string);
-                //detectorListColumn.DisplayStyle = DataGridViewComboBoxDisplayStyle.DropDownButton;
-                //detectorListColumn.DataSource = _session.ManagedDetectors.Select(d => d.Name);
 
-                _displayedDataTable = _displayedDataSet.Tables.Add("DisplayedTable");
-                _displayedDataTable.Columns.Add("SetKey", typeof(string));
-                _displayedDataTable.Columns.Add("SampleNumber", typeof(string));
-                _displayedDataTable.Columns.Add("Container", typeof(int));
-                _displayedDataTable.Columns.Add("PositionInContainer", typeof(int));
-                _displayedDataTable.Columns.Add("Detector", typeof(string));
-                _displayedDataTable.Columns.Add("DiskPosition", typeof(int));
-                _displayedDataTable.Columns.Add("DeadTime", typeof(decimal));
-                _displayedDataTable.Columns.Add("Height", typeof(decimal));
-                _displayedDataTable.Columns.Add("File", typeof(string));
-                _displayedDataTable.Columns.Add("Note", typeof(string));
+                DataGridViewColumn setKeyCol = new DataGridViewColumn() { Name = "SetKey", ValueType = typeof(string)};
+                DataGridViewColumn SampleNumberCol = new DataGridViewColumn() { Name = "SampleNumber", ValueType = typeof(string)};
+                DataGridViewColumn ContainerCol = new DataGridViewColumn() { Name = "Container", ValueType = typeof(int)};
+                DataGridViewColumn PositionInContainerCol = new DataGridViewColumn() { Name = "PositionInContainer", ValueType = typeof(int)};
+                DataGridViewColumn DiskPositionCol = new DataGridViewColumn() { Name = "DiskPosition", ValueType = typeof(int)};
+                DataGridViewColumn DeadTimeCol = new DataGridViewColumn() { Name = "DeadTime", ValueType = typeof(decimal)};
+                DataGridViewColumn FileCol = new DataGridViewColumn() { Name = "File", ValueType = typeof(string)};
+                DataGridViewColumn NoteCol = new DataGridViewColumn() { Name = "Note", ValueType = typeof(string), ReadOnly = false };
+
+                DataGridViewComboBoxColumn detectorListColumn = new DataGridViewComboBoxColumn();
+                detectorListColumn.Name = "Detector";
+                detectorListColumn.ValueType = typeof(string);
+                detectorListColumn.DisplayStyle = DataGridViewComboBoxDisplayStyle.DropDownButton;
+                detectorListColumn.DataSource = _session.ManagedDetectors.Select(d => d.Name);
+
+                DataGridViewComboBoxColumn heightListColumn = new DataGridViewComboBoxColumn();
+                detectorListColumn.Name = "Height";
+                detectorListColumn.ValueType = typeof(decimal);
+                detectorListColumn.DisplayStyle = DataGridViewComboBoxDisplayStyle.DropDownButton;
+                detectorListColumn.DataSource = new List<decimal>(){ 2.5m, 5m, 10m, 20m};
 
 
-                SessionFormDisplayedDataBindingSource.DataMember = _displayedDataTable.TableName;
+                SessionFormadvancedDataGridView.Columns.Add(setKeyCol);
+                SessionFormadvancedDataGridView.Columns.Add(SampleNumberCol);
+                SessionFormadvancedDataGridView.Columns.Add(ContainerCol);
+                SessionFormadvancedDataGridView.Columns.Add(PositionInContainerCol);
+                SessionFormadvancedDataGridView.Columns.Add(detectorListColumn);
+                SessionFormadvancedDataGridView.Columns.Add(DiskPositionCol);
+                SessionFormadvancedDataGridView.Columns.Add(DeadTimeCol);
+                SessionFormadvancedDataGridView.Columns.Add(heightListColumn);
+                SessionFormadvancedDataGridView.Columns.Add(FileCol);
+                SessionFormadvancedDataGridView.Columns.Add(NoteCol);
             }
             //advancedDataGridViewSearchToolBar_main.SetColumns(advancedDataGridView_main.Columns);
             catch (Exception ex)
@@ -160,9 +172,9 @@ namespace Measurements.UI.Desktop.Forms
                 if (_session.MeasurementList.Any())
                     MeasurementsProgressBar.Value++;
 
-                var currentRow = _displayedDataTable.Rows.OfType<DataRow>().Where(dr => dr.ItemArray[0].ToString() == currentMeasurement.SetKey && dr.ItemArray[1].ToString() == currentMeasurement.SampleNumber).First();
+                var currentRow = SessionFormadvancedDataGridView.Rows.OfType<DataGridViewRow>().Where(dr => dr.Cells[0].ToString() == currentMeasurement.SetKey && dr.Cells[1].ToString() == currentMeasurement.SampleNumber).First();
 
-                int currentRowIndex = _displayedDataTable.Rows.IndexOf(currentRow);
+                int currentRowIndex = SessionFormadvancedDataGridView.Rows.IndexOf(currentRow);
 
                 //_displayedDataTable.Rows[currentRowIndex].ItemArray[6] = _session.ManagedDetectors.Where(d => d.Name == currentMeasurement.Detector).First().DeadTime;
                 //_displayedDataTable.Rows[currentRowIndex].ItemArray[7] = currentMeasurement.Height;
@@ -189,7 +201,7 @@ namespace Measurements.UI.Desktop.Forms
         {
             try
             {
-                _displayedDataTable.Clear();
+                SessionFormadvancedDataGridView.Rows.Clear();
                 if (_session.MeasurementList.Any())
                     MeasurementsProgressBar.Maximum = _session.MeasurementList.Count();
 
@@ -211,7 +223,7 @@ namespace Measurements.UI.Desktop.Forms
                     m.Note ?? ""
                 };
 
-                    _displayedDataTable.Rows.Add(row);
+                    SessionFormadvancedDataGridView.Rows.Add(row);
                 }
             }
             catch (ArgumentException ae)
@@ -354,6 +366,18 @@ namespace Measurements.UI.Desktop.Forms
             try
             {
                 _session.Type = type;
+
+                if (type == "SLI")
+                {
+                    SessionFormadvancedDataGridView.Columns[2].Visible = false;
+                    SessionFormadvancedDataGridView.Columns[3].Visible = false;
+                }
+                else
+                {
+                    SessionFormadvancedDataGridView.Columns[2].Visible = true;
+                    SessionFormadvancedDataGridView.Columns[3].Visible = true;
+                }
+
                 SessionFormListBoxIrrDates.DataSource = null;
                 SessionFormListBoxIrrDates.DataSource = _session.IrradiationDateList;
                 FillDisplayedTable();
@@ -579,7 +603,7 @@ namespace Measurements.UI.Desktop.Forms
             try
             {
                 FillDisplayedTable();
-                if (!_session.MeasurementList.Any() || !_displayedDataTable.Rows.OfType<object>().Any())
+                if (!_session.MeasurementList.Any() || !SessionFormadvancedDataGridView.Rows.OfType<object>().Any())
                 {
                     MessageBoxTemplates.ErrorSync("Образцы для измерений не выбраны!");
                     return;
@@ -604,7 +628,10 @@ namespace Measurements.UI.Desktop.Forms
                 }
 
                 _session.ClearMeasurements();
-               
+
+                var mvcgProc =  Process.GetProcesses().Where(p => p.ProcessName == "mvcg").ToArray();
+                foreach(var mvcgp in mvcgProc)
+                    mvcgp.Kill();
 
                 ProcessManager.RunMvcg();
                 System.Threading.Thread.Sleep(1000);
