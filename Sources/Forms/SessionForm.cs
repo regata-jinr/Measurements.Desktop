@@ -603,6 +603,7 @@ namespace Measurements.UI.Desktop.Forms
                     return;
                 }
 
+                _session.ClearMeasurements();
                
 
                 ProcessManager.RunMvcg();
@@ -617,11 +618,11 @@ namespace Measurements.UI.Desktop.Forms
 
                 DisableControls();
                 HighlightCurrentSample();
-
+                
                 var dcp = new DetectorControlPanel(ref _session);
                 dcp.Show();
 
-                //_session.StartMeasurements();
+                _session.StartMeasurements();
             }
             catch (Exception ex)
             {

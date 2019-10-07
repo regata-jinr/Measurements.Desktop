@@ -165,7 +165,7 @@ namespace Measurements.UI.Desktop.Forms
             "5",
             "10",
             "20"});
-            this.DCPComboBoxHeight.Location = new System.Drawing.Point(454, 149);
+            this.DCPComboBoxHeight.Location = new System.Drawing.Point(428, 154);
             this.DCPComboBoxHeight.Name = "DCPComboBoxHeight";
             this.DCPComboBoxHeight.Size = new System.Drawing.Size(41, 24);
             this.DCPComboBoxHeight.TabIndex = 15;
@@ -175,7 +175,7 @@ namespace Measurements.UI.Desktop.Forms
             // DCPLabelHeight
             // 
             this.DCPLabelHeight.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DCPLabelHeight.Location = new System.Drawing.Point(384, 149);
+            this.DCPLabelHeight.Location = new System.Drawing.Point(358, 154);
             this.DCPLabelHeight.Name = "DCPLabelHeight";
             this.DCPLabelHeight.Size = new System.Drawing.Size(64, 24);
             this.DCPLabelHeight.TabIndex = 16;

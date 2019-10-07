@@ -32,25 +32,15 @@ namespace Measurements.UI.Desktop.Forms
 
             DesktopLocation = new Point(Screen.PrimaryScreen.Bounds.Left + 10, Screen.PrimaryScreen.Bounds.Bottom - Size.Height - 50);
 
-            var time = TimeSpan.FromSeconds(_session.Counts);
-            DCPNumericUpDownPresetHours.Value = time.Hours;
-            DCPNumericUpDownPresetMinutes.Value = time.Minutes;
-            DCPNumericUpDownPresetSeconds.Value = time.Seconds;
-
-            DCPNumericUpDownElapsedHours.Value = time.Hours;
-            DCPNumericUpDownElapsedMinutes.Value = time.Minutes;
-            DCPNumericUpDownElapsedSeconds.Value = time.Seconds;
-
             DCPNumericUpDownPresetHours.ValueChanged += ChangePresetTimeHandler;
             DCPNumericUpDownPresetMinutes.ValueChanged += ChangePresetTimeHandler;
             DCPNumericUpDownPresetSeconds.ValueChanged += ChangePresetTimeHandler;
 
             SourcesInitialize();
-         
 
         }
 
-        private void SourcesInitialize()
+        private async void SourcesInitialize()
         {
             DCPLabelCurrentSrcName.Text = _namesArray.CurrentItem;
             Text = $"Панель управления детектором  {_namesArray.CurrentItem}";
@@ -63,13 +53,27 @@ namespace Measurements.UI.Desktop.Forms
             DCPLabelCurrentSumpleOnCurrentSrc.Text = _currentDet.CurrentSample.ToString();
             DCPLabelCurrentSumpleOnNextSrc.Text = _session.ManagedDetectors.Where(d => d.Name == _namesArray.NextItem).First().CurrentSample.ToString();
             DCPLabelCurrentSumpleOnPrevSrc.Text = _session.ManagedDetectors.Where(d => d.Name == _namesArray.PrevItem).First().CurrentSample.ToString();
+            int PresetSeconds = int.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL).ToString());
+            int ElapsedSecond = (int)Math.Round(decimal.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_EREAL).ToString()),0);
+            int LeftSeconds = PresetSeconds - ElapsedSecond;
 
+            var timePreset = TimeSpan.FromSeconds(PresetSeconds);
+            DCPNumericUpDownPresetHours.Value = timePreset.Hours;
+            DCPNumericUpDownPresetMinutes.Value = timePreset.Minutes;
+            DCPNumericUpDownPresetSeconds.Value = timePreset.Seconds;
+
+            var timeLeft = TimeSpan.FromSeconds(LeftSeconds);
+            DCPNumericUpDownElapsedHours.Value = timeLeft.Hours;
+            DCPNumericUpDownElapsedMinutes.Value = timeLeft.Minutes;
+            DCPNumericUpDownElapsedSeconds.Value = timeLeft.Seconds;
+            
+            await Task.Run(() => RefreshTime()); 
+ 
         }
 
 
         private void RefreshTime()
         {
-
             int PresetSeconds = int.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL).ToString());
             int ElapsedSecond = (int)Math.Round(decimal.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_EREAL).ToString()),0);
             int LeftSeconds = PresetSeconds - ElapsedSecond;
@@ -95,7 +99,6 @@ namespace Measurements.UI.Desktop.Forms
         {
             _namesArray.Next();
             SourcesInitialize();
-
         }
 
         private void DCPButtonPrevSrc_Click(object sender, EventArgs e)
@@ -107,8 +110,8 @@ namespace Measurements.UI.Desktop.Forms
         private void DCPButtonClear_Click(object sender, EventArgs e)
         {
             _currentDet.Clear();
-
-            var time = TimeSpan.FromSeconds(_session.Counts);
+            int PresetSeconds = int.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL).ToString());
+            var time = TimeSpan.FromSeconds(PresetSeconds);
             DCPNumericUpDownElapsedHours.Value = time.Hours;
             DCPNumericUpDownElapsedMinutes.Value = time.Minutes;
             DCPNumericUpDownElapsedSeconds.Value = time.Seconds;
@@ -153,12 +156,16 @@ namespace Measurements.UI.Desktop.Forms
         {
             _currentDet.CurrentMeasurement.Height = decimal.Parse(DCPComboBoxHeight.Text);
             _currentDet.SetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_T_SGEOMTRY, DCPComboBoxHeight.Text); // height
+            _currentDet.AddEfficiencyCalibrationFile(_currentDet.CurrentMeasurement.Height.Value);
         }
 
         private void DCPButtonStop_Click(object sender, EventArgs e)
         {
-
-            //_currentDet.Stop();
+            _currentDet.Stop();
+            //_currentDet.Pause();
+            //_currentDet.Save();
+            //_session.NextSample(ref _currentDet); 
+            //_currentDet.Clear();
         }
 
         private void DCPButtonSave_Click(object sender, EventArgs e)
@@ -176,9 +183,20 @@ namespace Measurements.UI.Desktop.Forms
 
         private void ChangePresetTimeHandler(object sender, EventArgs e)
         {
+            _currentDet.Pause();
             var time = new TimeSpan((int)DCPNumericUpDownPresetHours.Value, (int)DCPNumericUpDownPresetMinutes.Value, (int)DCPNumericUpDownPresetSeconds.Value);
 
             _currentDet.SetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL, time.TotalSeconds);
+
+            int PresetSeconds = (int)time.TotalSeconds;
+            int ElapsedSecond = (int)Math.Round(decimal.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_EREAL).ToString()),0);
+            int LeftSeconds = PresetSeconds - ElapsedSecond;
+
+            var timeLeft = TimeSpan.FromSeconds(LeftSeconds);
+            DCPNumericUpDownElapsedHours.Value = timeLeft.Hours;
+            DCPNumericUpDownElapsedMinutes.Value = timeLeft.Minutes;
+            DCPNumericUpDownElapsedSeconds.Value = timeLeft.Seconds;
+            _currentDet.Start();
         }
     }
 }
