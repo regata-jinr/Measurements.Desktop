@@ -38,7 +38,6 @@ namespace Measurements.UI.Desktop.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SessionForm));
@@ -52,14 +51,13 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormIrradiationsDataLabel = new System.Windows.Forms.Label();
             this.SessionFormButtonPause = new System.Windows.Forms.Button();
             this.MenuOptions = new System.Windows.Forms.ToolStripMenuItem();
-            this.SessionFormadvancedDataGridView = new Zuby.ADGV.AdvancedDataGridView();
-            this.SessionFormDisplayedDataBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.SessionFormadvancedDataGridView = new System.Windows.Forms.DataGridView();
+            //this.SessionFormadvancedDataGridView = new Zuby.ADGV.AdvancedDataGridView();
             this.SessionFormButtonStop = new System.Windows.Forms.Button();
             this.SessionFormButtonClear = new System.Windows.Forms.Button();
             this.SessionFormLabelAllDetectors = new System.Windows.Forms.Label();
             this.SessionFormMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SessionFormadvancedDataGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SessionFormDisplayedDataBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // SessionFormMenuStrip
@@ -191,10 +189,9 @@ namespace Measurements.UI.Desktop.Forms
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.SessionFormadvancedDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
-            this.SessionFormadvancedDataGridView.FilterAndSortEnabled = true;
+            //this.SessionFormadvancedDataGridView.FilterAndSortEnabled = true;
             this.SessionFormadvancedDataGridView.Location = new System.Drawing.Point(134, 56);
             this.SessionFormadvancedDataGridView.Name = "SessionFormadvancedDataGridView";
-            this.SessionFormadvancedDataGridView.ReadOnly = true;
             this.SessionFormadvancedDataGridView.RowHeadersVisible = false;
             this.SessionFormadvancedDataGridView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.SessionFormadvancedDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
@@ -263,7 +260,6 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormMenuStrip.ResumeLayout(false);
             this.SessionFormMenuStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SessionFormadvancedDataGridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.SessionFormDisplayedDataBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -295,8 +291,8 @@ namespace Measurements.UI.Desktop.Forms
         private CountsForm _countsForm;
         private System.Windows.Forms.ToolStripDropDownButton HeightDropDownButton;
         private System.Windows.Forms.ToolStripProgressBar MeasurementsProgressBar;
-        private Zuby.ADGV.AdvancedDataGridView SessionFormadvancedDataGridView;
-        private System.Windows.Forms.BindingSource SessionFormDisplayedDataBindingSource;
+        private System.Windows.Forms.DataGridView SessionFormadvancedDataGridView;
+        //private Zuby.ADGV.AdvancedDataGridView SessionFormadvancedDataGridView;
         private System.Windows.Forms.Button SessionFormButtonStop;
         private System.Windows.Forms.Button SessionFormButtonClear;
         private System.Windows.Forms.Label SessionFormLabelAllDetectors;

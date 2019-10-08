@@ -27,12 +27,12 @@ namespace Measurements.UI.Desktop.Forms
             {
                 d.CurrentSample = _session.SpreadSamples[d.Name][0];
                 d.CurrentMeasurement = _session.MeasurementList.Where(m => m.IrradiationId == d.CurrentSample.Id).First();
-                d.FillFileInfo();
                 d.StatusChanged += DetStatusChangedHandler;
             }
 
             DesktopLocation = new Point(Screen.PrimaryScreen.Bounds.Left + 10, Screen.PrimaryScreen.Bounds.Bottom - Size.Height - 50);
 
+            _session.CurrentSampleChanged += SourcesInitialize;
             DCPNumericUpDownPresetHours.ValueChanged += ChangePresetTimeHandler;
             DCPNumericUpDownPresetMinutes.ValueChanged += ChangePresetTimeHandler;
             DCPNumericUpDownPresetSeconds.ValueChanged += ChangePresetTimeHandler;
@@ -99,7 +99,7 @@ namespace Measurements.UI.Desktop.Forms
                     DCPNumericUpDownElapsedMinutes?.Invoke(new Action(() => { DCPNumericUpDownElapsedMinutes.Value = time.Minutes; }));
                     DCPNumericUpDownElapsedSeconds?.Invoke(new Action(() => { DCPNumericUpDownElapsedSeconds.Value = time.Seconds; }));
 
-                    DCPLabelDeadTimeValue?.Invoke(new Action(() => { DCPLabelDeadTimeValue.Text = $"{_currentDet.DeadTime.ToString("f2")}%"; }));
+                    DCPLabelDeadTimeValue?.Invoke(new Action(() => { DCPLabelDeadTimeValue.Text = $"{_currentDet.DeadTime.ToString()}%"; }));
 
                 }
             }
@@ -169,8 +169,6 @@ namespace Measurements.UI.Desktop.Forms
         private void DCPButtonStop_Click(object sender, EventArgs e)
         {
             _currentDet.Stop();
-            System.Threading.Thread.Sleep(3000);
-            SourcesInitialize();
         }
 
         private void DCPButtonSave_Click(object sender, EventArgs e)
