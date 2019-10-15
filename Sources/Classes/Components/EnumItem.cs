@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using Measurements.Core;
 
 namespace Measurements.UI.Desktop.Components
 {
@@ -10,7 +8,7 @@ namespace Measurements.UI.Desktop.Components
     {
         public ToolStripMenuItem EnumMenuItem;
         public ToolStripStatusLabel EnumStatusLabel;
-        public event Action<string> DropDownItemClick;
+        public event Action<string> CheckedChanged;
         private string _optionName;
         public string CheckedItemText { get; set; }
 
@@ -47,16 +45,12 @@ namespace Measurements.UI.Desktop.Components
                 {
                     item.Checked = true;
                     EnumStatusLabel.Text = $"{currentItem.Text}||";
-                    CheckedItemText = $"{_optionName}: {currentItem.Text}||"; 
-                    DropDownItemClick?.Invoke(currentItem.Text);
+                    CheckedItemText = $"{_optionName}: {currentItem.Text}||";
+                    CheckedChanged?.Invoke(currentItem.Text);
                 }
                 else
                     item.Checked = false;
             }
-
-            //EnumMenuItem.ShowDropDown();
-
         }
-
     }
 }

@@ -14,7 +14,7 @@ namespace Measurements.UI.Managers
 
         private static Task ErrorTask(string message)
         {
-            return Task.Run(() => MessageBox.Show(message, $"Error!", MessageBoxButtons.OK, MessageBoxIcon.Error));
+            return Task.Run(()  => MessageBox.Show(message, $"Error!", MessageBoxButtons.OK, MessageBoxIcon.Error));
         }
 
         private static Task WarningTask(string message)
@@ -98,6 +98,17 @@ namespace Measurements.UI.Managers
 
             if (eventsArgs.Level == ExceptionLevel.Info)
                await InfoTask(MessageTemplate(ref eventsArgs));
+        }
+        public static async void WrapExceptionToMessageBox(ExceptionEventsArgs eventsArgs)
+        {
+            if (eventsArgs.Level == ExceptionLevel.Error)
+                ErrorSync(MessageTemplate(ref eventsArgs));
+
+            if (eventsArgs.Level == ExceptionLevel.Warn)
+                await WarningTask(MessageTemplate(ref eventsArgs));
+
+            if (eventsArgs.Level == ExceptionLevel.Info)
+                await InfoTask(MessageTemplate(ref eventsArgs));
         }
     }
 }

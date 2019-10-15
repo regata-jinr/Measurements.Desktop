@@ -10,6 +10,7 @@ namespace Measurements.UI.Desktop.Components
     {
         public ToolStripMenuItem DetectorMenuItem;
         public ToolStripStatusLabel DetectorStatusLabel;
+        public RadioButton DetectorRadioButton;
         private IDetector _det;
         private ISession _session;
         private Dictionary<DetectorStatus, System.Drawing.Color> StatusColor;
@@ -20,6 +21,7 @@ namespace Measurements.UI.Desktop.Components
             _det = det;
             DetectorMenuItem = new ToolStripMenuItem();
             DetectorStatusLabel = new ToolStripStatusLabel();
+            DetectorRadioButton = new RadioButton();
 
             StatusColor = new Dictionary<DetectorStatus, System.Drawing.Color>() { { DetectorStatus.busy, System.Drawing.Color.Yellow }, { DetectorStatus.off, System.Drawing.Color.Gray }, { DetectorStatus.ready, System.Drawing.Color.Green }, { DetectorStatus.error, System.Drawing.Color.Red } };
 
@@ -35,6 +37,9 @@ namespace Measurements.UI.Desktop.Components
 
             DetectorMenuItem.Text = _det.Name;
             DetectorMenuItem.Name = $"{_det.Name}Item";
+            DetectorRadioButton.Text = _det.Name;
+            DetectorRadioButton.Name = $"{_det.Name}rb";
+            DetectorRadioButton.AutoSize = true;
 
         }
 
