@@ -68,11 +68,11 @@ namespace Measurements.UI.Desktop.Forms
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.SessionFormsRadioButtonHeight2_5 = new System.Windows.Forms.RadioButton();
             this.SessionFormGroupBoxIrradiationJournalsData = new System.Windows.Forms.GroupBox();
+            this.SessionFormCheckBoxHideAlreadyMeasured = new System.Windows.Forms.CheckBox();
             this.SessionFormLabelIrradiatedSamplesTitle = new System.Windows.Forms.Label();
             this.SessionFormLableIrradiationsJournalsTitle = new System.Windows.Forms.Label();
             this.SessionFormAdvancedDataGridViewIrradiationsJournals = new Zuby.ADGV.AdvancedDataGridView();
             this.SessionFormAdvancedDataGridViewIrradiatedSamples = new Zuby.ADGV.AdvancedDataGridView();
-            this.SessionFormCheckBoxHideAlreadyMeasured = new System.Windows.Forms.CheckBox();
             this.SessionFormMenuStrip.SuspendLayout();
             this.SessionFormControlPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SessionFormAdvancedDataGridViewMeasurementsJournal)).BeginInit();
@@ -295,6 +295,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormButtonRemoveSelectedFromJournal.TabIndex = 17;
             this.SessionFormButtonRemoveSelectedFromJournal.Text = "Удалить";
             this.SessionFormButtonRemoveSelectedFromJournal.UseVisualStyleBackColor = true;
+            this.SessionFormButtonRemoveSelectedFromJournal.Click += new System.EventHandler(this.SessionFormButtonRemoveSelectedFromJournal_Click);
             // 
             // SessionFormGroupBoxDuration
             // 
@@ -482,6 +483,15 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormGroupBoxIrradiationJournalsData.TabStop = false;
             this.SessionFormGroupBoxIrradiationJournalsData.Text = "Данные из журналов облучений";
             // 
+            // SessionFormCheckBoxHideAlreadyMeasured
+            // 
+            this.SessionFormCheckBoxHideAlreadyMeasured.Location = new System.Drawing.Point(524, 13);
+            this.SessionFormCheckBoxHideAlreadyMeasured.Name = "SessionFormCheckBoxHideAlreadyMeasured";
+            this.SessionFormCheckBoxHideAlreadyMeasured.Size = new System.Drawing.Size(266, 25);
+            this.SessionFormCheckBoxHideAlreadyMeasured.TabIndex = 21;
+            this.SessionFormCheckBoxHideAlreadyMeasured.Text = "Скрыть уже измеренные образцы";
+            this.SessionFormCheckBoxHideAlreadyMeasured.UseVisualStyleBackColor = true;
+            // 
             // SessionFormLabelIrradiatedSamplesTitle
             // 
             this.SessionFormLabelIrradiatedSamplesTitle.Location = new System.Drawing.Point(202, 16);
@@ -509,6 +519,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.FilterAndSortEnabled = true;
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.Location = new System.Drawing.Point(6, 38);
+            this.SessionFormAdvancedDataGridViewIrradiationsJournals.MultiSelect = false;
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.Name = "SessionFormAdvancedDataGridViewIrradiationsJournals";
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.RowHeadersVisible = false;
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -532,15 +543,6 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.Size = new System.Drawing.Size(585, 184);
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.TabIndex = 17;
-            // 
-            // SessionFormCheckBoxHideAlreadyMeasured
-            // 
-            this.SessionFormCheckBoxHideAlreadyMeasured.Location = new System.Drawing.Point(524, 13);
-            this.SessionFormCheckBoxHideAlreadyMeasured.Name = "SessionFormCheckBoxHideAlreadyMeasured";
-            this.SessionFormCheckBoxHideAlreadyMeasured.Size = new System.Drawing.Size(266, 25);
-            this.SessionFormCheckBoxHideAlreadyMeasured.TabIndex = 21;
-            this.SessionFormCheckBoxHideAlreadyMeasured.Text = "Скрыть уже измеренные образцы";
-            this.SessionFormCheckBoxHideAlreadyMeasured.UseVisualStyleBackColor = true;
             // 
             // SessionForm
             // 

@@ -111,6 +111,7 @@ namespace Measurements.UI.Desktop.Forms
             }
         }
 
+
         private void UpdateMeasurementsJournal(object sender, DataGridViewCellEventArgs e)
         {
             try
@@ -123,6 +124,8 @@ namespace Measurements.UI.Desktop.Forms
                 {
                     var currentMeasurement = ic.Measurements.Where(ir => ir.Id == (int)SessionFormAdvancedDataGridViewMeasurementsJournal.Rows[e.RowIndex].Cells["Id"].Value).First();
 
+                    var currentMeasurementInList = _measurementsList.Find(m => m.Id == currentMeasurement.Id);
+
                     System.Type measInfo = typeof(MeasurementInfo);
                     var prop = measInfo.GetProperty(SessionFormAdvancedDataGridViewMeasurementsJournal.Columns[e.ColumnIndex].Name);
 
@@ -131,6 +134,7 @@ namespace Measurements.UI.Desktop.Forms
                     else
                         prop.SetValue(currentMeasurement, null);
 
+                    currentMeasurementInList = currentMeasurement;
 
                     ic.Measurements.Update(currentMeasurement);
                     ic.SaveChanges();
@@ -178,7 +182,26 @@ namespace Measurements.UI.Desktop.Forms
 
         private void SessionFormCheckBoxShowAlreadyMeasured_CheckedChanged(object sender, EventArgs e)
         {
-            ShowSamples();
+            //ShowSamples();
+            if (!SessionFormCheckBoxHideAlreadyMeasured.Checked)
+            {
+                foreach (DataGridViewRow hiddenRow in SessionFormAdvancedDataGridViewIrradiatedSamples.Rows.OfType<DataGridViewRow>().Where(dr => dr.Visible == false).ToArray())
+                    hiddenRow.Visible = true;
+                SessionFormAdvancedDataGridViewIrradiatedSamples.FirstDisplayedScrollingRowIndex = 0;
+            }
+            else
+            {
+                foreach (DataGridViewRow hiddenRow in SessionFormAdvancedDataGridViewIrradiatedSamples.Rows)
+                {
+                    if (hiddenRow == SessionFormAdvancedDataGridViewIrradiatedSamples.CurrentRow)
+                        SessionFormAdvancedDataGridViewIrradiatedSamples.CurrentCell = null;
+
+                    if (_measurementsList.Select(m => m.IrradiationId).Contains((int)hiddenRow.Cells["Id"].Value))
+                        hiddenRow.Visible = false;
+                }
+            }
+
+                
         }
 
         private void InitializeDisplayedTable()
@@ -204,7 +227,7 @@ namespace Measurements.UI.Desktop.Forms
                 SetVisibilities(_session.Type);
                 SessionFormAdvancedDataGridViewSearchToolBar.SetColumns(SessionFormAdvancedDataGridViewMeasurementsJournal.Columns);
 
-                ShowSamples();
+                //ShowSamples();
 
             }
             catch (Exception ex)
@@ -351,7 +374,6 @@ namespace Measurements.UI.Desktop.Forms
 
                 var colName = SessionFormAdvancedDataGridViewMeasurementsJournal.SelectedCells[0].OwningColumn.Name;
                 var firstCell =  SessionFormAdvancedDataGridViewMeasurementsJournal.SelectedCells[0];
-
 
                 if (colName == "Duration")
                 {
@@ -503,22 +525,23 @@ namespace Measurements.UI.Desktop.Forms
             List<IrradiationInfo> SampleList = null;
             using (var ic = new InfoContext())
             {
-                var existedMeasurements = ic.Measurements.Where(m => m.Type == _session.Type &&
-                                                                    m.DateTimeStart.HasValue &&
-                                                                    m.DateTimeStart.Value.Date == DateTime.Now.Date).
-                                                          Select(m => m.IrradiationId).ToList();
+                //var existedMeasurements = ic.Measurements.Where(m => m.Type == _session.Type &&
+                //                                                    m.DateTimeStart.HasValue &&
+                //                                                    m.DateTimeStart.Value.Date == DateTime.Now.Date).
+                //                                          Select(m => m.IrradiationId).ToList();
 
-                if (SessionFormCheckBoxHideAlreadyMeasured.Checked && existedMeasurements != null) 
-                    SampleList = ic.Irradiations.Where(ir =>
-                                                            ir.Type == _session.Type &&
-                                                            ir.DateTimeStart.HasValue &&
-                                                            ir.DateTimeStart.Value.Date == SelectedIrrJournalDate.Value &&
-                                                            ir.LoadNumber == SelectedLoadNumber &&
-                                                            !existedMeasurements.Contains(ir.Id)).ToList();
-                else
+                //if (SessionFormCheckBoxHideAlreadyMeasured.Checked && existedMeasurements != null) 
+                //    SampleList = ic.Irradiations.Where(ir =>
+                //                                            ir.Type == _session.Type &&
+                //                                            ir.DateTimeStart.HasValue &&
+                //                                            ir.DateTimeStart.Value.Date == SelectedIrrJournalDate.Value &&
+                //                                            ir.LoadNumber == SelectedLoadNumber &&
+                //                                            !existedMeasurements.Contains(ir.Id)).ToList();
+                //else
                     SampleList = ic.Irradiations.Where(ir => ir.Type == _session.Type && ir.DateTimeStart.HasValue && ir.DateTimeStart.Value.Date == SelectedIrrJournalDate.Value && ir.LoadNumber == SelectedLoadNumber).ToList();
-            }
 
+            }
+            SessionFormCheckBoxShowAlreadyMeasured_CheckedChanged(null, EventArgs.Empty);
             if (SampleList == null)
                 SampleList = new List<IrradiationInfo>();
 
@@ -989,6 +1012,17 @@ namespace Measurements.UI.Desktop.Forms
 
                 InitializeDisplayedTable();
 
+                if (SessionFormCheckBoxHideAlreadyMeasured.Checked)
+                {
+                    foreach (DataGridViewRow hiddenRow in SessionFormAdvancedDataGridViewIrradiatedSamples.SelectedRows)
+                    {
+                        hiddenRow.Selected = false;
+                        SessionFormAdvancedDataGridViewIrradiatedSamples.CurrentCell = null;
+                        if (_measurementsList.Select(m => m.IrradiationId).Contains((int)hiddenRow.Cells["Id"].Value))
+                            hiddenRow.Visible = false;
+                        SessionFormAdvancedDataGridViewIrradiatedSamples.FirstDisplayedCell.OwningRow.Selected = true;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -1051,6 +1085,34 @@ namespace Measurements.UI.Desktop.Forms
                         e.CaseSensitive);
                 if (c != null)
                     SessionFormAdvancedDataGridViewMeasurementsJournal.CurrentCell = c;
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = ex, Level = ExceptionLevel.Error });
+            }
+        }
+
+        private void SessionFormButtonRemoveSelectedFromJournal_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (SessionFormAdvancedDataGridViewMeasurementsJournal.SelectedCells.Count == 0)
+                    throw new ArgumentException("Не выбран ни один образец для удаления из журнала облучений!");
+
+                foreach (DataGridViewCell cell in SessionFormAdvancedDataGridViewMeasurementsJournal.SelectedCells)
+                {
+
+                    var row = cell.OwningRow;
+                    var selectedMeas = _measurementsList.Where(ir => ir.Id == (int)row.Cells["Id"].Value).First();
+
+                    using (var ic = new InfoContext())
+                    {
+                        ic.Measurements.Remove(selectedMeas);
+                        ic.SaveChanges();
+                    }
+                }
+
+                InitializeDisplayedTable();
             }
             catch (Exception ex)
             {

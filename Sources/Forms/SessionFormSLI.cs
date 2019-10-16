@@ -7,6 +7,7 @@ using Measurements.UI.Managers;
 using System.Data;
 using Measurements.Core.Handlers;
 using AutoMapper;
+using MoreLinq;
 
 
 namespace Measurements.UI.Desktop.Forms
@@ -59,7 +60,8 @@ namespace Measurements.UI.Desktop.Forms
 
                     newMeasurement.DateTimeStart = DateTime.Now.Date;
                     newMeasurement.Duration      = Duration;
-                    newMeasurement.Detector      = Detector;
+                    newMeasurement.Height        = HeightGeometry;
+                    newMeasurement.Detector      = SelectDetectorForSample(newMeasurement.SetKey, newMeasurement.SampleNumber);
                     newMeasurement.Assistant     = User;
 
                     _measurementsList.Add(newMeasurement);
@@ -81,10 +83,34 @@ namespace Measurements.UI.Desktop.Forms
             SessionFormlButtonAddAllToJournal.Visible = false;
         }
 
-        private void SelectDetectorForSample(ref MeasurementInfo measurement)
+        private string SelectDetectorForSample(string curSetKey, string curSampleNumber)
         {
-            
-            
+            try
+            {
+                if (_measurementsList.Count() < _session.ManagedDetectors.Count)
+                    return Detector;
+
+                var uniqueSets = _measurementsList.Select(m => new { m.Detector, m.SetKey }).Where(us => us.SetKey == curSetKey).Distinct().ToArray();
+
+                if (uniqueSets.Length == 0)
+                    return Detector;
+
+                if (uniqueSets.Length == 1)
+                    return uniqueSets.First().Detector;
+
+                return _measurementsList.Where(m => 
+                                                m.SetKey == uniqueSets[0].SetKey && (int.Parse(curSampleNumber) - int.Parse(m.SampleNumber)) > 0).
+                                         Select(n =>
+                                                new { diff = int.Parse(curSampleNumber) - int.Parse(n.SampleNumber), Detector =                            n.Detector }).
+                                         MinBy(n => n.diff).First().Detector;
+            }
+            catch (Exception e)
+            {
+                MessageBoxTemplates.WarningAsync("Проблема с распределением образцов по детекторам");
+                return Detector;
+            }
+
+
         }
 
     }
