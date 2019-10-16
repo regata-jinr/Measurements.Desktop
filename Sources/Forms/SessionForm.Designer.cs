@@ -49,6 +49,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormControlPanel = new System.Windows.Forms.GroupBox();
             this.SessionFormAdvancedDataGridViewMeasurementsJournal = new Zuby.ADGV.AdvancedDataGridView();
             this.SessionFormGroupBoxFormMeasurementsJournal = new System.Windows.Forms.GroupBox();
+            this.SessionFormlButtonAddAllToJournal = new System.Windows.Forms.Button();
             this.SessionFormlButtonAddSelectedToJournal = new System.Windows.Forms.Button();
             this.SessionFormButtonRemoveSelectedFromJournal = new System.Windows.Forms.Button();
             this.SessionFormGroupBoxDuration = new System.Windows.Forms.GroupBox();
@@ -71,6 +72,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormLableIrradiationsJournalsTitle = new System.Windows.Forms.Label();
             this.SessionFormAdvancedDataGridViewIrradiationsJournals = new Zuby.ADGV.AdvancedDataGridView();
             this.SessionFormAdvancedDataGridViewIrradiatedSamples = new Zuby.ADGV.AdvancedDataGridView();
+            this.SessionFormCheckBoxHideAlreadyMeasured = new System.Windows.Forms.CheckBox();
             this.SessionFormMenuStrip.SuspendLayout();
             this.SessionFormControlPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SessionFormAdvancedDataGridViewMeasurementsJournal)).BeginInit();
@@ -92,7 +94,7 @@ namespace Measurements.UI.Desktop.Forms
             this.MenuMenu});
             this.SessionFormMenuStrip.Location = new System.Drawing.Point(0, 0);
             this.SessionFormMenuStrip.Name = "SessionFormMenuStrip";
-            this.SessionFormMenuStrip.Size = new System.Drawing.Size(1412, 24);
+            this.SessionFormMenuStrip.Size = new System.Drawing.Size(1579, 24);
             this.SessionFormMenuStrip.TabIndex = 0;
             this.SessionFormMenuStrip.Text = "menuStrip1";
             // 
@@ -115,7 +117,7 @@ namespace Measurements.UI.Desktop.Forms
             // 
             this.SessionFormStatusStrip.Location = new System.Drawing.Point(0, 755);
             this.SessionFormStatusStrip.Name = "SessionFormStatusStrip";
-            this.SessionFormStatusStrip.Size = new System.Drawing.Size(1412, 22);
+            this.SessionFormStatusStrip.Size = new System.Drawing.Size(1579, 22);
             this.SessionFormStatusStrip.TabIndex = 1;
             this.SessionFormStatusStrip.Text = "statusStrip1";
             // 
@@ -190,7 +192,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormAdvancedDataGridViewSearchToolBar.MinimumSize = new System.Drawing.Size(0, 27);
             this.SessionFormAdvancedDataGridViewSearchToolBar.Name = "SessionFormAdvancedDataGridViewSearchToolBar";
             this.SessionFormAdvancedDataGridViewSearchToolBar.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.SessionFormAdvancedDataGridViewSearchToolBar.Size = new System.Drawing.Size(1412, 27);
+            this.SessionFormAdvancedDataGridViewSearchToolBar.Size = new System.Drawing.Size(1579, 27);
             this.SessionFormAdvancedDataGridViewSearchToolBar.TabIndex = 14;
             this.SessionFormAdvancedDataGridViewSearchToolBar.Text = "advancedDataGridViewSearchToolBar1";
             this.SessionFormAdvancedDataGridViewSearchToolBar.Search += new Zuby.ADGV.AdvancedDataGridViewSearchToolBarSearchEventHandler(this.SessionFormAdvancedDataGridViewSearchToolBar_Search);
@@ -203,7 +205,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormControlPanel.Controls.Add(this.SessionFormButtonStop);
             this.SessionFormControlPanel.Controls.Add(this.SessionFormButtonClear);
             this.SessionFormControlPanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SessionFormControlPanel.Location = new System.Drawing.Point(1073, 678);
+            this.SessionFormControlPanel.Location = new System.Drawing.Point(1240, 678);
             this.SessionFormControlPanel.Name = "SessionFormControlPanel";
             this.SessionFormControlPanel.Size = new System.Drawing.Size(331, 75);
             this.SessionFormControlPanel.TabIndex = 16;
@@ -238,32 +240,44 @@ namespace Measurements.UI.Desktop.Forms
             dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.SessionFormAdvancedDataGridViewMeasurementsJournal.DefaultCellStyle = dataGridViewCellStyle4;
             this.SessionFormAdvancedDataGridViewMeasurementsJournal.FilterAndSortEnabled = true;
-            this.SessionFormAdvancedDataGridViewMeasurementsJournal.Location = new System.Drawing.Point(12, 54);
+            this.SessionFormAdvancedDataGridViewMeasurementsJournal.Location = new System.Drawing.Point(8, 54);
             this.SessionFormAdvancedDataGridViewMeasurementsJournal.Name = "SessionFormAdvancedDataGridViewMeasurementsJournal";
             this.SessionFormAdvancedDataGridViewMeasurementsJournal.RowHeadersVisible = false;
             this.SessionFormAdvancedDataGridViewMeasurementsJournal.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.SessionFormAdvancedDataGridViewMeasurementsJournal.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.SessionFormAdvancedDataGridViewMeasurementsJournal.Size = new System.Drawing.Size(1392, 465);
+            this.SessionFormAdvancedDataGridViewMeasurementsJournal.Size = new System.Drawing.Size(1559, 465);
             this.SessionFormAdvancedDataGridViewMeasurementsJournal.TabIndex = 10;
             // 
             // SessionFormGroupBoxFormMeasurementsJournal
             // 
-            this.SessionFormGroupBoxFormMeasurementsJournal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.SessionFormGroupBoxFormMeasurementsJournal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.SessionFormGroupBoxFormMeasurementsJournal.Controls.Add(this.SessionFormlButtonAddAllToJournal);
             this.SessionFormGroupBoxFormMeasurementsJournal.Controls.Add(this.SessionFormlButtonAddSelectedToJournal);
             this.SessionFormGroupBoxFormMeasurementsJournal.Controls.Add(this.SessionFormButtonRemoveSelectedFromJournal);
             this.SessionFormGroupBoxFormMeasurementsJournal.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SessionFormGroupBoxFormMeasurementsJournal.Location = new System.Drawing.Point(647, 524);
+            this.SessionFormGroupBoxFormMeasurementsJournal.Location = new System.Drawing.Point(814, 524);
             this.SessionFormGroupBoxFormMeasurementsJournal.Name = "SessionFormGroupBoxFormMeasurementsJournal";
-            this.SessionFormGroupBoxFormMeasurementsJournal.Size = new System.Drawing.Size(248, 148);
+            this.SessionFormGroupBoxFormMeasurementsJournal.Size = new System.Drawing.Size(248, 149);
             this.SessionFormGroupBoxFormMeasurementsJournal.TabIndex = 24;
             this.SessionFormGroupBoxFormMeasurementsJournal.TabStop = false;
             this.SessionFormGroupBoxFormMeasurementsJournal.Text = "Формирование журнала";
+            // 
+            // SessionFormlButtonAddAllToJournal
+            // 
+            this.SessionFormlButtonAddAllToJournal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.SessionFormlButtonAddAllToJournal.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SessionFormlButtonAddAllToJournal.Location = new System.Drawing.Point(6, 66);
+            this.SessionFormlButtonAddAllToJournal.Name = "SessionFormlButtonAddAllToJournal";
+            this.SessionFormlButtonAddAllToJournal.Size = new System.Drawing.Size(231, 32);
+            this.SessionFormlButtonAddAllToJournal.TabIndex = 18;
+            this.SessionFormlButtonAddAllToJournal.Text = "Добавить все";
+            this.SessionFormlButtonAddAllToJournal.UseVisualStyleBackColor = true;
             // 
             // SessionFormlButtonAddSelectedToJournal
             // 
             this.SessionFormlButtonAddSelectedToJournal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.SessionFormlButtonAddSelectedToJournal.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SessionFormlButtonAddSelectedToJournal.Location = new System.Drawing.Point(6, 27);
+            this.SessionFormlButtonAddSelectedToJournal.Location = new System.Drawing.Point(6, 28);
             this.SessionFormlButtonAddSelectedToJournal.Name = "SessionFormlButtonAddSelectedToJournal";
             this.SessionFormlButtonAddSelectedToJournal.Size = new System.Drawing.Size(231, 32);
             this.SessionFormlButtonAddSelectedToJournal.TabIndex = 6;
@@ -275,7 +289,7 @@ namespace Measurements.UI.Desktop.Forms
             // 
             this.SessionFormButtonRemoveSelectedFromJournal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.SessionFormButtonRemoveSelectedFromJournal.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SessionFormButtonRemoveSelectedFromJournal.Location = new System.Drawing.Point(6, 107);
+            this.SessionFormButtonRemoveSelectedFromJournal.Location = new System.Drawing.Point(6, 108);
             this.SessionFormButtonRemoveSelectedFromJournal.Name = "SessionFormButtonRemoveSelectedFromJournal";
             this.SessionFormButtonRemoveSelectedFromJournal.Size = new System.Drawing.Size(231, 30);
             this.SessionFormButtonRemoveSelectedFromJournal.TabIndex = 17;
@@ -284,7 +298,7 @@ namespace Measurements.UI.Desktop.Forms
             // 
             // SessionFormGroupBoxDuration
             // 
-            this.SessionFormGroupBoxDuration.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.SessionFormGroupBoxDuration.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.SessionFormGroupBoxDuration.Controls.Add(this.SessionFormLabelDays);
             this.SessionFormGroupBoxDuration.Controls.Add(this.SessionFormNumericUpDownDays);
             this.SessionFormGroupBoxDuration.Controls.Add(this.SessionFormNumericUpDownMinutes);
@@ -294,9 +308,9 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormGroupBoxDuration.Controls.Add(this.SessionFormLabelHours);
             this.SessionFormGroupBoxDuration.Controls.Add(this.SessionFormNumericUpDownHours);
             this.SessionFormGroupBoxDuration.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SessionFormGroupBoxDuration.Location = new System.Drawing.Point(901, 524);
+            this.SessionFormGroupBoxDuration.Location = new System.Drawing.Point(1068, 524);
             this.SessionFormGroupBoxDuration.Name = "SessionFormGroupBoxDuration";
-            this.SessionFormGroupBoxDuration.Size = new System.Drawing.Size(223, 148);
+            this.SessionFormGroupBoxDuration.Size = new System.Drawing.Size(223, 149);
             this.SessionFormGroupBoxDuration.TabIndex = 23;
             this.SessionFormGroupBoxDuration.TabStop = false;
             this.SessionFormGroupBoxDuration.Text = "Продолжительность измерения выбранных образцов";
@@ -385,24 +399,24 @@ namespace Measurements.UI.Desktop.Forms
             // 
             // SessionFormGroupBoxDetectors
             // 
-            this.SessionFormGroupBoxDetectors.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.SessionFormGroupBoxDetectors.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.SessionFormGroupBoxDetectors.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SessionFormGroupBoxDetectors.Location = new System.Drawing.Point(1130, 524);
+            this.SessionFormGroupBoxDetectors.Location = new System.Drawing.Point(1297, 524);
             this.SessionFormGroupBoxDetectors.Name = "SessionFormGroupBoxDetectors";
-            this.SessionFormGroupBoxDetectors.Size = new System.Drawing.Size(274, 68);
+            this.SessionFormGroupBoxDetectors.Size = new System.Drawing.Size(274, 69);
             this.SessionFormGroupBoxDetectors.TabIndex = 25;
             this.SessionFormGroupBoxDetectors.TabStop = false;
             this.SessionFormGroupBoxDetectors.Text = "Сменить детектор для выбранного образца";
             // 
             // SessionFormGroupBoxHeights
             // 
-            this.SessionFormGroupBoxHeights.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.SessionFormGroupBoxHeights.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.SessionFormGroupBoxHeights.Controls.Add(this.radioButton3);
             this.SessionFormGroupBoxHeights.Controls.Add(this.radioButton2);
             this.SessionFormGroupBoxHeights.Controls.Add(this.radioButton1);
             this.SessionFormGroupBoxHeights.Controls.Add(this.SessionFormsRadioButtonHeight2_5);
             this.SessionFormGroupBoxHeights.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SessionFormGroupBoxHeights.Location = new System.Drawing.Point(1130, 598);
+            this.SessionFormGroupBoxHeights.Location = new System.Drawing.Point(1297, 599);
             this.SessionFormGroupBoxHeights.Name = "SessionFormGroupBoxHeights";
             this.SessionFormGroupBoxHeights.Size = new System.Drawing.Size(274, 74);
             this.SessionFormGroupBoxHeights.TabIndex = 26;
@@ -453,7 +467,9 @@ namespace Measurements.UI.Desktop.Forms
             // 
             // SessionFormGroupBoxIrradiationJournalsData
             // 
-            this.SessionFormGroupBoxIrradiationJournalsData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.SessionFormGroupBoxIrradiationJournalsData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.SessionFormGroupBoxIrradiationJournalsData.Controls.Add(this.SessionFormCheckBoxHideAlreadyMeasured);
             this.SessionFormGroupBoxIrradiationJournalsData.Controls.Add(this.SessionFormLabelIrradiatedSamplesTitle);
             this.SessionFormGroupBoxIrradiationJournalsData.Controls.Add(this.SessionFormLableIrradiationsJournalsTitle);
             this.SessionFormGroupBoxIrradiationJournalsData.Controls.Add(this.SessionFormAdvancedDataGridViewIrradiationsJournals);
@@ -461,7 +477,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormGroupBoxIrradiationJournalsData.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SessionFormGroupBoxIrradiationJournalsData.Location = new System.Drawing.Point(12, 524);
             this.SessionFormGroupBoxIrradiationJournalsData.Name = "SessionFormGroupBoxIrradiationJournalsData";
-            this.SessionFormGroupBoxIrradiationJournalsData.Size = new System.Drawing.Size(629, 228);
+            this.SessionFormGroupBoxIrradiationJournalsData.Size = new System.Drawing.Size(796, 228);
             this.SessionFormGroupBoxIrradiationJournalsData.TabIndex = 18;
             this.SessionFormGroupBoxIrradiationJournalsData.TabStop = false;
             this.SessionFormGroupBoxIrradiationJournalsData.Text = "Данные из журналов облучений";
@@ -470,7 +486,7 @@ namespace Measurements.UI.Desktop.Forms
             // 
             this.SessionFormLabelIrradiatedSamplesTitle.Location = new System.Drawing.Point(202, 16);
             this.SessionFormLabelIrradiatedSamplesTitle.Name = "SessionFormLabelIrradiatedSamplesTitle";
-            this.SessionFormLabelIrradiatedSamplesTitle.Size = new System.Drawing.Size(421, 16);
+            this.SessionFormLabelIrradiatedSamplesTitle.Size = new System.Drawing.Size(304, 16);
             this.SessionFormLabelIrradiatedSamplesTitle.TabIndex = 20;
             this.SessionFormLabelIrradiatedSamplesTitle.Text = "Список образцов из выбранного журнала";
             // 
@@ -484,6 +500,9 @@ namespace Measurements.UI.Desktop.Forms
             // 
             // SessionFormAdvancedDataGridViewIrradiationsJournals
             // 
+            this.SessionFormAdvancedDataGridViewIrradiationsJournals.AllowUserToAddRows = false;
+            this.SessionFormAdvancedDataGridViewIrradiationsJournals.AllowUserToDeleteRows = false;
+            this.SessionFormAdvancedDataGridViewIrradiationsJournals.AllowUserToResizeRows = false;
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.BackgroundColor = System.Drawing.Color.White;
@@ -498,7 +517,11 @@ namespace Measurements.UI.Desktop.Forms
             // 
             // SessionFormAdvancedDataGridViewIrradiatedSamples
             // 
-            this.SessionFormAdvancedDataGridViewIrradiatedSamples.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.SessionFormAdvancedDataGridViewIrradiatedSamples.AllowUserToAddRows = false;
+            this.SessionFormAdvancedDataGridViewIrradiatedSamples.AllowUserToDeleteRows = false;
+            this.SessionFormAdvancedDataGridViewIrradiatedSamples.AllowUserToResizeRows = false;
+            this.SessionFormAdvancedDataGridViewIrradiatedSamples.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.BackgroundColor = System.Drawing.Color.White;
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -507,14 +530,23 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.Name = "SessionFormAdvancedDataGridViewIrradiatedSamples";
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.RowHeadersVisible = false;
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.SessionFormAdvancedDataGridViewIrradiatedSamples.Size = new System.Drawing.Size(418, 184);
+            this.SessionFormAdvancedDataGridViewIrradiatedSamples.Size = new System.Drawing.Size(585, 184);
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.TabIndex = 17;
+            // 
+            // SessionFormCheckBoxHideAlreadyMeasured
+            // 
+            this.SessionFormCheckBoxHideAlreadyMeasured.Location = new System.Drawing.Point(524, 13);
+            this.SessionFormCheckBoxHideAlreadyMeasured.Name = "SessionFormCheckBoxHideAlreadyMeasured";
+            this.SessionFormCheckBoxHideAlreadyMeasured.Size = new System.Drawing.Size(266, 25);
+            this.SessionFormCheckBoxHideAlreadyMeasured.TabIndex = 21;
+            this.SessionFormCheckBoxHideAlreadyMeasured.Text = "Скрыть уже измеренные образцы";
+            this.SessionFormCheckBoxHideAlreadyMeasured.UseVisualStyleBackColor = true;
             // 
             // SessionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1412, 777);
+            this.ClientSize = new System.Drawing.Size(1579, 777);
             this.Controls.Add(this.SessionFormGroupBoxHeights);
             this.Controls.Add(this.SessionFormGroupBoxDetectors);
             this.Controls.Add(this.SessionFormGroupBoxFormMeasurementsJournal);
@@ -597,5 +629,7 @@ namespace Measurements.UI.Desktop.Forms
         private System.Windows.Forms.Label SessionFormLableIrradiationsJournalsTitle;
         private Zuby.ADGV.AdvancedDataGridView SessionFormAdvancedDataGridViewIrradiationsJournals;
         private Zuby.ADGV.AdvancedDataGridView SessionFormAdvancedDataGridViewIrradiatedSamples;
+        private System.Windows.Forms.Button SessionFormlButtonAddAllToJournal;
+        private System.Windows.Forms.CheckBox SessionFormCheckBoxHideAlreadyMeasured;
     }
 }

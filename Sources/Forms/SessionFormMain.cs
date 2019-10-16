@@ -24,6 +24,27 @@ namespace Measurements.UI.Desktop.Forms
         private ISession _session;
         private Dictionary<bool, System.Drawing.Color> ConnectionStatusColor;
         private List<MeasurementInfo> _measurementsList;
+        private string User { get { return SessionControllerSingleton.ConnectionStringBuilder.UserID; } }
+
+        private DateTime? SelectedIrrJournalDate
+        {
+            get 
+            {
+                if (SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedCells.Count != 0)
+                    return (DateTime)SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedCells[0].Value;
+                return null;
+            }
+        }
+
+        private int? SelectedLoadNumber
+        {
+            get
+            {
+                if (SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedCells.Count != 0 && _session.Type != "SLI")
+                    return (int)SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedCells[1].Value;
+                return null;
+            }
+        }
 
         public SessionForm(ISession session)
         {
@@ -34,7 +55,7 @@ namespace Measurements.UI.Desktop.Forms
 
                 InitializeComponent();
 
-                Text = $"Сессия измерений [{session.Name}]| Regata Measurements UI - {LoginForm.CurrentVersion} | [{SessionControllerSingleton.ConnectionStringBuilder.UserID}]";
+                Text = $"Сессия измерений [{session.Name}]| Regata Measurements UI - {LoginForm.CurrentVersion} | [{User}]";
 
                 SessionFormStatusStrip.ShowItemToolTips = true;
 
@@ -74,6 +95,11 @@ namespace Measurements.UI.Desktop.Forms
 
                 SessionFormAdvancedDataGridViewIrradiationsJournals.SelectionChanged += SelectIrrJournalHandler;
 
+                SessionFormCheckBoxHideAlreadyMeasured.Checked = true;
+                SessionFormCheckBoxHideAlreadyMeasured.CheckedChanged += SessionFormCheckBoxShowAlreadyMeasured_CheckedChanged;
+
+                SessionFormAdvancedDataGridViewMeasurementsJournal.CellValueChanged += UpdateMeasurementsJournal;
+
             }
             catch (Exception ex)
             {
@@ -85,6 +111,76 @@ namespace Measurements.UI.Desktop.Forms
             }
         }
 
+        private void UpdateMeasurementsJournal(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                if (e.RowIndex < 0 || e.RowIndex >= SessionFormAdvancedDataGridViewMeasurementsJournal.Rows.Count) return;
+
+                if (!DataValidation(e)) return;
+
+                using (var ic = new InfoContext())
+                {
+                    var currentMeasurement = ic.Measurements.Where(ir => ir.Id == (int)SessionFormAdvancedDataGridViewMeasurementsJournal.Rows[e.RowIndex].Cells["Id"].Value).First();
+
+                    System.Type measInfo = typeof(MeasurementInfo);
+                    var prop = measInfo.GetProperty(SessionFormAdvancedDataGridViewMeasurementsJournal.Columns[e.ColumnIndex].Name);
+
+                    if (!string.IsNullOrEmpty(SessionFormAdvancedDataGridViewMeasurementsJournal.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString()))
+                        prop.SetValue(currentMeasurement, SessionFormAdvancedDataGridViewMeasurementsJournal.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
+                    else
+                        prop.SetValue(currentMeasurement, null);
+
+
+                    ic.Measurements.Update(currentMeasurement);
+                    ic.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = ex, Level = ExceptionLevel.Error });
+            }
+        }
+
+        private bool DataValidation(DataGridViewCellEventArgs e)
+        {
+            DataGridViewCell currentCell = SessionFormAdvancedDataGridViewMeasurementsJournal.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            DataGridViewCell savedValueOfCurrentCell = currentCell.Clone() as DataGridViewCell;
+
+            try
+            {
+                var isValidated = true;
+
+                DataGridViewColumn currentColumn = currentCell.OwningColumn;
+                DataGridViewRow currentRow = currentCell.OwningRow;
+
+                if (currentColumn.Name.Contains("DateTime"))
+                    isValidated = DateTime.TryParse(currentCell.Value.ToString(), out _);
+
+                if (currentColumn.Name == "Note")
+                    isValidated = (currentCell.Value.ToString().Length < 300);
+
+                if (!isValidated)
+                {
+                    MessageBoxTemplates.WarningAsync($"Ошибка при валидации данных. Столбец - {currentColumn.Name}");
+                    currentCell.Value = savedValueOfCurrentCell.Value;
+                }
+
+                return isValidated;
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = ex, Level = ExceptionLevel.Error });
+                currentCell.Value = savedValueOfCurrentCell.Value;
+                return false;
+            }
+        }
+
+        private void SessionFormCheckBoxShowAlreadyMeasured_CheckedChanged(object sender, EventArgs e)
+        {
+            ShowSamples();
+        }
+
         private void InitializeDisplayedTable()
         {
             try
@@ -92,7 +188,7 @@ namespace Measurements.UI.Desktop.Forms
                 using (var ic = new InfoContext())
                 {
                     _measurementsList = ic.Measurements.Where(ir => ir.DateTimeStart.HasValue &&
-                                                             ir.DateTimeStart.Value.Date == _session.CurrentIrradiationDate.Date &&
+                                                             ir.DateTimeStart.Value.Date == DateTime.Now.Date &&
                                                              ir.Type == _session.Type)
                                                        .ToList();
                 }
@@ -105,11 +201,10 @@ namespace Measurements.UI.Desktop.Forms
                 _bindingSource = advbindSource.GetBindingSource();
                 SessionFormAdvancedDataGridViewMeasurementsJournal.DataSource = _bindingSource;
 
-                //if (_session.Type.Contains("LLI"))
-                //    _bindingSource.Sort = "Container, Position";
-
-                SetColumnVisibles(_session.Type);
+                SetVisibilities(_session.Type);
                 SessionFormAdvancedDataGridViewSearchToolBar.SetColumns(SessionFormAdvancedDataGridViewMeasurementsJournal.Columns);
+
+                ShowSamples();
 
             }
             catch (Exception ex)
@@ -119,12 +214,18 @@ namespace Measurements.UI.Desktop.Forms
                     _measurementsList = new List<MeasurementInfo>();
             }
         }
-        private void SetColumnVisibles(string type)
+
+        private void SetVisibilities(string type)
         {
             if (type == "SLI")
+            {
                 SetColumnProperties4SLI();
+                SetSLIVisibilities();
+            }
             if (type.Contains("LLI"))
+            {
                 SetColumnProperties4LLI();
+            }
         }
 
         private void SessionFormadvancedDataGridView_CurrentCellDirtyStateChanged(object sender, EventArgs e)
@@ -394,37 +495,54 @@ namespace Measurements.UI.Desktop.Forms
 
         private void ShowSamples()
         {
-            return;
-            SessionFormAdvancedDataGridViewIrradiatedSamples.DataSource = null;
-
             if (SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedRows.Count == 0)
                 return;
 
-            var selCells = SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedRows[0].Cells;
-            List<MeasurementInfo> SampleList = null;
+            SessionFormAdvancedDataGridViewIrradiatedSamples.DataSource = null;
+
+            List<IrradiationInfo> SampleList = null;
             using (var ic = new InfoContext())
             {
-                //SampleList = ic.Irradiations.Where(s => ).ToList();
+                var existedMeasurements = ic.Measurements.Where(m => m.Type == _session.Type &&
+                                                                    m.DateTimeStart.HasValue &&
+                                                                    m.DateTimeStart.Value.Date == DateTime.Now.Date).
+                                                          Select(m => m.IrradiationId).ToList();
+
+                if (SessionFormCheckBoxHideAlreadyMeasured.Checked && existedMeasurements != null) 
+                    SampleList = ic.Irradiations.Where(ir =>
+                                                            ir.Type == _session.Type &&
+                                                            ir.DateTimeStart.HasValue &&
+                                                            ir.DateTimeStart.Value.Date == SelectedIrrJournalDate.Value &&
+                                                            ir.LoadNumber == SelectedLoadNumber &&
+                                                            !existedMeasurements.Contains(ir.Id)).ToList();
+                else
+                    SampleList = ic.Irradiations.Where(ir => ir.Type == _session.Type && ir.DateTimeStart.HasValue && ir.DateTimeStart.Value.Date == SelectedIrrJournalDate.Value && ir.LoadNumber == SelectedLoadNumber).ToList();
             }
 
             if (SampleList == null)
-                SampleList = new List<MeasurementInfo>();
+                SampleList = new List<IrradiationInfo>();
 
-            var advbindSource = new  AdvancedBindingSource<MeasurementInfo>(SampleList);
+            if (_session.Type.Contains("LLI"))
+                SampleList = SampleList.OrderBy(ir => ir.Container).ThenBy(ir => ir.Position).ToList();
+
+            var advbindSource = new  AdvancedBindingSource<IrradiationInfo>(SampleList);
             SessionFormAdvancedDataGridViewIrradiatedSamples.SetDoubleBuffered();
             var bindingSource = advbindSource.GetBindingSource();
             SessionFormAdvancedDataGridViewIrradiatedSamples.DataSource = bindingSource;
 
-            SetColumnsProperties(ref SessionFormAdvancedDataGridViewMeasurementsJournal,
-                new string[] {  },
+            SetColumnsProperties(ref SessionFormAdvancedDataGridViewIrradiatedSamples,
+                new string[] { "Id", "Type", "Weight", "DateTimeStart", "Duration", "DateTimeFinish", "Container", "Position", "Channel", "LoadNumber", "Rehandler", "Assistant", "SetKey", "SampleKey" },
                 new Dictionary<string, string>()
                 {
-                    { "",          "" },
-                    { "",   "" },
-                    { "",        "" }
+                   {"CountryCode",  "Страна"},
+                   {"ClientNumber", "Клиент"},
+                   {"Year",         "Год"},
+                   {"SetNumber",    "Номер партии"},
+                   {"SetIndex",     "Индекс партии"},
+                   {"SampleNumber", "Номер образца"},
+                   {"Note",         "Примечание"},
                 },
                 new string[0]
-
                 );
 
         }
@@ -572,7 +690,10 @@ namespace Measurements.UI.Desktop.Forms
                         detItem.DetectorRadioButton.CheckedChanged += DetectorsRadioButtonCheckedChanged;
 
                         if (SessionFormGroupBoxDetectors.Controls.Count == 0)
+                        {
                             detItem.DetectorRadioButton.Location = new System.Drawing.Point(10, 38);
+                            detItem.DetectorRadioButton.Checked = true;
+                        }
                         else
                         {
                             var lastRbWidth  = SessionFormGroupBoxDetectors.Controls.OfType<RadioButton>().Last().Size.Width;

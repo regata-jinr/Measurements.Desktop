@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using Measurements.Core;
 using System.Linq;
-using Measurements.UI.Desktop.Components;
 using Measurements.UI.Managers;
 using System.Data;
 using Measurements.Core.Handlers;
-using System.Diagnostics;
+using AutoMapper;
+
 
 namespace Measurements.UI.Desktop.Forms
 {
@@ -17,26 +17,27 @@ namespace Measurements.UI.Desktop.Forms
 
         private void SetColumnProperties4SLI()
         {
-            //SetColumnsProperties(ref IrradiationJournalADGV,
-            //                    new string[]
-            //                    { "Id", "SetKey", "SampleKey", "Type", "Container", "Position", "LoadNumber", "Rehandler" },
-            //                    new Dictionary<string, string>() {
-            //                        { "CountryCode",    "Код страны" },
-            //                        { "ClientNumber",   "Номер клиента" },
-            //                        { "Year",           "Год" },
-            //                        { "SetNumber",      "Номер партии" },
-            //                        { "SetIndex",       "Индекс партии" },
-            //                        { "SampleNumber",   "Номер образца" },
-            //                        { "Weight",         "Вес" },
-            //                        { "DateTimeStart",  "Дата и время начала облучения" },
-            //                        { "Duration",       "Продолжительность облучения" },
-            //                        { "DateTimeFinish", "Дата и время конца облучения" },
-            //                        { "Channel",        "Канал" },
-            //                        { "Assistant",      "Облучил" },
-            //                        { "Note",           "Примечание" } },
-            //                    new string[]
-            //                    { "CountryCode", "ClientNumber", "Year", "SetNumber", "SetIndex", "SampleNumber", "Weight", "Duration", "Channel", "Assistant" }
-            //                    );
+            SetColumnsProperties(ref SessionFormAdvancedDataGridViewMeasurementsJournal,
+                                new string[]
+                                { "Id","IrradiationId", "SetKey", "Type" },
+                                new Dictionary<string,      string>() {
+                                    { "CountryCode",        "Код страны" },
+                                    { "ClientNumber",       "Номер клиента" },
+                                    { "Year",               "Год" },
+                                    { "SetNumber",          "Номер партии" },
+                                    { "SetIndex",           "Индекс партии" },
+                                    { "SampleNumber",       "Номер образца" },
+                                    { "DateTimeStart",      "Дата и время начала измерения" },
+                                    { "Duration",           "Продолжительность измерения" },
+                                    { "DateTimeFinish",     "Дата и время конца измерения" },
+                                    { "Height",             "Высота" },
+                                    { "FileSpectra",        "Файл спектра" },
+                                    { "Detector",           "Детектор" },
+                                    { "Assistant",          "Оператор" },
+                                    { "Note",               "Примечание" } },
+                                new string[]
+                                { "CountryCode", "ClientNumber", "Year", "SetNumber", "SetIndex", "SampleNumber", "Height", "Duration", "Detector", "Assistant", "FileSpectra" }
+                                );
 
         }
 
@@ -46,33 +47,28 @@ namespace Measurements.UI.Desktop.Forms
         {
             try
             {
-                //foreach (DataGridViewRow row in IrradiationJournalADGVSamples.SelectedRows)
-                //{
-                //    var drvSet = IrradiationJournalADGVSamplesSets.SelectedRows[0];
+                foreach (DataGridViewRow row in SessionFormAdvancedDataGridViewIrradiatedSamples.SelectedRows)
+                {
+                    IrradiationInfo currentSample = null;
+                    using (var ic = new InfoContext())
+                        currentSample = ic.Irradiations.Where(ir => ir.Id == (int)row.Cells["Id"].Value).First();
 
-                //    var newIrr = new IrradiationInfo()
-                //    {
-                //        CountryCode  = drvSet.Cells["Country_Code"].Value.ToString(),
-                //        ClientNumber = drvSet.Cells["Client_Id"].Value.ToString(),
-                //        Year         = drvSet.Cells["Year"].Value.ToString(),
-                //        SetNumber    = drvSet.Cells["Sample_Set_Id"].Value.ToString(),
-                //        SetIndex     = drvSet.Cells["Sample_Set_Index"].Value.ToString(),
-                //        SampleNumber = row.Cells["A_Sample_ID"].Value.ToString(),
-                //        Type         = _type,
-                //        DateTimeStart = _currentJournalDateTime,
-                //        Weight       = string.IsNullOrEmpty(row.Cells["P_Weighting_SLI"].Value.ToString()) ? 0 : decimal.Parse(row.Cells["P_Weighting_SLI"].Value.ToString()),
-                //        Duration     = Duration,
-                //        Channel      = this.Channel,
-                //        Assistant    =  _user
-                //    };
+                    var configuration = new MapperConfiguration(cfg => cfg.AddMaps("MeasurementsCore"));
+                    var mapper = new Mapper(configuration);
+                    var newMeasurement = mapper.Map<MeasurementInfo>(currentSample);
 
-                //    _irradiationList.Add(newIrr);
-                //    using (var ic = new InfoContext())
-                //    {
-                //        ic.Irradiations.Add(newIrr);
-                //        ic.SaveChanges();
-                //    }
-                //}
+                    newMeasurement.DateTimeStart = DateTime.Now.Date;
+                    newMeasurement.Duration      = Duration;
+                    newMeasurement.Detector      = Detector;
+                    newMeasurement.Assistant     = User;
+
+                    _measurementsList.Add(newMeasurement);
+                    using (var ic = new InfoContext())
+                    {
+                        ic.Measurements.Add(newMeasurement);
+                        ic.SaveChanges();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -82,8 +78,13 @@ namespace Measurements.UI.Desktop.Forms
 
         private void SetSLIVisibilities()
         {
-            //IrradiationJournalGoupBoxContainer.Visible = false;
-            //IrradiationJournalButtonRehandle.Visible = false;
+            SessionFormlButtonAddAllToJournal.Visible = false;
+        }
+
+        private void SelectDetectorForSample(ref MeasurementInfo measurement)
+        {
+            
+            
         }
 
     }

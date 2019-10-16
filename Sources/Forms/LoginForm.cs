@@ -21,9 +21,7 @@ namespace Measurements.UI.Desktop.Forms
                 MessageBoxTemplates.UIHandleException();
                 var config = new Measurements.Configurator.ConfigManager();
                 _connectionStringBase = config.GenConnectionStringBase;
-#if DEBUG
-                _connectionStringBase = @"Server=RUMLAB\REGATALOCAL;Database=NAA_DB_TEST;Trusted_Connection=True;";
-#endif
+
                 InitializeComponent();
                 Text = $"Regata Measurements UI - {CurrentVersion}";
                 textBoxLoginFormUser.Focus();
@@ -33,6 +31,12 @@ namespace Measurements.UI.Desktop.Forms
                     MessageBoxTemplates.ErrorSync("Программа измерений уже запущена");
                     Application.Exit();
                 }
+#if DEBUG
+                MessageBoxTemplates.InfoSync("Вы находитесь в режиме отладки. База данных тестовая. Не забудьте перед релизом переключить сборку на соответствующий тип.");
+                _connectionStringBase = @"Server=RUMLAB\REGATALOCAL;Database=NAA_DB_TEST;Trusted_Connection=True;User Id=bdrum";
+                var scpf = new SessionControlPanel(_connectionStringBase);
+                scpf.Show();
+#endif
             }
             catch (Exception e)
             {

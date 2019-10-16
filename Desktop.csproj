@@ -48,6 +48,9 @@
     <Reference Include="AutoClosingMessageBox, Version=1.0.0.2, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\AutoClosingMessageBox.1.0.0.2\lib\net40\AutoClosingMessageBox.dll</HintPath>
     </Reference>
+    <Reference Include="AutoMapper, Version=9.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\AutoMapper.9.0.0\lib\net461\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="CredentialManagement, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\CredentialManagement.Standard.1.0.4\lib\netstandard2.0\CredentialManagement.dll</HintPath>
     </Reference>
@@ -281,9 +284,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Sources\Forms\SessionControlPanel.resx">
       <DependentUpon>SessionControlPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Sources\Forms\SessionForm.resx">
-      <DependentUpon>SessionFormMain.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Sources\Forms\SessionFormMain.resx">
       <DependentUpon>SessionFormMain.cs</DependentUpon>
