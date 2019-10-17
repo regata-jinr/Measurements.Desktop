@@ -41,72 +41,77 @@ namespace Measurements.UI.Desktop.Forms
 
         private void AddLLIMeasurementsInfoToMainTable()
         {
-            //foreach (DataGridViewRow row in IrradiationJournalADGVSamples.SelectedRows)
-            //{
-            //    var drvSet = IrradiationJournalADGVSamplesSets.SelectedRows[0];
-
-
-            //    var newIrr = new IrradiationInfo()
-            //    {
-            //        CountryCode  = drvSet.Cells["Country_Code"].Value.ToString(),
-            //        ClientNumber = drvSet.Cells["Client_Id"].Value.ToString(),
-            //        Year         = drvSet.Cells["Year"].Value.ToString(),
-            //        SetNumber    = drvSet.Cells["Sample_Set_Id"].Value.ToString(),
-            //        SetIndex     = drvSet.Cells["Sample_Set_Index"].Value.ToString(),
-            //        SampleNumber = row.Cells["A_Sample_ID"].Value.ToString(),
-            //        Type         = _type,
-            //        DateTimeStart = _currentJournalDateTime,
-            //        Weight       = string.IsNullOrEmpty(row.Cells["P_Weighting_SLI"].Value.ToString()) ? 0 : decimal.Parse(row.Cells["P_Weighting_SLI"].Value.ToString()),
-            //        Duration     = Duration,
-            //        Channel      = this.Channel,
-            //        Container    = ContainerNumber,
-            //        Position     = PositionInContainer,
-            //        LoadNumber   = _loadNumber,
-            //        Assistant    = _user
-            //    };
-            //    _irradiationList.Add(newIrr);
-
-            //    using (var ic = new InfoContext())
-            //    {
-            //        ic.Irradiations.Add(newIrr);
-            //        ic.SaveChanges();
-            //    }
-            //}
+            AddSLIMeasurementsInfoToMainTable();
         }
 
-        //TODO: add spreading samples by container
         private void AddAllMeasurementsInfoToMainTable()
         {
+            if (!SelectedIrrJournalDate.HasValue)
+            {
+                MessageBoxTemplates.WarningAsync("Перед добавлением образцов необходимо выбрать журнал облучений");
+                return;
+            }
             try
             {
-                foreach (DataGridViewRow row in SessionFormAdvancedDataGridViewIrradiatedSamples.SelectedRows)
+                CheckExcessionOfDiskSize();
+                List<IrradiationInfo> IrradiationList = null;
+                using (var ic = new InfoContext())
+                    IrradiationList = ic.Irradiations.Where(ir => ir.Type == _session.Type && ir.DateTimeStart.HasValue && ir.DateTimeStart.Value.Date == SelectedIrrJournalDate.Value.Date && ir.LoadNumber.Value == SelectedLoadNumber.Value && ir.Container.HasValue).ToList();
+
+                if (!IrradiationList.Any())
+                    MessageBoxTemplates.WarningAsync("Программа не может получить список образцов из журнала облучений");
+
+                var NumberOfContainers = IrradiationList.Select(ir => ir.Container.Value).Distinct().OrderBy(cn => cn).ToArray();
+
+                if (!NumberOfContainers.Any())
+                    MessageBoxTemplates.WarningAsync("Программа не может получить список контейнеров");
+
+                int i = 0;
+
+                foreach (var conNum in NumberOfContainers)
                 {
-                    IrradiationInfo currentSample = null;
-                    using (var ic = new InfoContext())
-                        currentSample = ic.Irradiations.Where(ir => ir.Id == (int)row.Cells["Id"].Value).First();
+                    var sampleList = new List<IrradiationInfo> (IrradiationList.Where(ir => ir.Container == conNum).ToList());
 
-                    var configuration = new MapperConfiguration(cfg => cfg.AddMaps("MCore"));
-                    var mapper = new Mapper(configuration);
-                    var newMeasurement = mapper.Map<MeasurementInfo>(currentSample);
-
-                    newMeasurement.DateTimeStart = DateTime.Now.Date;
-                    newMeasurement.Duration = Duration;
-                    newMeasurement.Detector = Detector;
-                    newMeasurement.Assistant = User;
-
-                    _measurementsList.Add(newMeasurement);
-                    using (var ic = new InfoContext())
+                    foreach (var currentSample in sampleList)
                     {
-                        ic.Measurements.Add(newMeasurement);
-                        ic.SaveChanges();
+                        var configuration = new MapperConfiguration(cfg => cfg.AddMaps("MeasurementsCore"));
+                        var mapper = new Mapper(configuration);
+                        var newMeasurement = mapper.Map<MeasurementInfo>(currentSample);
+
+                        newMeasurement.DateTimeStart = DateTime.Now.Date;
+                        newMeasurement.Duration = Duration;
+                        newMeasurement.Height = HeightGeometry;
+                        newMeasurement.Detector = (_session.ManagedDetectors.OrderBy(md => md.Name).ToArray())[i].Name;
+                        newMeasurement.Assistant = User;
+
+                        _measurementsList.Add(newMeasurement);
+                        using (var ic = new InfoContext())
+                        {
+                            ic.Measurements.Add(newMeasurement);
+                            ic.SaveChanges();
+                        }
                     }
+
+                    //System.Threading.Tasks.Parallel.ForEach(sampleList, (s) => { MeasurementList.Where(m => m.IrradiationId == s.Id).First().Detector = ManagedDetectors[i].Name; });
+
+                    i++;
+                    if (i >= _session.ManagedDetectors.Count())
+                        i = 0;
                 }
             }
-            catch (Exception ex)
+            catch (ArgumentException ae)
             {
-                MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = ex, Level = ExceptionLevel.Error });
+                MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs {exception = ae, Level = ExceptionLevel.Error }); 
+            }
+            catch (Exception e)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs {exception = e, Level = ExceptionLevel.Error }); 
             }
         }
-
+        private void CheckExcessionOfDiskSize()
+        {
+            //if ((IrradiationList.Count / ManagedDetectors.Count) > SampleChanger.SizeOfDisk)
+            //ExcessTheSizeOfDiskEvent?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

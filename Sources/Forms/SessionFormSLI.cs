@@ -48,7 +48,7 @@ namespace Measurements.UI.Desktop.Forms
         {
             try
             {
-                foreach (DataGridViewRow row in SessionFormAdvancedDataGridViewIrradiatedSamples.SelectedRows)
+                foreach (DataGridViewRow row in SessionFormAdvancedDataGridViewIrradiatedSamples.SelectedRows.OfType<DataGridViewRow>().Reverse())
                 {
                     IrradiationInfo currentSample = null;
                     using (var ic = new InfoContext())
@@ -61,7 +61,7 @@ namespace Measurements.UI.Desktop.Forms
                     newMeasurement.DateTimeStart = DateTime.Now.Date;
                     newMeasurement.Duration      = Duration;
                     newMeasurement.Height        = HeightGeometry;
-                    newMeasurement.Detector      = SelectDetectorForSample(newMeasurement.SetKey, newMeasurement.SampleNumber);
+                    newMeasurement.Detector      = AssignDetectorForSample(newMeasurement.SetKey, newMeasurement.SampleNumber);
                     newMeasurement.Assistant     = User;
 
                     _measurementsList.Add(newMeasurement);
@@ -83,7 +83,7 @@ namespace Measurements.UI.Desktop.Forms
             SessionFormlButtonAddAllToJournal.Visible = false;
         }
 
-        private string SelectDetectorForSample(string curSetKey, string curSampleNumber)
+        private string AssignDetectorForSample(string curSetKey, string curSampleNumber)
         {
             try
             {
