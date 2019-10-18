@@ -18,12 +18,18 @@ namespace Measurements.UI.Desktop.Forms
     //TODO: change type should re draw datagrid view
     //TODO: reorganize the code
 
+    enum MeasurementStatus { ready, error, inProgress, done }
+
     public partial class SessionForm : Form
     {
         private BindingSource _bindingSource;
+        private event Action ChangeMeasurementStatus;
         private ISession _session;
-        private Dictionary<bool, System.Drawing.Color> ConnectionStatusColor;
+        private readonly Dictionary<bool, System.Drawing.Color> ConnectionStatusColor;
         private List<MeasurementInfo> _measurementsList;
+        private List<IrradiationInfo> _irradiationList;
+        private Dictionary<string, List<MeasurementInfo>> _spreadedMeasurementsInfoes;
+
         private string User { get { return SessionControllerSingleton.ConnectionStringBuilder.UserID; } }
 
         private DateTime? SelectedIrrJournalDate
@@ -50,6 +56,7 @@ namespace Measurements.UI.Desktop.Forms
         {
             try
             {
+
                 ConnectionStatusColor = new Dictionary<bool, System.Drawing.Color>() { { false, System.Drawing.Color.Red }, { true, System.Drawing.Color.Green } };
                 _session = session;
 
@@ -81,7 +88,7 @@ namespace Measurements.UI.Desktop.Forms
 
                 SessionFormMenuStrip.Items.Add(MenuOptions);
 
-                _session.MeasurementOfSampleDone += MeasurementDoneHandler;
+                _session.MeasurementOfSampleDone += CurrentMeasurementDoneHandler;
 
                 SessionFormStatusStrip.Items.Add(MeasurementsProgressBar);
 
@@ -101,6 +108,8 @@ namespace Measurements.UI.Desktop.Forms
                 SessionFormCheckBoxHideAlreadyMeasured.CheckedChanged += SessionFormCheckBoxShowAlreadyMeasured_CheckedChanged;
 
                 SessionFormAdvancedDataGridViewMeasurementsJournal.CellValueChanged += UpdateMeasurementsJournal;
+
+                _spreadedMeasurementsInfoes = new Dictionary<string, List<MeasurementInfo>>();
 
             }
             catch (Exception ex)
@@ -211,11 +220,15 @@ namespace Measurements.UI.Desktop.Forms
             {
                 using (var ic = new InfoContext())
                 {
-                    _measurementsList = ic.Measurements.Where(ir => ir.DateTimeStart.HasValue &&
-                                                             ir.DateTimeStart.Value.Date == DateTime.Now.Date &&
-                                                             ir.Type == _session.Type)
+                    _measurementsList = ic.Measurements.Where(m => m.DateTimeStart.HasValue &&
+                                                              m.DateTimeStart.Value.Date == DateTime.Now.Date &&
+                                                              m.Type == _session.Type)
                                                        .ToList();
+                    _irradiationList = ic.Irradiations.Where(ir => _measurementsList.Select(m => m.IrradiationId).Contains(ir.Id)).ToList();
                 }
+
+                if (_irradiationList == null)
+                    _irradiationList = new List<IrradiationInfo>();
 
                 if (_measurementsList == null)
                     _measurementsList = new List<MeasurementInfo>();
@@ -230,6 +243,8 @@ namespace Measurements.UI.Desktop.Forms
 
                 SessionFormCheckBoxShowAlreadyMeasured_CheckedChanged(null, EventArgs.Empty);
 
+                foreach (DataGridViewRow row in SessionFormAdvancedDataGridViewMeasurementsJournal.Rows.OfType<DataGridViewRow>().Where(dr => !string.IsNullOrEmpty(dr.Cells["FileSpectra"].Value.ToString())).ToArray())
+                    row.DefaultCellStyle.BackColor = System.Drawing.Color.LightGreen;
             }
             catch (Exception ex)
             {
@@ -413,12 +428,20 @@ namespace Measurements.UI.Desktop.Forms
             }
         }
 
-        private void MeasurementDoneHandler(MeasurementInfo currentMeasurement)
+        private void CurrentMeasurementDoneHandler(MeasurementInfo currentMeasurement)
         {
             try
             {
-              
-                HighlightCurrentSample();
+                var det = _session.ManagedDetectors.Where(d => d.Name == currentMeasurement.Detector).First();
+
+                InitializeDisplayedTable();
+                if (!_spreadedMeasurementsInfoes[currentMeasurement.Detector].Where(m => m.Type == _session.Type && string.IsNullOrEmpty(m.FileSpectra)).Any())
+                {
+                    MessageBoxTemplates.InfoAsync($"Детектор {det.Name} завершил измерения");
+                    return;
+                }
+                SetFirstNotMeasuredForDetector(det.Name);
+                det.Start();
             }
             catch (ArgumentOutOfRangeException aoe)
             { }
@@ -585,12 +608,14 @@ namespace Measurements.UI.Desktop.Forms
             }
         }
 
+        public static readonly string[] MeasurementTypes = {"SLI", "LLI-1", "LLI-2"};
+
         private void InitializeTypeDropDownItems()
         {
             try
             {
                 var detEndPostition = SessionFormStatusStrip.Items.IndexOf(DetectorsLabelEnd) + 1;
-                var typesItems = new EnumItem(Session.MeasurementTypes, "Тип");
+                var typesItems = new EnumItem(MeasurementTypes, "Тип");
                 typesItems.CheckedChanged += SetType;
                 SessionFormMenuStrip.Items.Add(typesItems.EnumMenuItem);
                 SessionFormStatusStrip.Items.Insert(detEndPostition, typesItems.EnumStatusLabel);
@@ -632,7 +657,6 @@ namespace Measurements.UI.Desktop.Forms
                 _session.Type = type;
                 InitializeDisplayedTable();
                 InitializeIrradiationsDatesTable();
-
             }
             catch (Exception ex)
             {
@@ -814,7 +838,6 @@ namespace Measurements.UI.Desktop.Forms
             try
             {
                 SessionFormMenuStrip.Enabled = false;
-                CountsStatusLabel.Enabled = false;
             }
             catch (Exception ex)
             {
@@ -844,11 +867,43 @@ namespace Measurements.UI.Desktop.Forms
             }
         }
 
+        private IrradiationInfo GetRelatedSample(MeasurementInfo measurement) 
+        {
+            var ir = _irradiationList.Where(i => i.Id == measurement.IrradiationId).First();
+            if (ir == null)
+                MessageBoxTemplates.WarningAsync("Программа не смогла найти данные в журнале облучений");
+            return ir;
+        }
+
+
+
+        private void SetFirstNotMeasuredForDetector(string detName)
+        {
+            var det =_session.ManagedDetectors.Where(d => d.Name == detName).First();
+
+            var CurrentMeasurement = _spreadedMeasurementsInfoes[detName].Where(m => m.Detector == detName && string.IsNullOrEmpty(m.FileSpectra)).First();
+            det.RelatedIrradiation = GetRelatedSample(CurrentMeasurement);
+            det.CurrentMeasurement = CurrentMeasurement;
+
+            HighlightMeasurement(det.CurrentMeasurement.Id, System.Drawing.Color.LightYellow);
+        }
+
+        private void SpreadSamplesToDetectors()
+        {
+            _spreadedMeasurementsInfoes.Clear();
+            foreach (var d in _session.ManagedDetectors)
+            {
+                var listOfMeasurementsOnDetector =_measurementsList.Where(m => m.Detector == d.Name && string.IsNullOrEmpty(m.FileSpectra)).ToList();
+                if (listOfMeasurementsOnDetector.Any())
+                    _spreadedMeasurementsInfoes.Add(d.Name, listOfMeasurementsOnDetector);
+            }
+        }
+
         private void SessionFormButtonStart_Click(object sender, EventArgs e)
         {
             try
             {
-                if (!_session.MeasurementList.Any() || !SessionFormAdvancedDataGridViewMeasurementsJournal.Rows.OfType<object>().Any())
+                if (!_irradiationList.Any() || !_measurementsList.Any() || !SessionFormAdvancedDataGridViewMeasurementsJournal.Rows.OfType<object>().Any())
                 {
                     MessageBoxTemplates.ErrorSync("Образцы для измерений не выбраны!");
                     return;
@@ -866,13 +921,9 @@ namespace Measurements.UI.Desktop.Forms
                     return;
                 }
 
-                if (_session.Counts == 0)
-                {
-                    MessageBoxTemplates.ErrorSync("Задайте необходимую продолжительность измерений каждого образца!");
-                    return;
-                }
 
                 _session.ClearMeasurements();
+                SpreadSamplesToDetectors();
 
                 var mvcgProc =  Process.GetProcesses().Where(p => p.ProcessName == "mvcg").ToArray();
                 foreach(var mvcgp in mvcgProc)
@@ -889,12 +940,16 @@ namespace Measurements.UI.Desktop.Forms
                 }
 
                 DisableControls();
-                HighlightCurrentSample();
                 
+                foreach (var dName in _spreadedMeasurementsInfoes.Keys)
+                {
+                    SetFirstNotMeasuredForDetector(dName);
+                    _session.ManagedDetectors.Where(d => d.Name == dName).First().Start();
+                }
+
                 var dcp = new DetectorControlPanel(ref _session);
                 dcp.Show();
 
-                _session.StartMeasurements();
             }
             catch (Exception ex)
             {
@@ -907,9 +962,10 @@ namespace Measurements.UI.Desktop.Forms
         }
 
 
-        private void HighlightCurrentSample()
+
+        private void HighlightMeasurement(int mId, System.Drawing.Color color)
         {
-            
+            SessionFormAdvancedDataGridViewMeasurementsJournal.Rows.OfType<DataGridViewRow>().Where(dr => (int)dr.Cells["Id"].Value == mId).First().DefaultCellStyle.BackColor = color;
         }
 
         private void SessionFormButtonPause_Click(object sender, EventArgs e)
@@ -940,8 +996,8 @@ namespace Measurements.UI.Desktop.Forms
                     foreach (var d in _session.ManagedDetectors)
                     {
                         var cd = d;
-                        _session.SaveSpectra(ref cd);
-                        _session.SaveMeasurement(ref cd);
+                        //_session.SaveSpectra(ref cd);
+                        //_session.SaveMeasurement(ref cd);
                         ProcessManager.CloseDetector(d.Name);
                     }
                     _session.StopMeasurements();
@@ -958,7 +1014,7 @@ namespace Measurements.UI.Desktop.Forms
                     foreach (var d in _session.ManagedDetectors)
                     {
                         var cd = d;
-                        _session.SaveSpectra(ref cd);
+                        //_session.SaveSpectra(ref cd);
                         ProcessManager.CloseDetector(d.Name);
                     }
                     _session.StopMeasurements();
@@ -1089,13 +1145,19 @@ namespace Measurements.UI.Desktop.Forms
                         continue;
 
                     var selectedMeas = _measurementsList.Where(ir => ir.Id == (int)row.Cells["Id"].Value).First();
+                    IrradiationInfo relatedIrrInfo = null;
+                    if (_irradiationList.Where(ir => ir.Id == selectedMeas.IrradiationId).Any())
+                        relatedIrrInfo = _irradiationList.Where(ir => ir.Id == selectedMeas.IrradiationId).First();
 
                     using (var ic = new InfoContext())
                     {
                         ic.Measurements.Remove(selectedMeas);
                         ic.SaveChanges();
                     }
+
                     _measurementsList.Remove(selectedMeas);
+                    if (relatedIrrInfo != null)
+                        _irradiationList.Remove(relatedIrrInfo);
 
                     foreach (DataGridViewRow hiddenRow in SessionFormAdvancedDataGridViewIrradiatedSamples.Rows.OfType<DataGridViewRow>().Where(dr => dr.Visible == false).ToArray())
                     {

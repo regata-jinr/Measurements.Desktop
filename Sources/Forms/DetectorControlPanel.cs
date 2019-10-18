@@ -24,15 +24,11 @@ namespace Measurements.UI.Desktop.Forms
             _namesArray = new CircularList<string>(_session.ManagedDetectors.Select(d => d.Name).ToArray());
 
             foreach (var d in _session.ManagedDetectors)
-            {
-                d.CurrentSample = _session.SpreadSamples[d.Name][0];
-                d.CurrentMeasurement = _session.MeasurementList.Where(m => m.IrradiationId == d.CurrentSample.Id).First();
                 d.StatusChanged += DetStatusChangedHandler;
-            }
 
             DesktopLocation = new Point(Screen.PrimaryScreen.Bounds.Left + 10, Screen.PrimaryScreen.Bounds.Bottom - Size.Height - 50);
 
-            _session.CurrentSampleChanged += SourcesInitialize;
+            //_session.CurrentSampleChanged += SourcesInitialize;
             DCPNumericUpDownPresetHours.ValueChanged += ChangePresetTimeHandler;
             DCPNumericUpDownPresetMinutes.ValueChanged += ChangePresetTimeHandler;
             DCPNumericUpDownPresetSeconds.ValueChanged += ChangePresetTimeHandler;
@@ -43,38 +39,44 @@ namespace Measurements.UI.Desktop.Forms
 
         private async void SourcesInitialize()
         {
-            DCPLabelCurrentSrcName.Text = _namesArray.CurrentItem;
-            Text = $"Панель управления детектором  {_namesArray.CurrentItem}";
-            DCPLabelNextSrcName.Text = _namesArray.NextItem;
-            DCPLabelPrevSrcName.Text = _namesArray.PrevItem;
-            ProcessManager.SelectDetector(_namesArray.CurrentItem);
-            _currentDet = _session.ManagedDetectors.Where(d => d.Name == _namesArray.CurrentItem).First();
-            DetStatusChangedHandler(null, EventArgs.Empty);
-            DCPComboBoxHeight.SelectedItem = DCPComboBoxHeight.Items.OfType<string>().Where(ch => ch.ToString() == _currentDet.CurrentMeasurement.Height.ToString()).First();
-            DCPLabelCurrentSumpleOnCurrentSrc.Text = _currentDet.CurrentSample.ToString();
-            DCPLabelCurrentSumpleOnNextSrc.Text = _session.ManagedDetectors.Where(d => d.Name == _namesArray.NextItem).First().CurrentSample.ToString();
-            DCPLabelCurrentSumpleOnPrevSrc.Text = _session.ManagedDetectors.Where(d => d.Name == _namesArray.PrevItem).First().CurrentSample.ToString();
-            int PresetSeconds = int.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL).ToString());
-            int ElapsedSecond = (int)Math.Round(decimal.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_EREAL).ToString()),0);
-            int LeftSeconds = PresetSeconds - ElapsedSecond;
+            try
+            {
+                DCPLabelCurrentSrcName.Text = _namesArray.CurrentItem;
+                Text = $"Панель управления детектором  {_namesArray.CurrentItem}";
+                DCPLabelNextSrcName.Text = _namesArray.NextItem;
+                DCPLabelPrevSrcName.Text = _namesArray.PrevItem;
+                ProcessManager.SelectDetector(_namesArray.CurrentItem);
+                _currentDet = _session.ManagedDetectors.Where(d => d.Name == _namesArray.CurrentItem).First();
+                DetStatusChangedHandler(null, EventArgs.Empty);
+                //DCPComboBoxHeight.SelectedItem = DCPComboBoxHeight.Items.OfType<string>().Where(ch => (Math.Abs(decimal.Parse(ch) - _currentDet.CurrentMeasurement.Height.Value) < 0.5m)).First();
+                DCPLabelCurrentSumpleOnCurrentSrc.Text = _currentDet.CurrentMeasurement.ToString();
+                DCPLabelCurrentSumpleOnNextSrc.Text = _session.ManagedDetectors.Where(d => d.Name == _namesArray.NextItem).First().CurrentMeasurement.ToString();
+                DCPLabelCurrentSumpleOnPrevSrc.Text = _session.ManagedDetectors.Where(d => d.Name == _namesArray.PrevItem).First().CurrentMeasurement.ToString();
+                int PresetSeconds = int.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL).ToString());
+                int ElapsedSecond = (int)Math.Round(decimal.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_EREAL).ToString()),0);
+                int LeftSeconds = PresetSeconds - ElapsedSecond;
 
-            var timePreset = TimeSpan.FromSeconds(PresetSeconds);
-            DCPNumericUpDownPresetHours.Value = timePreset.Hours;
-            DCPNumericUpDownPresetMinutes.Value = timePreset.Minutes;
-            DCPNumericUpDownPresetSeconds.Value = timePreset.Seconds;
+                var timePreset = TimeSpan.FromSeconds(PresetSeconds);
+                DCPNumericUpDownPresetHours.Value = timePreset.Hours;
+                DCPNumericUpDownPresetMinutes.Value = timePreset.Minutes;
+                DCPNumericUpDownPresetSeconds.Value = timePreset.Seconds;
 
-            var timeLeft = TimeSpan.FromSeconds(LeftSeconds);
-            DCPNumericUpDownElapsedHours.Value = timeLeft.Hours;
-            DCPNumericUpDownElapsedMinutes.Value = timeLeft.Minutes;
-            DCPNumericUpDownElapsedSeconds.Value = timeLeft.Seconds;
-            DCPLabelDeadTimeValue.Text = $"{_currentDet.DeadTime.ToString("f2")}%";
-            await Task.Run(() => RefreshTime()); 
- 
+                var timeLeft = TimeSpan.FromSeconds(LeftSeconds);
+                DCPNumericUpDownElapsedHours.Value = timeLeft.Hours;
+                DCPNumericUpDownElapsedMinutes.Value = timeLeft.Minutes;
+                DCPNumericUpDownElapsedSeconds.Value = timeLeft.Seconds;
+                DCPLabelDeadTimeValue.Text = $"{_currentDet.DeadTime.ToString("f2")}%";
+                await Task.Run(() => RefreshTime());
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
         }
-
-
-
-
 
         private void RefreshTime()
         {
@@ -93,7 +95,6 @@ namespace Measurements.UI.Desktop.Forms
                     LeftSeconds = PresetSeconds - ElapsedSecond;
 
                     var time = TimeSpan.FromSeconds(LeftSeconds);
-
 
                     DCPNumericUpDownElapsedHours?.Invoke(new Action(() => { DCPNumericUpDownElapsedHours.Value = time.Hours; }));
                     DCPNumericUpDownElapsedMinutes?.Invoke(new Action(() => { DCPNumericUpDownElapsedMinutes.Value = time.Minutes; }));

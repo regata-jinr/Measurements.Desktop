@@ -11,9 +11,9 @@ namespace Measurements.UI.Desktop.Components
         public ToolStripMenuItem DetectorMenuItem;
         public ToolStripStatusLabel DetectorStatusLabel;
         public RadioButton DetectorRadioButton;
-        private IDetector _det;
-        private ISession _session;
-        private Dictionary<DetectorStatus, System.Drawing.Color> StatusColor;
+        private readonly IDetector _det;
+        private readonly ISession _session;
+        private readonly Dictionary<DetectorStatus, System.Drawing.Color> StatusColor;
 
         public DetectorItem(ref ISession session, ref IDetector det)
         {

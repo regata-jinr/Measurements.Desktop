@@ -20,7 +20,7 @@ namespace Measurements.UI.Desktop.Forms
         {
             SetColumnsProperties(ref SessionFormAdvancedDataGridViewMeasurementsJournal,
                                 new string[]
-                                { "Id","IrradiationId", "SetKey", "Type" },
+                                { "Id","IrradiationId", "SetKey", "Type", "SampleKey" },
                                 new Dictionary<string,      string>() {
                                     { "CountryCode",        "Код страны" },
                                     { "ClientNumber",       "Номер клиента" },
@@ -54,6 +54,7 @@ namespace Measurements.UI.Desktop.Forms
                     using (var ic = new InfoContext())
                         currentSample = ic.Irradiations.Where(ir => ir.Id == (int)row.Cells["Id"].Value).First();
 
+                    _irradiationList.Add(currentSample);
                     var configuration = new MapperConfiguration(cfg => cfg.AddMaps("MeasurementsCore"));
                     var mapper = new Mapper(configuration);
                     var newMeasurement = mapper.Map<MeasurementInfo>(currentSample);
@@ -98,15 +99,20 @@ namespace Measurements.UI.Desktop.Forms
                 if (uniqueSets.Length == 1)
                     return uniqueSets.First().Detector;
 
-                return _measurementsList.Where(m => 
+                var det = _measurementsList.Where(m =>
                                                 m.SetKey == uniqueSets[0].SetKey && (int.Parse(curSampleNumber) - int.Parse(m.SampleNumber)) > 0).
                                          Select(n =>
-                                                new { diff = int.Parse(curSampleNumber) - int.Parse(n.SampleNumber), Detector =                            n.Detector }).
+                                                new { diff = int.Parse(curSampleNumber) - int.Parse(n.SampleNumber), Detector = n.Detector }).
                                          MinBy(n => n.diff).First().Detector;
+
+                if (!string.IsNullOrEmpty(det))
+                    return det;
+
+                return Detector;
             }
             catch (Exception e)
             {
-                MessageBoxTemplates.WarningAsync("Проблема с распределением образцов по детекторам");
+                //MessageBoxTemplates.WarningAsync("Проблема с распределением образцов по детекторам");
                 return Detector;
             }
 

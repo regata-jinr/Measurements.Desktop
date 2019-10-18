@@ -17,7 +17,7 @@ namespace Measurements.UI.Desktop.Forms
         {
             SetColumnsProperties(ref SessionFormAdvancedDataGridViewMeasurementsJournal,
                                 new string[]
-                                { "Id","IrradiationId", "SetKey", "Type" },
+                                { "Id","IrradiationId", "SetKey", "Type", "SampleKey" },
                                 new Dictionary<string, string>() {
                                     { "CountryCode",        "Код страны" },
                                     { "ClientNumber",       "Номер клиента" },
@@ -59,7 +59,10 @@ namespace Measurements.UI.Desktop.Forms
                     IrradiationList = ic.Irradiations.Where(ir => ir.Type == _session.Type && ir.DateTimeStart.HasValue && ir.DateTimeStart.Value.Date == SelectedIrrJournalDate.Value.Date && ir.LoadNumber.Value == SelectedLoadNumber.Value && ir.Container.HasValue).ToList();
 
                 if (!IrradiationList.Any())
+                {
                     MessageBoxTemplates.WarningAsync("Программа не может получить список образцов из журнала облучений");
+                    return;
+                }
 
                 var NumberOfContainers = IrradiationList.Select(ir => ir.Container.Value).Distinct().OrderBy(cn => cn).ToArray();
 
@@ -67,6 +70,8 @@ namespace Measurements.UI.Desktop.Forms
                     MessageBoxTemplates.WarningAsync("Программа не может получить список контейнеров");
 
                 int i = 0;
+
+                _irradiationList.AddRange(IrradiationList);
 
                 foreach (var conNum in NumberOfContainers)
                 {
