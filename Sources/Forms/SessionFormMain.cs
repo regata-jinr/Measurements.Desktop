@@ -1077,11 +1077,17 @@ namespace Measurements.UI.Desktop.Forms
             try
             {
                 if (SessionFormAdvancedDataGridViewMeasurementsJournal.SelectedCells.Count == 0)
-                    throw new ArgumentException("Не выбран ни один образец для удаления из журнала облучений!");
+                {
+                    MessageBoxTemplates.WarningAsync("Не выбран ни один образец для удаления из журнала измерений!");
+                    return;
+                }
 
                 foreach (DataGridViewCell cell in SessionFormAdvancedDataGridViewMeasurementsJournal.SelectedCells)
                 {
                     var row = cell.OwningRow;
+                    if (!_measurementsList.Select(m => m.Id).Contains((int)row.Cells["Id"].Value))
+                        continue;
+
                     var selectedMeas = _measurementsList.Where(ir => ir.Id == (int)row.Cells["Id"].Value).First();
 
                     using (var ic = new InfoContext())
