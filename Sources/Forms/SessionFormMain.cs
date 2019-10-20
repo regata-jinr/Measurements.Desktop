@@ -29,6 +29,7 @@ namespace Measurements.UI.Desktop.Forms
         private List<MeasurementInfo> _measurementsList;
         private List<IrradiationInfo> _irradiationList;
         private Dictionary<string, List<MeasurementInfo>> _spreadedMeasurementsInfoes;
+        DetectorControlPanel DetectorsControlPanel;
 
         private string User { get { return SessionControllerSingleton.ConnectionStringBuilder.UserID; } }
 
@@ -136,6 +137,7 @@ namespace Measurements.UI.Desktop.Forms
                     var currentMeasurement = ic.Measurements.Where(ir => ir.Id == (int)SessionFormAdvancedDataGridViewMeasurementsJournal.Rows[e.RowIndex].Cells["Id"].Value).First();
 
                     var currentMeasurementInList = _measurementsList.Find(m => m.Id == currentMeasurement.Id);
+                    _measurementsList.Remove(currentMeasurementInList);
 
                     System.Type measInfo = typeof(MeasurementInfo);
                     var prop = measInfo.GetProperty(SessionFormAdvancedDataGridViewMeasurementsJournal.Columns[e.ColumnIndex].Name);
@@ -145,8 +147,8 @@ namespace Measurements.UI.Desktop.Forms
                     else
                         prop.SetValue(currentMeasurement, null);
 
-                    currentMeasurementInList = currentMeasurement;
-
+                    _measurementsList.Add(currentMeasurement);
+                    _measurementsList.Sort((x, y) => x.Id.CompareTo(y.Id));
                     ic.Measurements.Update(currentMeasurement);
                     ic.SaveChanges();
                 }
@@ -855,7 +857,6 @@ namespace Measurements.UI.Desktop.Forms
             try
             {
                 SessionFormMenuStrip.Enabled = true;
-                CountsStatusLabel.Enabled = true;
             }
             catch (Exception ex)
             {
@@ -882,9 +883,10 @@ namespace Measurements.UI.Desktop.Forms
             var det =_session.ManagedDetectors.Where(d => d.Name == detName).First();
 
             var CurrentMeasurement = _spreadedMeasurementsInfoes[detName].Where(m => m.Detector == detName && string.IsNullOrEmpty(m.FileSpectra)).First();
-            det.RelatedIrradiation = GetRelatedSample(CurrentMeasurement);
-            det.CurrentMeasurement = CurrentMeasurement;
+            det.FillSampleInformation(CurrentMeasurement, GetRelatedSample(CurrentMeasurement));
 
+            if (DetectorsControlPanel != null)
+                DetectorsControlPanel.SourcesInitialize();
             HighlightMeasurement(det.CurrentMeasurement.Id, System.Drawing.Color.LightYellow);
         }
 
@@ -942,13 +944,12 @@ namespace Measurements.UI.Desktop.Forms
                 DisableControls();
                 
                 foreach (var dName in _spreadedMeasurementsInfoes.Keys)
-                {
                     SetFirstNotMeasuredForDetector(dName);
-                    _session.ManagedDetectors.Where(d => d.Name == dName).First().Start();
-                }
 
-                var dcp = new DetectorControlPanel(ref _session);
-                dcp.Show();
+                _session.StartMeasurements();
+
+                DetectorsControlPanel = new DetectorControlPanel(ref _session);
+                DetectorsControlPanel.Show();
 
             }
             catch (Exception ex)
@@ -989,6 +990,9 @@ namespace Measurements.UI.Desktop.Forms
         {
             try
             {
+                if (DetectorsControlPanel != null)
+                    DetectorsControlPanel.Close();
+
                 var r = MessageBox.Show($"Вы пытаетесь остановить измерения.{Environment.NewLine}Если Вы хотите сохранить файл спектра, а также информацию о текущих измерениях в базу данных, а затем остановить измерения, нажмите Yes.{Environment.NewLine}Если Вы хотите сохранить файл спектра, но не хотите сохранять информацию в базу данных и при этом хотите остановить измерения нажмите - No.{Environment.NewLine}Если Вы хотите продолжить измерения нажмите - Cancel.", "Прерывание процесса измерений",MessageBoxButtons.YesNoCancel,MessageBoxIcon.Exclamation);
                 if (r == DialogResult.Yes)
                 {

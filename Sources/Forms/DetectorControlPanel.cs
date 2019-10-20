@@ -29,7 +29,7 @@ namespace Measurements.UI.Desktop.Forms
             DesktopLocation = new Point(Screen.PrimaryScreen.Bounds.Left + 10, Screen.PrimaryScreen.Bounds.Bottom - Size.Height - 50);
 
             //_session.CurrentSampleChanged += SourcesInitialize;
-            DCPNumericUpDownPresetHours.ValueChanged += ChangePresetTimeHandler;
+            DCPNumericUpDownPresetHours.ValueChanged   += ChangePresetTimeHandler;
             DCPNumericUpDownPresetMinutes.ValueChanged += ChangePresetTimeHandler;
             DCPNumericUpDownPresetSeconds.ValueChanged += ChangePresetTimeHandler;
 
@@ -37,7 +37,25 @@ namespace Measurements.UI.Desktop.Forms
 
         }
 
-        private async void SourcesInitialize()
+        private decimal HeightGeom
+        {
+            get
+            {
+                return _currentDet.CurrentMeasurement.Height.Value;
+            }
+            set
+            {
+                DCPComboBoxHeight.SelectedIndex = DCPComboBoxHeight.FindStringExact(value.ToString());
+                if (value == _currentDet.CurrentMeasurement.Height) return;
+
+                _currentDet.CurrentMeasurement.Height = value;
+                _currentDet.SetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_T_SGEOMTRY, value.ToString()); // height
+                _currentDet.AddEfficiencyCalibrationFile(_currentDet.CurrentMeasurement.Height.Value);
+
+            }
+        }
+
+        public async void SourcesInitialize()
         {
             try
             {
@@ -48,7 +66,7 @@ namespace Measurements.UI.Desktop.Forms
                 ProcessManager.SelectDetector(_namesArray.CurrentItem);
                 _currentDet = _session.ManagedDetectors.Where(d => d.Name == _namesArray.CurrentItem).First();
                 DetStatusChangedHandler(null, EventArgs.Empty);
-                //DCPComboBoxHeight.SelectedItem = DCPComboBoxHeight.Items.OfType<string>().Where(ch => (Math.Abs(decimal.Parse(ch) - _currentDet.CurrentMeasurement.Height.Value) < 0.5m)).First();
+                HeightGeom = _currentDet.CurrentMeasurement.Height.Value;
                 DCPLabelCurrentSumpleOnCurrentSrc.Text = _currentDet.CurrentMeasurement.ToString();
                 DCPLabelCurrentSumpleOnNextSrc.Text = _session.ManagedDetectors.Where(d => d.Name == _namesArray.NextItem).First().CurrentMeasurement.ToString();
                 DCPLabelCurrentSumpleOnPrevSrc.Text = _session.ManagedDetectors.Where(d => d.Name == _namesArray.PrevItem).First().CurrentMeasurement.ToString();
@@ -162,9 +180,7 @@ namespace Measurements.UI.Desktop.Forms
 
         private void HeightChangedHandler(object sender, EventArgs e)
         {
-            _currentDet.CurrentMeasurement.Height = decimal.Parse(DCPComboBoxHeight.Text);
-            _currentDet.SetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_T_SGEOMTRY, DCPComboBoxHeight.Text); // height
-            _currentDet.AddEfficiencyCalibrationFile(_currentDet.CurrentMeasurement.Height.Value);
+            HeightGeom = decimal.Parse(DCPComboBoxHeight.GetItemText(DCPComboBoxHeight.SelectedItem));
         }
 
         private void DCPButtonStop_Click(object sender, EventArgs e)

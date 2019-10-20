@@ -503,11 +503,11 @@ namespace Measurements.UI.Desktop.Forms
             // 
             // SessionFormCheckBoxHideAlreadyMeasured
             // 
-            this.SessionFormCheckBoxHideAlreadyMeasured.Location = new System.Drawing.Point(524, 13);
+            this.SessionFormCheckBoxHideAlreadyMeasured.Location = new System.Drawing.Point(524, 16);
             this.SessionFormCheckBoxHideAlreadyMeasured.Name = "SessionFormCheckBoxHideAlreadyMeasured";
-            this.SessionFormCheckBoxHideAlreadyMeasured.Size = new System.Drawing.Size(266, 25);
+            this.SessionFormCheckBoxHideAlreadyMeasured.Size = new System.Drawing.Size(266, 19);
             this.SessionFormCheckBoxHideAlreadyMeasured.TabIndex = 21;
-            this.SessionFormCheckBoxHideAlreadyMeasured.Text = "Скрыть уже измеренные образцы";
+            this.SessionFormCheckBoxHideAlreadyMeasured.Text = "Скрыть добавленные образцы";
             this.SessionFormCheckBoxHideAlreadyMeasured.UseVisualStyleBackColor = true;
             // 
             // SessionFormLabelIrradiatedSamplesTitle

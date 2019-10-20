@@ -171,14 +171,14 @@ namespace Measurements.UI.Desktop.Forms
             this.DCPComboBoxHeight.FormattingEnabled = true;
             this.DCPComboBoxHeight.Items.AddRange(new object[] {
             "2.5",
-            "5",
-            "10",
-            "20"});
+            "5.0",
+            "10.0",
+            "20.0"});
             this.DCPComboBoxHeight.Location = new System.Drawing.Point(409, 138);
             this.DCPComboBoxHeight.Name = "DCPComboBoxHeight";
-            this.DCPComboBoxHeight.Size = new System.Drawing.Size(41, 24);
+            this.DCPComboBoxHeight.Size = new System.Drawing.Size(58, 24);
             this.DCPComboBoxHeight.TabIndex = 15;
-            this.DCPComboBoxHeight.Text = "20";
+            this.DCPComboBoxHeight.Text = "20.0";
             this.DCPComboBoxHeight.SelectedIndexChanged += new System.EventHandler(this.HeightChangedHandler);
             // 
             // DCPLabelHeight
