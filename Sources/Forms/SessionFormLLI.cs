@@ -17,7 +17,7 @@ namespace Measurements.UI.Desktop.Forms
         {
             SetColumnsProperties(ref SessionFormAdvancedDataGridViewMeasurementsJournal,
                                 new string[]
-                                { "Id","IrradiationId", "SetKey", "Type", "SampleKey" },
+                                { "Id","IrradiationId", "SetKey", "Type", "SampleKey", "LoadNumber", "IrrJournalDate" },
                                 new Dictionary<string, string>() {
                                     { "CountryCode",        "Код страны" },
                                     { "ClientNumber",       "Номер клиента" },
@@ -83,11 +83,13 @@ namespace Measurements.UI.Desktop.Forms
                         var mapper = new Mapper(configuration);
                         var newMeasurement = mapper.Map<MeasurementInfo>(currentSample);
 
-                        newMeasurement.DateTimeStart = DateTime.Now.Date;
-                        newMeasurement.Duration = Duration;
-                        newMeasurement.Height = HeightGeometry;
-                        newMeasurement.Detector = (_session.ManagedDetectors.OrderBy(md => md.Name).ToArray())[i].Name;
-                        newMeasurement.Assistant = User;
+                        newMeasurement.IrrJournalDate = MJournalIrrDate;
+                        newMeasurement.LoadNumber     = MJournalIrrLoadNumber;
+                        newMeasurement.DateTimeStart  = DateTime.Now.Date;
+                        newMeasurement.Duration       = Duration;
+                        newMeasurement.Height         = HeightGeometry;
+                        newMeasurement.Detector       = (_session.ManagedDetectors.OrderBy(md => md.Name).ToArray())[i].Name;
+                        newMeasurement.Assistant      = User;
 
                         _measurementsList.Add(newMeasurement);
                         using (var ic = new InfoContext())

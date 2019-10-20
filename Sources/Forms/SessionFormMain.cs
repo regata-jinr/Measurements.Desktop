@@ -37,9 +37,17 @@ namespace Measurements.UI.Desktop.Forms
         {
             get 
             {
-                if (SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedCells.Count != 0)
-                    return (DateTime)SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedCells[0].Value;
-                return null;
+                try
+                {
+                    if (SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedCells.Count != 0)
+                        return (DateTime)SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedCells[0].Value;
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = e, Level = ExceptionLevel.Error });
+                    return null;
+                }
             }
         }
 
@@ -47,9 +55,17 @@ namespace Measurements.UI.Desktop.Forms
         {
             get
             {
-                if (SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedCells.Count != 0 && _session.Type != "SLI")
-                    return (int)SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedCells[1].Value;
-                return null;
+                try
+                {
+                    if (SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedCells.Count != 0 && _session.Type != "SLI")
+                        return (int)SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedCells[1].Value;
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = e, Level = ExceptionLevel.Error });
+                    return null;
+                }
             }
         }
 
@@ -57,7 +73,6 @@ namespace Measurements.UI.Desktop.Forms
         {
             try
             {
-
                 ConnectionStatusColor = new Dictionary<bool, System.Drawing.Color>() { { false, System.Drawing.Color.Red }, { true, System.Drawing.Color.Green } };
                 _session = session;
 
@@ -112,6 +127,7 @@ namespace Measurements.UI.Desktop.Forms
 
                 _spreadedMeasurementsInfoes = new Dictionary<string, List<MeasurementInfo>>();
 
+                SesionFormComboBoxExistedMeasurementsJournal.SelectedIndexChanged += SesionFormComboBoxExistedMeasurementsJournal_SelectedValueChanged;
             }
             catch (Exception ex)
             {
@@ -123,6 +139,35 @@ namespace Measurements.UI.Desktop.Forms
             }
         }
 
+        private void SesionFormComboBoxExistedMeasurementsJournal_SelectedValueChanged(object sender, EventArgs e)
+        {
+            InitializeDisplayedTable();
+        }
+
+        private void FormMeasurementJournalList()
+        {
+            try
+            {
+                if (_session.Type == null) return;
+
+                List<string> MeasurementsJournalIds = null;
+                using (var ic = new InfoContext())
+                {
+                    MeasurementsJournalIds = ic.Irradiations.Where(ir => ir.Type == _session.Type && ir.DateTimeStart.HasValue).Select(ir => new { ir.DateTimeStart.Value.Date, ir.LoadNumber }).Distinct().OrderByDescending(ir => ir.Date).ThenByDescending(ir => ir.LoadNumber).Select(ir => $"{ir.Date.ToShortDateString()};{ir.LoadNumber}").Distinct().ToList();
+                }
+
+                SesionFormComboBoxExistedMeasurementsJournal.DataSource = MeasurementsJournalIds;
+
+                SesionFormComboBoxExistedMeasurementsJournal.SelectedItem = MeasurementsJournalIds.First();
+
+                if (SessionFormAdvancedDataGridViewMeasurementsJournal.DataSource == null)
+                    InitializeDisplayedTable();
+            }
+            catch (Exception e)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = e, Level = ExceptionLevel.Error });
+            }
+        }
 
         private void UpdateMeasurementsJournal(object sender, DataGridViewCellEventArgs e)
         {
@@ -196,7 +241,7 @@ namespace Measurements.UI.Desktop.Forms
         private void SessionFormCheckBoxShowAlreadyMeasured_CheckedChanged(object sender, EventArgs e)
         {
             //ShowSamples();
-            if (SessionFormAdvancedDataGridViewIrradiatedSamples.RowCount == 0) return;
+            if (SessionFormAdvancedDataGridViewIrradiatedSamples.RowCount == 0 || _measurementsList == null) return;
             if (!SessionFormCheckBoxHideAlreadyMeasured.Checked)
             {
                 foreach (DataGridViewRow hiddenRow in SessionFormAdvancedDataGridViewIrradiatedSamples.Rows.OfType<DataGridViewRow>().Where(dr => dr.Visible == false).ToArray())
@@ -216,14 +261,52 @@ namespace Measurements.UI.Desktop.Forms
             }
         }
 
+        private DateTime MJournalIrrDate
+        {
+            get
+            {
+                try
+                {
+                    var CurrentJournalId = SesionFormComboBoxExistedMeasurementsJournal.SelectedItem.ToString();
+                    return DateTime.Parse(CurrentJournalId.Split(';')[0]);
+                }
+                catch (Exception e)
+                {
+                    MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = e, Level = ExceptionLevel.Error });
+                    return DateTime.Now.Date;
+                }
+            }
+        }
+
+        private int? MJournalIrrLoadNumber
+        {
+            get
+            {
+                try
+                {
+                    var CurrentJournalId = SesionFormComboBoxExistedMeasurementsJournal.SelectedItem.ToString();
+                    int? mJournalLoadNumber = null;
+                    if (_session.Type.Contains("LLI"))
+                        mJournalLoadNumber = int.Parse(CurrentJournalId.Split(';')[1]);
+                    return mJournalLoadNumber;
+                }
+                catch (Exception e)
+                {
+                    MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = e, Level = ExceptionLevel.Error });
+                    return null;
+                }
+            }
+        }
+
         private void InitializeDisplayedTable()
         {
             try
             {
                 using (var ic = new InfoContext())
                 {
-                    _measurementsList = ic.Measurements.Where(m => m.DateTimeStart.HasValue &&
-                                                              m.DateTimeStart.Value.Date == DateTime.Now.Date &&
+                    _measurementsList = ic.Measurements.Where(m =>
+                                                              m.IrrJournalDate.Date == MJournalIrrDate &&
+                                                              m.LoadNumber == MJournalIrrLoadNumber &&
                                                               m.Type == _session.Type)
                                                        .ToList();
                     _irradiationList = ic.Irradiations.Where(ir => _measurementsList.Select(m => m.IrradiationId).Contains(ir.Id)).ToList();
@@ -258,14 +341,21 @@ namespace Measurements.UI.Desktop.Forms
 
         private void SetVisibilities(string type)
         {
-            if (type == "SLI")
+            try
             {
-                SetColumnProperties4SLI();
-                SetSLIVisibilities();
+                if (type == "SLI")
+                {
+                    SetColumnProperties4SLI();
+                    SetSLIVisibilities();
+                }
+                if (type.Contains("LLI"))
+                {
+                    SetColumnProperties4LLI();
+                }
             }
-            if (type.Contains("LLI"))
+            catch (Exception e)
             {
-                SetColumnProperties4LLI();
+                MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = e, Level = ExceptionLevel.Error });
             }
         }
 
@@ -295,10 +385,12 @@ namespace Measurements.UI.Desktop.Forms
         {
             get
             {
+                if (!SessionFormTableLayoutPanelDetectors.Controls.OfType<RadioButton>().Any()) return "";
                 return SessionFormTableLayoutPanelDetectors.Controls.OfType<RadioButton>().Where(r => r.Checked).First().Text;
             }
             set
             {
+                if (!SessionFormTableLayoutPanelDetectors.Controls.OfType<RadioButton>().Any()) return;
                 SessionFormTableLayoutPanelDetectors.Controls.OfType<RadioButton>().Where(r => r.Text == value.ToString()).First().Checked = true;
             }
         }
@@ -336,20 +428,35 @@ namespace Measurements.UI.Desktop.Forms
         {
             get
             {
-                var ts = new TimeSpan((int)SessionFormNumericUpDownDays.Value,
+                try
+                {
+                    var ts = new TimeSpan((int)SessionFormNumericUpDownDays.Value,
                                       (int)SessionFormNumericUpDownHours.Value,
                                       (int)SessionFormNumericUpDownMinutes.Value,
                                       (int)SessionFormNumericUpDownSeconds.Value
                                       );
-                return (int)ts.TotalSeconds;
+                    return (int)ts.TotalSeconds;
+                }
+                catch (Exception ex)
+                {
+                    MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = ex, Level = ExceptionLevel.Error });
+                    return 0;
+                }
             }
             set
             {
-                var ts = TimeSpan.FromSeconds(value);
-                SessionFormNumericUpDownSeconds.Value = ts.Seconds;
-                SessionFormNumericUpDownMinutes.Value = ts.Minutes;
-                SessionFormNumericUpDownHours.Value   = ts.Hours;
-                SessionFormNumericUpDownDays.Value    = ts.Days;
+                try
+                {
+                    var ts = TimeSpan.FromSeconds(value);
+                    SessionFormNumericUpDownSeconds.Value = ts.Seconds;
+                    SessionFormNumericUpDownMinutes.Value = ts.Minutes;
+                    SessionFormNumericUpDownHours.Value = ts.Hours;
+                    SessionFormNumericUpDownDays.Value = ts.Days;
+                }
+                catch (Exception ex)
+                {
+                    MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = ex, Level = ExceptionLevel.Error });
+                }
             }
         }
 
@@ -542,33 +649,35 @@ namespace Measurements.UI.Desktop.Forms
 
         private void ShowSamples()
         {
-            if (SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedRows.Count == 0)
-                return;
-
-            SessionFormAdvancedDataGridViewIrradiatedSamples.DataSource = null;
-
-            List<IrradiationInfo> SampleList = null;
-            using (var ic = new InfoContext())
+            try
             {
-              SampleList = ic.Irradiations.Where(ir => ir.Type == _session.Type && ir.DateTimeStart.HasValue && ir.DateTimeStart.Value.Date == SelectedIrrJournalDate.Value && ir.LoadNumber == SelectedLoadNumber).ToList();
-            }
+                if (SessionFormAdvancedDataGridViewIrradiationsJournals.SelectedRows.Count == 0)
+                    return;
 
-            SessionFormCheckBoxShowAlreadyMeasured_CheckedChanged(null, EventArgs.Empty);
-            if (SampleList == null)
-                SampleList = new List<IrradiationInfo>();
+                SessionFormAdvancedDataGridViewIrradiatedSamples.DataSource = null;
 
-            if (_session.Type.Contains("LLI"))
-                SampleList = SampleList.OrderBy(ir => ir.Container).ThenBy(ir => ir.Position).ToList();
-
-            var advbindSource = new  AdvancedBindingSource<IrradiationInfo>(SampleList);
-            SessionFormAdvancedDataGridViewIrradiatedSamples.SetDoubleBuffered();
-            var bindingSource = advbindSource.GetBindingSource();
-            SessionFormAdvancedDataGridViewIrradiatedSamples.DataSource = bindingSource;
-
-            SetColumnsProperties(ref SessionFormAdvancedDataGridViewIrradiatedSamples,
-                new string[] { "Id", "Type", "Weight", "DateTimeStart", "Duration", "DateTimeFinish", "Container", "Position", "Channel", "LoadNumber", "Rehandler", "Assistant", "SetKey", "SampleKey" },
-                new Dictionary<string, string>()
+                List<IrradiationInfo> SampleList = null;
+                using (var ic = new InfoContext())
                 {
+                    SampleList = ic.Irradiations.Where(ir => ir.Type == _session.Type && ir.DateTimeStart.HasValue && ir.DateTimeStart.Value.Date == SelectedIrrJournalDate.Value && ir.LoadNumber == SelectedLoadNumber).ToList();
+                }
+
+                SessionFormCheckBoxShowAlreadyMeasured_CheckedChanged(null, EventArgs.Empty);
+                if (SampleList == null)
+                    SampleList = new List<IrradiationInfo>();
+
+                if (_session.Type.Contains("LLI"))
+                    SampleList = SampleList.OrderBy(ir => ir.Container).ThenBy(ir => ir.Position).ToList();
+
+                var advbindSource = new  AdvancedBindingSource<IrradiationInfo>(SampleList);
+                SessionFormAdvancedDataGridViewIrradiatedSamples.SetDoubleBuffered();
+                var bindingSource = advbindSource.GetBindingSource();
+                SessionFormAdvancedDataGridViewIrradiatedSamples.DataSource = bindingSource;
+
+                SetColumnsProperties(ref SessionFormAdvancedDataGridViewIrradiatedSamples,
+                    new string[] { "Id", "Type", "Weight", "DateTimeStart", "Duration", "DateTimeFinish", "Container", "Position", "Channel", "LoadNumber", "Rehandler", "Assistant", "SetKey", "SampleKey" },
+                    new Dictionary<string, string>()
+                    {
                    {"CountryCode",  "Страна"},
                    {"ClientNumber", "Клиент"},
                    {"Year",         "Год"},
@@ -576,11 +685,16 @@ namespace Measurements.UI.Desktop.Forms
                    {"SetIndex",     "Индекс партии"},
                    {"SampleNumber", "Номер образца"},
                    {"Note",         "Примечание"},
-                },
-                new string[0]
-                );
+                    },
+                    new string[0]
+                    );
 
-            SessionFormCheckBoxShowAlreadyMeasured_CheckedChanged(null, EventArgs.Empty);
+                SessionFormCheckBoxShowAlreadyMeasured_CheckedChanged(null, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = ex, Level = ExceptionLevel.Error });
+            }
         }
 
         private void SetColumnsProperties(ref Zuby.ADGV.AdvancedDataGridView adgv, string[] invisibles, Dictionary<string, string> columnHeaders, string[] readonlies)
@@ -657,7 +771,7 @@ namespace Measurements.UI.Desktop.Forms
             try
             {
                 _session.Type = type;
-                InitializeDisplayedTable();
+                FormMeasurementJournalList();
                 InitializeIrradiationsDatesTable();
             }
             catch (Exception ex)
@@ -839,7 +953,11 @@ namespace Measurements.UI.Desktop.Forms
         {
             try
             {
-                SessionFormMenuStrip.Enabled = false;
+                SessionFormMenuStrip.Enabled                        = false;
+                SessionFormGroupBoxFormMeasurementsJournal.Enabled  = false;
+                SessionFormGroupBoxDetectors.Enabled                = false;
+                SessionFormGroupBoxChooseMeasurementJournal.Enabled = false;
+                SessionFormGroupBoxIrradiationJournalsData.Enabled  = false;
             }
             catch (Exception ex)
             {
@@ -849,14 +967,17 @@ namespace Measurements.UI.Desktop.Forms
                     Level = Core.Handlers.ExceptionLevel.Error
                 });
             }
-
         }
 
         private void EnableControls()
         {
             try
             {
-                SessionFormMenuStrip.Enabled = true;
+                SessionFormMenuStrip.Enabled                        = true;
+                SessionFormGroupBoxFormMeasurementsJournal.Enabled  = true;
+                SessionFormGroupBoxDetectors.Enabled                = true;
+                SessionFormGroupBoxChooseMeasurementJournal.Enabled = true;
+                SessionFormGroupBoxIrradiationJournalsData.Enabled  = true;
             }
             catch (Exception ex)
             {
@@ -880,24 +1001,38 @@ namespace Measurements.UI.Desktop.Forms
 
         private void SetFirstNotMeasuredForDetector(string detName)
         {
-            var det =_session.ManagedDetectors.Where(d => d.Name == detName).First();
+            try
+            {
+                var det =_session.ManagedDetectors.Where(d => d.Name == detName).First();
 
-            var CurrentMeasurement = _spreadedMeasurementsInfoes[detName].Where(m => m.Detector == detName && string.IsNullOrEmpty(m.FileSpectra)).First();
-            det.FillSampleInformation(CurrentMeasurement, GetRelatedSample(CurrentMeasurement));
+                var CurrentMeasurement = _spreadedMeasurementsInfoes[detName].Where(m => m.Detector == detName && string.IsNullOrEmpty(m.FileSpectra)).First();
+                det.FillSampleInformation(CurrentMeasurement, GetRelatedSample(CurrentMeasurement));
 
-            if (DetectorsControlPanel != null)
-                DetectorsControlPanel.SourcesInitialize();
-            HighlightMeasurement(det.CurrentMeasurement.Id, System.Drawing.Color.LightYellow);
+                if (DetectorsControlPanel != null)
+                    DetectorsControlPanel.SourcesInitialize();
+                HighlightMeasurement(det.CurrentMeasurement.Id, System.Drawing.Color.LightYellow);
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = ex, Level = ExceptionLevel.Error });
+            }
         }
 
         private void SpreadSamplesToDetectors()
         {
-            _spreadedMeasurementsInfoes.Clear();
-            foreach (var d in _session.ManagedDetectors)
+            try
             {
-                var listOfMeasurementsOnDetector =_measurementsList.Where(m => m.Detector == d.Name && string.IsNullOrEmpty(m.FileSpectra)).ToList();
-                if (listOfMeasurementsOnDetector.Any())
-                    _spreadedMeasurementsInfoes.Add(d.Name, listOfMeasurementsOnDetector);
+                _spreadedMeasurementsInfoes.Clear();
+                foreach (var d in _session.ManagedDetectors)
+                {
+                    var listOfMeasurementsOnDetector =_measurementsList.Where(m => m.Detector == d.Name && string.IsNullOrEmpty(m.FileSpectra)).ToList();
+                    if (listOfMeasurementsOnDetector.Any())
+                        _spreadedMeasurementsInfoes.Add(d.Name, listOfMeasurementsOnDetector);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBox(new ExceptionEventsArgs() { exception = ex, Level = ExceptionLevel.Error });
             }
         }
 
@@ -911,7 +1046,7 @@ namespace Measurements.UI.Desktop.Forms
                     return;
                 }
 
-                if (!_session.ManagedDetectors.Any())
+                if (!_session.ManagedDetectors.Any() || !SessionFormTableLayoutPanelDetectors.Controls.OfType<RadioButton>().Any())
                 {
                     MessageBoxTemplates.ErrorSync("Ни один детектор не подключен к сессии");
                     return;
@@ -922,6 +1057,8 @@ namespace Measurements.UI.Desktop.Forms
                     MessageBoxTemplates.ErrorSync("Выбирете тип проводимых измерений!");
                     return;
                 }
+                
+                DisableControls();
 
 
                 _session.ClearMeasurements();
@@ -941,8 +1078,6 @@ namespace Measurements.UI.Desktop.Forms
                     d.Connect();
                 }
 
-                DisableControls();
-                
                 foreach (var dName in _spreadedMeasurementsInfoes.Keys)
                     SetFirstNotMeasuredForDetector(dName);
 
@@ -966,7 +1101,18 @@ namespace Measurements.UI.Desktop.Forms
 
         private void HighlightMeasurement(int mId, System.Drawing.Color color)
         {
-            SessionFormAdvancedDataGridViewMeasurementsJournal.Rows.OfType<DataGridViewRow>().Where(dr => (int)dr.Cells["Id"].Value == mId).First().DefaultCellStyle.BackColor = color;
+            try
+            {
+                SessionFormAdvancedDataGridViewMeasurementsJournal.Rows.OfType<DataGridViewRow>().Where(dr => (int)dr.Cells["Id"].Value == mId).First().DefaultCellStyle.BackColor = color;
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
         }
 
         private void SessionFormButtonPause_Click(object sender, EventArgs e)
@@ -990,42 +1136,13 @@ namespace Measurements.UI.Desktop.Forms
         {
             try
             {
-                if (DetectorsControlPanel != null)
+                if (DetectorsControlPanel == null) return;
+
+                var r = MessageBox.Show($"Вы пытаетесь остановить измерения.{Environment.NewLine}При нажатии кнопки Ok вся информация о текущих измерениях будет потеряна. Если Вы хотите сохранить информацию, сделайте это в ручную через панель детекторов.{Environment.NewLine}Если Вы хотите продолжить измерения нажмите - Cancel.", "Прерывание процесса измерений",MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (r == DialogResult.OK)
+                {
                     DetectorsControlPanel.Close();
-
-                var r = MessageBox.Show($"Вы пытаетесь остановить измерения.{Environment.NewLine}Если Вы хотите сохранить файл спектра, а также информацию о текущих измерениях в базу данных, а затем остановить измерения, нажмите Yes.{Environment.NewLine}Если Вы хотите сохранить файл спектра, но не хотите сохранять информацию в базу данных и при этом хотите остановить измерения нажмите - No.{Environment.NewLine}Если Вы хотите продолжить измерения нажмите - Cancel.", "Прерывание процесса измерений",MessageBoxButtons.YesNoCancel,MessageBoxIcon.Exclamation);
-                if (r == DialogResult.Yes)
-                {
-                    _session.PauseMeasurements();
-                    foreach (var d in _session.ManagedDetectors)
-                    {
-                        var cd = d;
-                        //_session.SaveSpectra(ref cd);
-                        //_session.SaveMeasurement(ref cd);
-                        ProcessManager.CloseDetector(d.Name);
-                    }
-                    _session.StopMeasurements();
                     EnableControls();
-
-                    ProcessManager.CloseMvcg();
-                    System.Threading.Thread.Sleep(2000);
-                    return;
-                }
-
-                if (r == DialogResult.No)
-                {
-                    _session.PauseMeasurements();
-                    foreach (var d in _session.ManagedDetectors)
-                    {
-                        var cd = d;
-                        //_session.SaveSpectra(ref cd);
-                        ProcessManager.CloseDetector(d.Name);
-                    }
-                    _session.StopMeasurements();
-                    EnableControls();
-                    ProcessManager.CloseMvcg();
-                    System.Threading.Thread.Sleep(2000);
-                    return;
                 }
             }
             catch (Exception ex)
@@ -1188,6 +1305,16 @@ namespace Measurements.UI.Desktop.Forms
         {
             AddAllMeasurementsInfoToMainTable();
             InitializeDisplayedTable();
+        }
+
+        private void SessionFormToolStripMenuItemRefreshFormContent_Click(object sender, EventArgs e)
+        {
+
+            if(_session.Type == null) return;
+            InitializeIrradiationsDatesTable();
+            ShowSamples();
+            FormMeasurementJournalList();
+
         }
     }
 }

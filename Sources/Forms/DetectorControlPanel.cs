@@ -45,12 +45,23 @@ namespace Measurements.UI.Desktop.Forms
             }
             set
             {
-                DCPComboBoxHeight.SelectedIndex = DCPComboBoxHeight.FindStringExact(value.ToString());
-                if (value == _currentDet.CurrentMeasurement.Height) return;
+                try
+                {
+                    DCPComboBoxHeight.SelectedIndex = DCPComboBoxHeight.FindStringExact(value.ToString());
+                    if (value == _currentDet.CurrentMeasurement.Height) return;
 
-                _currentDet.CurrentMeasurement.Height = value;
-                _currentDet.SetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_T_SGEOMTRY, value.ToString()); // height
-                _currentDet.AddEfficiencyCalibrationFile(_currentDet.CurrentMeasurement.Height.Value);
+                    _currentDet.CurrentMeasurement.Height = value;
+                    _currentDet.SetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_T_SGEOMTRY, value.ToString()); // height
+                    _currentDet.AddEfficiencyCalibrationFile(_currentDet.CurrentMeasurement.Height.Value);
+                }
+                catch (Exception ex)
+                {
+                    MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                    {
+                        exception = ex,
+                        Level = Core.Handlers.ExceptionLevel.Error
+                    });
+                }
 
             }
         }
@@ -141,111 +152,187 @@ namespace Measurements.UI.Desktop.Forms
 
         private void DCPButtonClear_Click(object sender, EventArgs e)
         {
-            _currentDet.Clear();
-            int PresetSeconds = int.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL).ToString());
-            var time = TimeSpan.FromSeconds(PresetSeconds);
-            DCPNumericUpDownElapsedHours.Value = time.Hours;
-            DCPNumericUpDownElapsedMinutes.Value = time.Minutes;
-            DCPNumericUpDownElapsedSeconds.Value = time.Seconds;
+            try
+            {
+                _currentDet.Clear();
+                int PresetSeconds = int.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL).ToString());
+                var time = TimeSpan.FromSeconds(PresetSeconds);
+                DCPNumericUpDownElapsedHours.Value = time.Hours;
+                DCPNumericUpDownElapsedMinutes.Value = time.Minutes;
+                DCPNumericUpDownElapsedSeconds.Value = time.Seconds;
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
         }
 
 
         private void DCPButtonStartPause_Click(object sender, EventArgs e)
         {
-            if (_currentDet.Status == DetectorStatus.busy)
+            try
             {
-                _currentDet.Pause();
-                return;
-            }
+                if (_currentDet.Status == DetectorStatus.busy)
+                {
+                    _currentDet.Pause();
+                    return;
+                }
 
-            if (_currentDet.Status == DetectorStatus.ready)
-                _currentDet.Start();
+                if (_currentDet.Status == DetectorStatus.ready)
+                    _currentDet.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
         }
 
         private async void DetStatusChangedHandler(object sender, EventArgs e)
         {
-            if (_currentDet.Status == DetectorStatus.busy)
+            try
             {
-                DCPButtonStartPause.Text = "Пауза";
-                await Task.Run(() => RefreshTime());
+                if (_currentDet.Status == DetectorStatus.busy)
+                {
+                    DCPButtonStartPause.Text = "Пауза";
+                    await Task.Run(() => RefreshTime());
+                }
+
+                if (_currentDet.Status == DetectorStatus.ready && _currentDet.IsPaused)
+                    DCPButtonStartPause.Text = "Продолжить";
+
+                if (_currentDet.Status == DetectorStatus.ready && !_currentDet.IsPaused)
+                    DCPButtonStartPause.Text = "Старт";
             }
-
-            if (_currentDet.Status == DetectorStatus.ready && _currentDet.IsPaused)
-                DCPButtonStartPause.Text = "Продолжить";
-
-            if (_currentDet.Status == DetectorStatus.ready && !_currentDet.IsPaused)
-                DCPButtonStartPause.Text = "Старт";
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
 
         }
 
         private void HeightChangedHandler(object sender, EventArgs e)
         {
-            HeightGeom = decimal.Parse(DCPComboBoxHeight.GetItemText(DCPComboBoxHeight.SelectedItem));
+            try
+            {
+                HeightGeom = decimal.Parse(DCPComboBoxHeight.GetItemText(DCPComboBoxHeight.SelectedItem));
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
         }
 
         private void DCPButtonStop_Click(object sender, EventArgs e)
         {
-            _currentDet.Stop();
+            try
+            {
+                _currentDet.Stop();
+            }
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
         }
 
         private void DCPButtonSave_Click(object sender, EventArgs e)
         {
-            var itWasBusy = false;
-            if (_currentDet.Status == DetectorStatus.busy)
+            try
             {
-                _currentDet.Pause();
-                itWasBusy = true;
+                var itWasBusy = false;
+                if (_currentDet.Status == DetectorStatus.busy)
+                {
+                    _currentDet.Pause();
+                    itWasBusy = true;
+                }
+
+                var dr = saveFileDialogSaveCurrentSpectra.ShowDialog();
+                if (dr == DialogResult.OK)
+                    _currentDet.Save(saveFileDialogSaveCurrentSpectra.FileName);
+
+                if (itWasBusy)
+                    _currentDet.Start();
             }
-
-            var dr = saveFileDialogSaveCurrentSpectra.ShowDialog();
-            if(dr == DialogResult.OK)
-                _currentDet.Save(saveFileDialogSaveCurrentSpectra.FileName);
-
-            if (itWasBusy)
-                _currentDet.Start();
-
+            catch (Exception ex)
+            {
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
+            }
         }
 
 
         private void ChangePresetTimeHandler(object sender, EventArgs e)
         {
-            var itWasBusy = false;
-            if (_currentDet.Status == DetectorStatus.busy)
+            try
             {
-                _currentDet.Pause();
-                itWasBusy = true;
+                var itWasBusy = false;
+                if (_currentDet.Status == DetectorStatus.busy)
+                {
+                    _currentDet.Pause();
+                    itWasBusy = true;
+                }
+
+                DCPNumericUpDownPresetHours.Enabled = false;
+                DCPNumericUpDownPresetMinutes.Enabled = false;
+                DCPNumericUpDownPresetSeconds.Enabled = false;
+
+
+                var time = new TimeSpan((int)DCPNumericUpDownPresetHours.Value, (int)DCPNumericUpDownPresetMinutes.Value, (int)DCPNumericUpDownPresetSeconds.Value);
+
+                _currentDet.SetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL, time.TotalSeconds);
+
+                int PresetSeconds = (int)time.TotalSeconds;
+                int ElapsedSecond = (int)Math.Round(decimal.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_EREAL).ToString()),0);
+                int LeftSeconds = PresetSeconds - ElapsedSecond;
+
+                if (LeftSeconds < 0)
+                {
+                    _currentDet.Clear();
+                    return;
+                }
+
+                var timeLeft = TimeSpan.FromSeconds(LeftSeconds);
+                DCPNumericUpDownElapsedHours.Value = timeLeft.Hours;
+                DCPNumericUpDownElapsedMinutes.Value = timeLeft.Minutes;
+                DCPNumericUpDownElapsedSeconds.Value = timeLeft.Seconds;
+
+                if (itWasBusy)
+                    _currentDet.Start();
+
+                DCPNumericUpDownPresetHours.Enabled = true;
+                DCPNumericUpDownPresetMinutes.Enabled = true;
+                DCPNumericUpDownPresetSeconds.Enabled = true;
             }
-
-            DCPNumericUpDownPresetHours.Enabled = false;
-            DCPNumericUpDownPresetMinutes.Enabled = false;
-            DCPNumericUpDownPresetSeconds.Enabled = false;
-
-            
-            var time = new TimeSpan((int)DCPNumericUpDownPresetHours.Value, (int)DCPNumericUpDownPresetMinutes.Value, (int)DCPNumericUpDownPresetSeconds.Value);
-
-            _currentDet.SetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_PREAL, time.TotalSeconds);
-
-            int PresetSeconds = (int)time.TotalSeconds;
-            int ElapsedSecond = (int)Math.Round(decimal.Parse(_currentDet.GetParameterValue(CanberraDeviceAccessLib.ParamCodes.CAM_X_EREAL).ToString()),0);
-            int LeftSeconds = PresetSeconds - ElapsedSecond;
-
-            if (LeftSeconds < 0)
+            catch (Exception ex)
             {
-                _currentDet.Clear();
-                return;
+                MessageBoxTemplates.WrapExceptionToMessageBoxAsync(new Core.Handlers.ExceptionEventsArgs()
+                {
+                    exception = ex,
+                    Level = Core.Handlers.ExceptionLevel.Error
+                });
             }
-
-            var timeLeft = TimeSpan.FromSeconds(LeftSeconds);
-            DCPNumericUpDownElapsedHours.Value = timeLeft.Hours;
-            DCPNumericUpDownElapsedMinutes.Value = timeLeft.Minutes;
-            DCPNumericUpDownElapsedSeconds.Value = timeLeft.Seconds;
-
-            if (itWasBusy)
-                _currentDet.Start();
-
-            DCPNumericUpDownPresetHours.Enabled = true;
-            DCPNumericUpDownPresetMinutes.Enabled = true;
-            DCPNumericUpDownPresetSeconds.Enabled = true;
         }
     }
 }

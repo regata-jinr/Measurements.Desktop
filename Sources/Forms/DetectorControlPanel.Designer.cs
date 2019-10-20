@@ -17,7 +17,7 @@ namespace Measurements.UI.Desktop.Forms
         {
             foreach (var d in _session.ManagedDetectors)
             {
-                d.Pause();
+                d.Stop();
                 ProcessManager.CloseDetector(d.Name);
                 System.Threading.Thread.Sleep(1000);
             }
