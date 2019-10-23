@@ -1303,6 +1303,11 @@ namespace Measurements.UI.Desktop.Forms
 
         private void SessionFormlButtonAddAllToJournal_Click(object sender, EventArgs e)
         {
+            if (_session.ManagedDetectors.Count == 0)
+            {
+                MessageBoxTemplates.ErrorSync("Не выбран ни один детектор!");
+                return;
+            }
             AddAllMeasurementsInfoToMainTable();
             InitializeDisplayedTable();
         }

@@ -40,6 +40,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormMenuStrip = new System.Windows.Forms.MenuStrip();
             this.MenuMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuSaveSession = new System.Windows.Forms.ToolStripMenuItem();
+            this.SessionFormToolStripMenuItemRefreshFormContent = new System.Windows.Forms.ToolStripMenuItem();
             this.SessionFormStatusStrip = new System.Windows.Forms.StatusStrip();
             this.SessionFormButtonStart = new System.Windows.Forms.Button();
             this.SessionFormButtonPause = new System.Windows.Forms.Button();
@@ -77,7 +78,6 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormAdvancedDataGridViewIrradiatedSamples = new Zuby.ADGV.AdvancedDataGridView();
             this.SessionFormGroupBoxChooseMeasurementJournal = new System.Windows.Forms.GroupBox();
             this.SesionFormComboBoxExistedMeasurementsJournal = new System.Windows.Forms.ComboBox();
-            this.SessionFormToolStripMenuItemRefreshFormContent = new System.Windows.Forms.ToolStripMenuItem();
             this.SessionFormMenuStrip.SuspendLayout();
             this.SessionFormControlPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SessionFormAdvancedDataGridViewMeasurementsJournal)).BeginInit();
@@ -120,6 +120,13 @@ namespace Measurements.UI.Desktop.Forms
             this.MenuSaveSession.Size = new System.Drawing.Size(201, 22);
             this.MenuSaveSession.Text = "Сохранить сессию";
             this.MenuSaveSession.Click += new System.EventHandler(this.MenuSaveSession_Click);
+            // 
+            // SessionFormToolStripMenuItemRefreshFormContent
+            // 
+            this.SessionFormToolStripMenuItemRefreshFormContent.Name = "SessionFormToolStripMenuItemRefreshFormContent";
+            this.SessionFormToolStripMenuItemRefreshFormContent.Size = new System.Drawing.Size(201, 22);
+            this.SessionFormToolStripMenuItemRefreshFormContent.Text = "Обновить содержимое";
+            this.SessionFormToolStripMenuItemRefreshFormContent.Click += new System.EventHandler(this.SessionFormToolStripMenuItemRefreshFormContent_Click);
             // 
             // SessionFormStatusStrip
             // 
@@ -231,6 +238,7 @@ namespace Measurements.UI.Desktop.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.SessionFormAdvancedDataGridViewMeasurementsJournal.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.SessionFormAdvancedDataGridViewMeasurementsJournal.BackgroundColor = System.Drawing.Color.White;
+            this.SessionFormAdvancedDataGridViewMeasurementsJournal.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -540,6 +548,7 @@ namespace Measurements.UI.Desktop.Forms
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.BackgroundColor = System.Drawing.Color.White;
+            this.SessionFormAdvancedDataGridViewIrradiationsJournals.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.FilterAndSortEnabled = true;
             this.SessionFormAdvancedDataGridViewIrradiationsJournals.Location = new System.Drawing.Point(6, 42);
@@ -559,6 +568,7 @@ namespace Measurements.UI.Desktop.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.BackgroundColor = System.Drawing.Color.White;
+            this.SessionFormAdvancedDataGridViewIrradiatedSamples.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.FilterAndSortEnabled = true;
             this.SessionFormAdvancedDataGridViewIrradiatedSamples.Location = new System.Drawing.Point(205, 42);
@@ -588,13 +598,6 @@ namespace Measurements.UI.Desktop.Forms
             this.SesionFormComboBoxExistedMeasurementsJournal.Name = "SesionFormComboBoxExistedMeasurementsJournal";
             this.SesionFormComboBoxExistedMeasurementsJournal.Size = new System.Drawing.Size(231, 26);
             this.SesionFormComboBoxExistedMeasurementsJournal.TabIndex = 0;
-            // 
-            // SessionFormToolStripMenuItemRefreshFormContent
-            // 
-            this.SessionFormToolStripMenuItemRefreshFormContent.Name = "SessionFormToolStripMenuItemRefreshFormContent";
-            this.SessionFormToolStripMenuItemRefreshFormContent.Size = new System.Drawing.Size(201, 22);
-            this.SessionFormToolStripMenuItemRefreshFormContent.Text = "Обновить содержимое";
-            this.SessionFormToolStripMenuItemRefreshFormContent.Click += new System.EventHandler(this.SessionFormToolStripMenuItemRefreshFormContent_Click);
             // 
             // SessionForm
             // 
