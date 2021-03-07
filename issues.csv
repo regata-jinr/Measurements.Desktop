@@ -1,0 +1,5 @@
+title;body;label;assignee
+Fill UI labels table;I've to add each component to UI tables for language switching;DB;bdrum
+Fill functional field;To work with spectra acqusition I have to provide such functional:`r`n- [ ] Fill duration\n - [ ] Select detector for sample\n - [ ] Add sample from register\n - [ ] Add all samples from register\n - [ ] Delete sample\n - [ ] Fill height of measurement\n - [ ] Start acqusition\n - [ ] Stop acqusition\n - [ ] Pause acqusition\n - [ ] Clear acquisition\n - [ ] Show samples queue for each detector;  enhancement;bdrum
+Add application options;Users should be able to choose:\n - [ ] type of measured sampels\n - [ ] Acqusition mode\n - [ ] Language;enhancement;bdrum
+Set up detector panel;Detector control panel is the top level form that allow to control opened MVCG window.;enhancement;bdrum

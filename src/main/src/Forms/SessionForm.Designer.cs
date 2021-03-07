@@ -115,14 +115,14 @@ namespace Regata.Desktop.WinForms.Measurements
             this.MenuSaveSession.Name = "MenuSaveSession";
             this.MenuSaveSession.Size = new System.Drawing.Size(201, 22);
             this.MenuSaveSession.Text = "Сохранить сессию";
-            this.MenuSaveSession.Click += new System.EventHandler(this.MenuSaveSession_Click);
+            //this.MenuSaveSession.Click += new System.EventHandler(this.MenuSaveSession_Click);
             // 
             // SessionFormToolStripMenuItemRefreshFormContent
             // 
             this.SessionFormToolStripMenuItemRefreshFormContent.Name = "SessionFormToolStripMenuItemRefreshFormContent";
             this.SessionFormToolStripMenuItemRefreshFormContent.Size = new System.Drawing.Size(201, 22);
             this.SessionFormToolStripMenuItemRefreshFormContent.Text = "Обновить содержимое";
-            this.SessionFormToolStripMenuItemRefreshFormContent.Click += new System.EventHandler(this.SessionFormToolStripMenuItemRefreshFormContent_Click);
+            //this.SessionFormToolStripMenuItemRefreshFormContent.Click += new System.EventHandler(this.SessionFormToolStripMenuItemRefreshFormContent_Click);
             // 
             // SessionFormStatusStrip
             // 
@@ -146,7 +146,7 @@ namespace Regata.Desktop.WinForms.Measurements
             this.SessionFormButtonStart.TabIndex = 5;
             this.SessionFormButtonStart.Text = "Start";
             this.SessionFormButtonStart.UseVisualStyleBackColor = false;
-            this.SessionFormButtonStart.Click += new System.EventHandler(this.SessionFormButtonStart_Click);
+            //this.SessionFormButtonStart.Click += new System.EventHandler(this.SessionFormButtonStart_Click);
             // 
             // SessionFormButtonPause
             // 
@@ -162,7 +162,7 @@ namespace Regata.Desktop.WinForms.Measurements
             this.SessionFormButtonPause.TabIndex = 9;
             this.SessionFormButtonPause.Text = "Pause";
             this.SessionFormButtonPause.UseVisualStyleBackColor = false;
-            this.SessionFormButtonPause.Click += new System.EventHandler(this.SessionFormButtonPause_Click);
+            //this.SessionFormButtonPause.Click += new System.EventHandler(this.SessionFormButtonPause_Click);
             // 
             // MenuOptions
             // 
@@ -183,7 +183,7 @@ namespace Regata.Desktop.WinForms.Measurements
             this.SessionFormButtonStop.TabIndex = 11;
             this.SessionFormButtonStop.Text = "Stop";
             this.SessionFormButtonStop.UseVisualStyleBackColor = false;
-            this.SessionFormButtonStop.Click += new System.EventHandler(this.SessionFormButtonStop_Click);
+            //this.SessionFormButtonStop.Click += new System.EventHandler(this.SessionFormButtonStop_Click);
             // 
             // SessionFormButtonClear
             // 
@@ -198,7 +198,7 @@ namespace Regata.Desktop.WinForms.Measurements
             this.SessionFormButtonClear.TabIndex = 12;
             this.SessionFormButtonClear.Text = "Clear";
             this.SessionFormButtonClear.UseVisualStyleBackColor = false;
-            this.SessionFormButtonClear.Click += new System.EventHandler(this.SessionFormButtonClear_Click);
+            //this.SessionFormButtonClear.Click += new System.EventHandler(this.SessionFormButtonClear_Click);
             // 
             // SessionFormControlPanel
             // 
@@ -270,7 +270,7 @@ namespace Regata.Desktop.WinForms.Measurements
             this.SessionFormlButtonAddAllToJournal.TabIndex = 18;
             this.SessionFormlButtonAddAllToJournal.Text = "Добавить образцы из журналов измерений";
             this.SessionFormlButtonAddAllToJournal.UseVisualStyleBackColor = true;
-            this.SessionFormlButtonAddAllToJournal.Click += new System.EventHandler(this.SessionFormlButtonAddAllToJournal_Click);
+            //this.SessionFormlButtonAddAllToJournal.Click += new System.EventHandler(this.SessionFormlButtonAddAllToJournal_Click);
             // 
             // SessionFormlButtonAddSelectedToJournal
             // 
@@ -283,7 +283,7 @@ namespace Regata.Desktop.WinForms.Measurements
             this.SessionFormlButtonAddSelectedToJournal.TabIndex = 6;
             this.SessionFormlButtonAddSelectedToJournal.Text = "Добавить образы из журналов облучений";
             this.SessionFormlButtonAddSelectedToJournal.UseVisualStyleBackColor = true;
-            this.SessionFormlButtonAddSelectedToJournal.Click += new System.EventHandler(this.SessionFormlButtonAddSelectedToJournal_Click);
+            //this.SessionFormlButtonAddSelectedToJournal.Click += new System.EventHandler(this.SessionFormlButtonAddSelectedToJournal_Click);
             // 
             // SessionFormButtonRemoveSelectedFromJournal
             // 
@@ -296,7 +296,7 @@ namespace Regata.Desktop.WinForms.Measurements
             this.SessionFormButtonRemoveSelectedFromJournal.TabIndex = 17;
             this.SessionFormButtonRemoveSelectedFromJournal.Text = "Удалить выделенную запись";
             this.SessionFormButtonRemoveSelectedFromJournal.UseVisualStyleBackColor = true;
-            this.SessionFormButtonRemoveSelectedFromJournal.Click += new System.EventHandler(this.SessionFormButtonRemoveSelectedFromJournal_Click);
+            //this.SessionFormButtonRemoveSelectedFromJournal.Click += new System.EventHandler(this.SessionFormButtonRemoveSelectedFromJournal_Click);
             // 
             // SessionFormGroupBoxDuration
             // 
@@ -554,7 +554,7 @@ namespace Regata.Desktop.WinForms.Measurements
         private System.Windows.Forms.ToolStripStatusLabel CountsStatusLabel;
         private System.Windows.Forms.ToolStripDropDownButton HeightDropDownButton;
         private System.Windows.Forms.ToolStripProgressBar MeasurementsProgressBar;
-        private RDataGridView<Measurement> SessionFormAdvancedDataGridViewMeasurementsJournal;
+        //private RDataGridView<Measurement> SessionFormAdvancedDataGridViewMeasurementsJournal;
         private System.Windows.Forms.Button SessionFormButtonStop;
         private System.Windows.Forms.Button SessionFormButtonClear;
         private System.Windows.Forms.GroupBox SessionFormControlPanel;

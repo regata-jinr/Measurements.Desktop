@@ -26,12 +26,12 @@ namespace Regata.Desktop.WinForms.Measurements
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            foreach (var d in _session.ManagedDetectors)
-            {
-                d.Stop();
-                ProcessManager.CloseDetector(d.Name);
-                System.Threading.Thread.Sleep(1000);
-            }
+            //foreach (var d in _session.ManagedDetectors)
+            //{
+            //    d.Stop();
+            //    ProcessManager.CloseDetector(d.Name);
+            //    System.Threading.Thread.Sleep(1000);
+            //}
             ProcessManager.CloseMvcg();
 
             if (disposing && (components != null))

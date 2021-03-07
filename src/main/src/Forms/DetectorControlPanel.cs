@@ -19,6 +19,7 @@ using System.Windows.Forms;
 using Regata.Desktop.WinForms.Components;
 using Regata.Core.Hardware;
 using Regata.Core;
+using RCM=Regata.Core.Messages;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -83,7 +84,7 @@ namespace Regata.Desktop.WinForms.Measurements
             }
             catch (Exception ex)
             {
-                Report.Notify(Codes.ERR_UI_WF_DCP_INIT_UNREG);
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_DCP_INIT_UNREG) { DetailedText = ex.ToString()});
             }
         }
 
@@ -106,9 +107,9 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Report.Notify(Codes.ERR_UI_WF_DCP_REFR_TIME_UNREG);
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_DCP_REFR_TIME_UNREG) { DetailedText = ex.ToString()});
             }
         }
 
@@ -137,7 +138,7 @@ namespace Regata.Desktop.WinForms.Measurements
             }
             catch (Exception ex)
             {
-                Report.Notify(Codes.ERR_UI_WF_DCP_CLR_UNREG);
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_DCP_CLR_UNREG) { DetailedText = ex.ToString()});
             }
         }
 
@@ -157,7 +158,7 @@ namespace Regata.Desktop.WinForms.Measurements
             }
             catch (Exception ex)
             {
-                Report.Notify(Codes.ERR_UI_WF_DCP_PAUSE_UNREG);
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_DCP_PAUSE_UNREG) { DetailedText = ex.ToString()});
             }
         }
 
@@ -179,7 +180,7 @@ namespace Regata.Desktop.WinForms.Measurements
             }
             catch (Exception ex)
             {
-                Report.Notify(Codes.ERR_UI_WF_DET_STAT_CHNG_UNREG);
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_DET_STAT_CHNG_UNREG) { DetailedText = ex.ToString()});
             }
 
         }
@@ -188,12 +189,12 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
-                ISampleInfo si = _currentDet;
-                si.Height = float.Parse(DCPComboBoxHeight.GetItemText(DCPComboBoxHeight.SelectedItem));
+                //ISampleInfo si = _currentDet;
+                //si.Height = float.Parse(DCPComboBoxHeight.GetItemText(DCPComboBoxHeight.SelectedItem));
             }
             catch (Exception ex)
             {
-                Report.Notify(Codes.ERR_UI_WF_DET_HGHT_CHNG_UNREG);
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_DET_HGHT_CHNG_UNREG) { DetailedText = ex.ToString()});
             }
         }
 
@@ -205,7 +206,7 @@ namespace Regata.Desktop.WinForms.Measurements
             }
             catch (Exception ex)
             {
-                Report.Notify(Codes.ERR_UI_WF_DET_STOP_UNREG);
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_DET_STOP_UNREG) { DetailedText = ex.ToString()});
             }
         }
 
@@ -229,7 +230,7 @@ namespace Regata.Desktop.WinForms.Measurements
             }
             catch (Exception ex)
             {
-                Report.Notify(Codes.ERR_UI_WF_DET_SAVE_UNREG);
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_DET_SAVE_UNREG) { DetailedText = ex.ToString()});
             }
         }
 
@@ -274,7 +275,7 @@ namespace Regata.Desktop.WinForms.Measurements
             }
             catch (Exception ex)
             {
-                Report.Notify(Codes.ERR_UI_WF_TIME_CHNG_UNREG);
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_TIME_CHNG_UNREG) { DetailedText = ex.ToString()});
             }
         }
     }  // public partial class DetectorControlPanel : Form
