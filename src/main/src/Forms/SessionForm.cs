@@ -78,7 +78,7 @@ namespace Regata.Desktop.WinForms.Measurements
             //    ConnectionStatusColor = new Dictionary<bool, System.Drawing.Color>() { { false, System.Drawing.Color.Red }, { true, System.Drawing.Color.Green } };
             //    _session = session;
 
-            //    InitializeComponent();
+            InitializeComponent();
 
             //    Text = $"Сессия измерений [{session.Name}]| Regata Measurements UI - {LoginForm.CurrentVersion} | [{User}]";
 
