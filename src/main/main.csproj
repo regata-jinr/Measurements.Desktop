@@ -39,24 +39,12 @@
   <ItemGroup>
     <PackageReference Include="AdysTech.CredentialManager" Version="2.3.0" />
     <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.3" />
-    <PackageReference Include="NLog" Version="4.7.6" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
-    <Reference Include="mssql-context">
-      <HintPath>..\..\..\..\..\Core\artifacts\Release\mssql-context\mssql-context.dll</HintPath>
-    </Reference>
-    <Reference Include="mssql-models">
-      <HintPath>..\..\..\..\..\Core\artifacts\Release\mssql-models\mssql-models.dll</HintPath>
-    </Reference>
-    <Reference Include="report">
-      <HintPath>..\..\..\..\..\Core\artifacts\Release\report\report.dll</HintPath>
-    </Reference>
-    <Reference Include="Detector">
-      <HintPath>..\..\..\..\..\Core\artifacts\Release\Detector\Detector.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+    <PackageReference Include="NLog" Version="4.7.10" />
   </ItemGroup>
 
   <ItemGroup>
@@ -65,15 +53,6 @@
     </Reference>
     <Reference Include="Detector">
       <HintPath>..\..\..\..\..\..\Core\artifacts\Debug\Detector\Detector.dll</HintPath>
-    </Reference>
-    <Reference Include="mssql-context">
-      <HintPath>..\..\..\..\..\..\Core\artifacts\Debug\mssql-context\mssql-context.dll</HintPath>
-    </Reference>
-    <Reference Include="mssql-models">
-      <HintPath>..\..\..\..\..\..\Core\artifacts\Debug\mssql-models\mssql-models.dll</HintPath>
-    </Reference>
-    <Reference Include="settings">
-      <HintPath>..\..\..\..\..\..\Core\artifacts\Debug\settings\settings.dll</HintPath>
     </Reference>
     <Reference Include="WinFormsTemplates">
       <HintPath>..\..\..\..\..\..\Core\artifacts\Debug\WinFormsTemplates\WinFormsTemplates.dll</HintPath>

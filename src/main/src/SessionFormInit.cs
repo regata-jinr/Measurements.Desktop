@@ -10,9 +10,11 @@
  ***************************************************************************/
 
 using Regata.Core.UI.WinForms.Forms;
+using Regata.Core.UI.WinForms;
 using Regata.Core.UI.WinForms.Items;
-using Regata.Core.DB.MSSQL.Models;
-using Regata.Core.DB.MSSQL.Context;
+using Regata.Core.DataBase.Models;
+using Regata.Core.DataBase;
+using Regata.Core.Settings;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -30,8 +32,9 @@ namespace Regata.Desktop.WinForms.Measurements
 
         public static RegisterForm<Measurement> GetRegisterForm()
         {
-            Core.Report.LogDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "test", "MeasurementsDesktop");
-            var rf = new RegisterForm<Measurement>();
+            var rf = new RegisterForm<Measurement>(Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage);
+            rf.LangItem.CheckedChanged += () => { Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage = rf.LangItem.CheckedItem; };
+            //Settings<MeasurementsSettings>.CurrentSettings.LanguageChanged += rf.ChangeLanguage;
             CurrentMeasurementsRegister = new MeasurementsRegister() { Type = -1, IrradiationDate = null, Id = 0};
 
             using (var r = new RegataContext())
@@ -79,6 +82,9 @@ namespace Regata.Desktop.WinForms.Measurements
                                                     .ToArray();
                 }
                 rf.TabsPane[1, 0].Columns[0].Visible = false;
+
+                Labels.SetControlsLabels(rf.Controls);
+
             };
 
             #endregion
@@ -216,6 +222,8 @@ namespace Regata.Desktop.WinForms.Measurements
                     }
                 }
             };
+
+            Labels.SetControlsLabels(rf.Controls);
 
             return rf;
 

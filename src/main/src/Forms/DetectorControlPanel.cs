@@ -19,6 +19,7 @@ using System.Windows.Forms;
 using Regata.Desktop.WinForms.Components;
 using Regata.Core.Hardware;
 using Regata.Core;
+using Regata.Core.DataBase.Models;
 using RCM=Regata.Core.Messages;
 
 namespace Regata.Desktop.WinForms.Measurements

@@ -11,7 +11,7 @@
 
 using Regata.Desktop.WinForms.Components;
 using Regata.Core.UI.WinForms;
-using Regata.Core.DB.MSSQL.Models;
+using Regata.Core.DataBase.Models;
 
 namespace Regata.Desktop.WinForms.Measurements
 { 

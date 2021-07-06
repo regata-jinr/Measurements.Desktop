@@ -14,7 +14,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Linq;
 using System.Net;
-using Regata.Core.DB.MSSQL.Context;
+using Regata.Core.DataBase;
 using Regata.Core;
 using RCM=Regata.Core.Messages;
 using AdysTech.CredentialManager;
