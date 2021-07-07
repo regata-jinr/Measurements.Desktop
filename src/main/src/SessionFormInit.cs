@@ -12,30 +12,28 @@
 using Regata.Core.UI.WinForms.Forms;
 using Regata.Core.UI.WinForms;
 using Regata.Core.UI.WinForms.Items;
-using Regata.Core.DataBase.Models;
 using Regata.Core.DataBase;
+using Regata.Core.DataBase.Models;
 using Regata.Core.Settings;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.IO;
 using System.Windows.Forms;
-using System.Diagnostics;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
     public static class SessionFormInit
     {
-
         public static MeasurementsRegister CurrentMeasurementsRegister;
 
         public static RegisterForm<Measurement> GetRegisterForm()
         {
             var rf = new RegisterForm<Measurement>(Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage);
-            rf.LangItem.CheckedChanged += () => { Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage = rf.LangItem.CheckedItem; };
+            rf.LangItem.CheckItem(Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage);
+            rf.LangItem.CheckedChanged += () => { Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage = rf.LangItem.CheckedItem; Labels.SetControlsLabels(rf.Controls); };
             //Settings<MeasurementsSettings>.CurrentSettings.LanguageChanged += rf.ChangeLanguage;
-            CurrentMeasurementsRegister = new MeasurementsRegister() { Type = -1, IrradiationDate = null, Id = 0};
+            CurrentMeasurementsRegister = new MeasurementsRegister() { Type = -1, Id = 0};
 
             using (var r = new RegataContext())
             {
@@ -76,9 +74,9 @@ namespace Regata.Desktop.WinForms.Measurements
                     rf.TabsPane[1, 0].DataSource = r.MeasurementsRegisters
                                                     .AsNoTracking()
                                                     .Where(m => m.Type == (int)type_items.CheckedItem && m.DateTimeStart != null)
-                                                    .Select(m => new { m.Id, m.LoadNumber, m.IrradiationDate.Value.Date })
+                                                    .Select(m => new { m.Id, m.LoadNumber, m.IrradiationDate })
                                                     .Distinct()
-                                                    .OrderByDescending(i => i.Date)
+                                                    .OrderByDescending(m => m.IrradiationDate)
                                                     .ToArray();
                 }
                 rf.TabsPane[1, 0].Columns[0].Visible = false;
@@ -99,7 +97,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 var date = rf.TabsPane[0, 0].SelectedCells[1].Value as DateTime?;
 
-                CurrentMeasurementsRegister.IrradiationDate = date;
+                CurrentMeasurementsRegister.IrradiationDate = date.Value;
 
                 using (var r = new RegataContext())
                 {
@@ -232,7 +230,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private static void CreateNewMeasurementsRegister()
         {
-            if (CurrentMeasurementsRegister.Type < 0 || !CurrentMeasurementsRegister.IrradiationDate.HasValue)
+            if (CurrentMeasurementsRegister.Type < 0) // || !CurrentMeasurementsRegister.IrradiationDate.HasValue)
                 return;
 
 
