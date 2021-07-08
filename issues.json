@@ -1,0 +1,26 @@
+[
+    {
+        "title": "Detector extraction and inception",
+        "body": "Break control of specific detector for testing and setting and then manage it again.",
+        "label": "enhancement,Detector",
+        "assignee": "bdrum"
+    },
+    {
+        "title": "Check order of samples on the disk",
+        "body": "Make a screenshot from camera and check samples queue with samples order on disk. Character recognition.",
+        "label": "enhancement,SC",
+        "assignee": "bdrum"
+    },
+    {
+        "title": "Bounds testing",
+        "body": "What happened in case of 4 detector has selected, but only three samples in queue and so on",
+        "label": "enhancement,Detector",
+        "assignee": "bdrum"
+    },
+    {
+        "title": "Behavior after finishing of SLI",
+        "body": "после завершения измерений на детекторе для кжи детектор закрывается после измерения на каждом детекторе окно джини закрывается и нажатие на кнопку старт в сесии приводит к запуску следующих пустых (не померенных) образцов",
+        "label": "enhancement,Detector",
+        "assignee": "bdrum"
+    }
+]

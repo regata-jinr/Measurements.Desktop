@@ -31,8 +31,10 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             var rf = new RegisterForm<Measurement>(Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage);
             rf.LangItem.CheckItem(Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage);
-            rf.LangItem.CheckedChanged += () => { Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage = rf.LangItem.CheckedItem; Labels.SetControlsLabels(rf.Controls); };
-            //Settings<MeasurementsSettings>.CurrentSettings.LanguageChanged += rf.ChangeLanguage;
+            
+            Settings<MeasurementsSettings>.CurrentSettings.LanguageChanged += () => Labels.SetControlsLabels(rf.Controls);
+            rf.LangItem.CheckedChanged += () => { Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage = rf.LangItem.CheckedItem; };
+            
             CurrentMeasurementsRegister = new MeasurementsRegister() { Type = -1, Id = 0};
 
             using (var r = new RegataContext())
@@ -202,6 +204,7 @@ namespace Regata.Desktop.WinForms.Measurements
                     r.SaveChanges();
                     rf.MainRDGV.DataSource = meas;
                 }
+
 
             };
 
