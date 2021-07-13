@@ -9,11 +9,6 @@
  *                                                                         *
  ***************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Regata.Core.Settings;
 
 namespace Regata.Desktop.WinForms.Measurements
@@ -21,5 +16,5 @@ namespace Regata.Desktop.WinForms.Measurements
     class MeasurementsSettings : ASettings
     {
 
-    }
-}
+    } // class MeasurementsSettings : ASettings
+}     // namespace Regata.Desktop.WinForms.Measurements

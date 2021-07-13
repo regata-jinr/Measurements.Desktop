@@ -1,7 +1,7 @@
-/***************************************************************************
+﻿/***************************************************************************
  *                                                                         *
  *                                                                         *
- * Copyright(c) 2017-2021, REGATA Experiment at FLNP|JINR                  *
+ * Copyright(c) 2021, REGATA Experiment at FLNP|JINR                       *
  * Author: [Boris Rumyantsev](mailto:bdrum@jinr.ru)                        *
  *                                                                         *
  * The REGATA Experiment team license this file to you under the           *
@@ -9,22 +9,10 @@
  *                                                                         *
  ***************************************************************************/
 
-using System;
-using System.Windows.Forms;
-using Regata.Core.Settings;
-
 namespace Regata.Desktop.WinForms.Measurements
 {
-    static class Program
+    public static partial class MainFormInit
     {
-        [STAThread]
-        static void Main()
-        {
-            Application.SetHighDpiMode(HighDpiMode.SystemAware);
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Settings<MeasurementsSettings>.AssemblyName = "Measurements.Desktop";
-            Application.Run(MainFormInit.GetRegisterForm());
-        }
-    }
-}
+
+    } //public static class SessionFormInit
+}     // namespace Regata.Desktop.WinForms.Measurements
