@@ -23,8 +23,7 @@ namespace Regata.Desktop.WinForms.Measurements
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Settings<MeasurementsSettings>.AssemblyName = "Measurements.Desktop";
-            Application.Run(MainFormInit.GetRegisterForm());
+            Application.Run(new MainForm().mainForm);
         }
     }
 }

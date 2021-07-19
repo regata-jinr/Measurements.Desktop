@@ -11,7 +11,7 @@
 
 namespace Regata.Desktop.WinForms.Measurements
 {
-    public static partial class MainFormInit
+    public partial class MainForm
     {
 
     } //public static class SessionFormInit

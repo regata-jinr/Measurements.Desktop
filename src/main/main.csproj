@@ -59,6 +59,10 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="src\Settings\" />
+  </ItemGroup>
+
 
 
 </Project>

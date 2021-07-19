@@ -9,10 +9,22 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core.UI.WinForms.Forms;
+using Regata.Core.UI.WinForms;
+using Regata.Core.UI.WinForms.Items;
+using Regata.Core.DataBase;
+using Regata.Core.DataBase.Models;
+using Regata.Core.Settings;
+using System.Linq;
+
+
 namespace Regata.Desktop.WinForms.Measurements
 {
-    public static partial class MainFormInit
+    public partial class MainForm
     {
-
+        private void InitStatusStrip()
+        {
+            mainForm.StatusStrip.Items.Add(MeasurementsTypeItems.EnumStatusLabel);
+        }
     } //public static class SessionFormInit
 }     // namespace Regata.Desktop.WinForms.Measurements
