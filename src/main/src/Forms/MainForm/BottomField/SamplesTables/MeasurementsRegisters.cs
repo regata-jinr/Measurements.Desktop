@@ -11,7 +11,9 @@
 
 
 using Regata.Core.DataBase;
+using Regata.Core.DataBase.Models;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +21,8 @@ namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm
     {
+        private List<Measurement> _selectedMeasurements;
+
 
         private void InitMeasurementsRegisters()
         {
@@ -38,6 +42,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private async Task FillMeasurementsRegisters()
         {
+
+
             using (var r = new RegataContext())
             {
                 mainForm.TabsPane[1, 0].DataSource = await r.MeasurementsRegisters
@@ -50,6 +56,7 @@ namespace Regata.Desktop.WinForms.Measurements
                                                 .ToArrayAsync();
             }
 
+       
 
             mainForm.TabsPane[1, 0].Columns[0].Visible = false;
         }
@@ -57,6 +64,10 @@ namespace Regata.Desktop.WinForms.Measurements
         private async Task FillSelectedMeasurements()
         {
             if (mainForm.TabsPane[1, 0].SelectedCells.Count <= 0) return;
+
+
+            _selectedMeasurements.Clear();
+            _selectedMeasurements.Capacity = 99;
 
             mainForm.TabsPane[1, 1].DataSource = null;
 
@@ -67,27 +78,32 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 CurrentMeasurementsRegister.IrradiationDate = r.MeasurementsRegisters.AsNoTracking().Where(m => m.Id == mRegId.Value).Select(m => m.IrradiationDate).FirstOrDefault();
 
-                mainForm.TabsPane[1, 1].DataSource = await r.Measurements
+                _selectedMeasurements.AddRange(await r.Measurements
                                                 .AsNoTracking()
                                                 .Where(
                                                          m =>
                                                                 m.Type == (int)MeasurementsTypeItems.CheckedItem &&
                                                                 m.RegId == mRegId.Value
                                                       )
-                                                .Select(m => new
-                                                {
-                                                    m.CountryCode,
-                                                    m.ClientNumber,
-                                                    m.Year,
-                                                    m.SetNumber,
-                                                    m.SetIndex,
-                                                    m.SampleNumber,
-                                                    m.IrradiationId
-                                                }
-                                                       )
-                                                .ToArrayAsync();
+                                                .ToArrayAsync());
             };
+
+            //.Select(m => new
+            //{
+            //    m.CountryCode,
+            //    m.ClientNumber,
+            //    m.Year,
+            //    m.SetNumber,
+            //    m.SetIndex,
+            //    m.SampleNumber,
+            //    m.IrradiationId
+            //}
+            //)
+
+            _selectedMeasurements.TrimExcess();
+
+            mainForm.TabsPane[1, 1].DataSource = _selectedMeasurements;
         }
 
-        } //public static class SessionFormInit
+        } //public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements

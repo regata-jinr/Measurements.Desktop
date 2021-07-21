@@ -26,5 +26,5 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             mainForm.StatusStrip.Items.Add(MeasurementsTypeItems.EnumStatusLabel);
         }
-    } //public static class SessionFormInit
+    } //public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements

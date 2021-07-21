@@ -9,10 +9,19 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core.UI.WinForms.Controls;
+using Regata.Core.Hardware;
+using System.Windows.Forms;
+
 namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm
     {
+        public ControlsGroupBox controlsMeasParams;
+        public CheckedArrayControl<Detector> CheckedDetectorArrayControl;
+        public CheckedArrayControl<float> CheckedHeightArrayControl;
+        public Button buttonShowAcqQueue;
 
-    } //public static class SessionFormInit
+
+    } //public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements

@@ -48,5 +48,5 @@ namespace Regata.Desktop.WinForms.Measurements
 
         }
 
-    } //public static class SessionFormInit
+    } //public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements

@@ -15,7 +15,7 @@ using Regata.Core.UI.WinForms.Items;
 using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
 using Regata.Core.Settings;
-using System.Linq;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -36,6 +36,9 @@ namespace Regata.Desktop.WinForms.Measurements
             mainForm = new RegisterForm<Measurement>();
             CurrentMeasurementsRegister = new MeasurementsRegister() { Type = -1, Id = 0 };
             MeasurementsTypeItems = new EnumItem<MeasurementsType>();
+            _selectedIrradiations = new List<Irradiation>();
+            _selectedMeasurements = new List<Measurement>();
+
 
             Settings<MeasurementsSettings>.CurrentSettings.LanguageChanged += () => Labels.SetControlsLabels(mainForm.Controls);
 
@@ -44,6 +47,10 @@ namespace Regata.Desktop.WinForms.Measurements
             InitCurrentRegister();
             InitIrradiationsRegisters();
             InitMeasurementsRegisters();
+            InitializeFuntionalField();
+            InitializeRegFormingControls();
+
+
 
             Labels.SetControlsLabels(mainForm.Controls);
         }
@@ -53,5 +60,5 @@ namespace Regata.Desktop.WinForms.Measurements
 
         
 
-    } //public static class SessionFormInit
+    } //public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements

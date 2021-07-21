@@ -10,7 +10,10 @@
  ***************************************************************************/
 
 using Regata.Core.DataBase;
+using Regata.Core.DataBase.Models;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -18,13 +21,86 @@ namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm
     {
+        private List<Measurement> _measurementsList;
+
+        private async Task AddRecordAsync(int id)
+        {
+            using (var r = new RegataContext())
+            {
+                var m = new Measurement(r.Irradiations.Where(i => i.Id == id).FirstOrDefault());
+                _measurementsList.Add(m);
+                await r.SaveChangesAsync();
+            }
+        }
+
+        private async Task AddRecordAsync(Measurement m)
+        {
+            using (var r = new RegataContext())
+            {
+                _measurementsList.Add(m);
+                await r.SaveChangesAsync();
+            }
+        }
+
+        private async Task AddRecordsAsync(IEnumerable<Measurement> ms)
+        {
+            using (var r = new RegataContext())
+            {
+                _measurementsList.AddRange(ms);
+                await r.SaveChangesAsync();
+            }
+        }
+
+
+        private async Task RemoveRecordAsync(Measurement m)
+        {
+            using (var r = new RegataContext())
+            {
+                _measurementsList.Remove(m);
+                await r.SaveChangesAsync();
+            }
+        }
+
+        private async Task RemoveRecordsAsync(IEnumerable<Measurement> ms)
+        {
+            using (var r = new RegataContext())
+            {
+                _measurementsList.RemoveAll(m => ms.Select(msm => msm.Id).ToArray().Contains(m.Id));
+                await r.SaveChangesAsync();
+            }
+        }
+
+        private async Task ClearCurrentRegisterAsync()
+        {
+            using (var r = new RegataContext())
+            {
+                _measurementsList.Clear();
+                await r.SaveChangesAsync();
+            }
+        }
+
+        private async Task RemoveRecordAsync(int id)
+        {
+            var m = _measurementsList.Where(m => m.Id == id).FirstOrDefault();
+
+            if (m == null) return;
+
+            using (var r = new RegataContext())
+            {
+                _measurementsList.Remove(m);
+                await r.SaveChangesAsync();
+            }
+        }
+
 
         private void InitCurrentRegister()
         {
 
+            _measurementsList = new List<Measurement>();
+
             using (var r = new RegataContext())
             {
-                mainForm.MainRDGV.DataSource = r.Measurements.Where(m => m.RegId == 0).ToArray();
+                mainForm.MainRDGV.DataSource = _measurementsList;
             }
 
             mainForm.Disposed += (s, e) =>
@@ -61,5 +137,5 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
-    } //public static class SessionFormInit
+    } //public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements
