@@ -21,7 +21,11 @@ namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm
     {
-        private List<Measurement> _selectedMeasurements;
+        /// <summary>
+        /// List of Measurements from selected measurements register in TabPane
+        /// 
+        /// </summary>
+        private List<Measurement> _chosenMeasurements;
 
 
         private void InitMeasurementsRegisters()
@@ -66,8 +70,8 @@ namespace Regata.Desktop.WinForms.Measurements
             if (mainForm.TabsPane[1, 0].SelectedCells.Count <= 0) return;
 
 
-            _selectedMeasurements.Clear();
-            _selectedMeasurements.Capacity = 99;
+            _chosenMeasurements.Clear();
+            _chosenMeasurements.Capacity = 499;
 
             mainForm.TabsPane[1, 1].DataSource = null;
 
@@ -78,7 +82,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 CurrentMeasurementsRegister.IrradiationDate = r.MeasurementsRegisters.AsNoTracking().Where(m => m.Id == mRegId.Value).Select(m => m.IrradiationDate).FirstOrDefault();
 
-                _selectedMeasurements.AddRange(await r.Measurements
+                _chosenMeasurements.AddRange(await r.Measurements
                                                 .AsNoTracking()
                                                 .Where(
                                                          m =>
@@ -100,9 +104,9 @@ namespace Regata.Desktop.WinForms.Measurements
             //}
             //)
 
-            _selectedMeasurements.TrimExcess();
+            _chosenMeasurements.TrimExcess();
 
-            mainForm.TabsPane[1, 1].DataSource = _selectedMeasurements;
+            mainForm.TabsPane[1, 1].DataSource = _chosenMeasurements;
         }
 
         } //public partial class MainForm

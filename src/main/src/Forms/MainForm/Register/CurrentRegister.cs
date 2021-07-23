@@ -13,6 +13,7 @@ using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,23 +22,31 @@ namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm
     {
-        private List<Measurement> _measurementsList;
 
-        private async Task AddRecordAsync(int id)
+        private async Task AddRecordAsync(int id, CancellationToken _ct)
         {
-            using (var r = new RegataContext())
-            {
-                var m = new Measurement(r.Irradiations.Where(i => i.Id == id).FirstOrDefault());
-                _measurementsList.Add(m);
-                await r.SaveChangesAsync();
-            }
+            var m = new Measurement(await _regataContext.Irradiations.Where(i => i.Id == id).FirstOrDefaultAsync());
+            m.RegId = CurrentMeasurementsRegister.Id;
+            await _regataContext.Measurements.AddAsync(m);
+            await _regataContext.SaveChangesAsync(_ct);
         }
+
+        private async Task RemoveRecordAsync(int id, CancellationToken _ct)
+        {
+            var m = _regataContext.Measurements.Where(m => m.Id == id).FirstOrDefault();
+
+            if (m == null) return;
+
+            _regataContext.Measurements.Remove(m);
+            await _regataContext.SaveChangesAsync(_ct);
+        }
+
 
         private async Task AddRecordAsync(Measurement m)
         {
             using (var r = new RegataContext())
             {
-                _measurementsList.Add(m);
+                //_measurementsList.Add(m);
                 await r.SaveChangesAsync();
             }
         }
@@ -46,62 +55,45 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             using (var r = new RegataContext())
             {
-                _measurementsList.AddRange(ms);
+                //_measurementsList.AddRange(ms);
                 await r.SaveChangesAsync();
             }
         }
 
 
-        private async Task RemoveRecordAsync(Measurement m)
+        private async Task RemoveRecordAsync(Measurement m, CancellationToken _ct)
         {
-            using (var r = new RegataContext())
-            {
-                _measurementsList.Remove(m);
-                await r.SaveChangesAsync();
-            }
+               _regataContext.Measurements.Remove(m);
+               await _regataContext.SaveChangesAsync(_ct);
         }
 
         private async Task RemoveRecordsAsync(IEnumerable<Measurement> ms)
         {
             using (var r = new RegataContext())
             {
-                _measurementsList.RemoveAll(m => ms.Select(msm => msm.Id).ToArray().Contains(m.Id));
+                //_measurementsList.RemoveAll(m => ms.Select(msm => msm.Id).ToArray().Contains(m.Id));
                 await r.SaveChangesAsync();
             }
         }
 
         private async Task ClearCurrentRegisterAsync()
         {
-            using (var r = new RegataContext())
-            {
-                _measurementsList.Clear();
-                await r.SaveChangesAsync();
-            }
+            var m = _regataContext.Measurements.Local.ToArray();
+
+            //await r.SaveChangesAsync();
         }
 
-        private async Task RemoveRecordAsync(int id)
-        {
-            var m = _measurementsList.Where(m => m.Id == id).FirstOrDefault();
-
-            if (m == null) return;
-
-            using (var r = new RegataContext())
-            {
-                _measurementsList.Remove(m);
-                await r.SaveChangesAsync();
-            }
-        }
-
+      
 
         private void InitCurrentRegister()
         {
+            //using (var r = new RegataContext())
+            //{
+                _regataContext.Measurements.Where(m => m.Id == 0).Load();
+                mainForm.MainRDGV.DataSource = _regataContext.Measurements.Local.ToBindingList();
+            //}
 
-            _measurementsList = new List<Measurement>();
-
-            using (var r = new RegataContext())
-            {
-                mainForm.MainRDGV.DataSource = _measurementsList;
-            }
+             //= _measurementsList;
 
             mainForm.Disposed += (s, e) =>
             {

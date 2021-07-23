@@ -22,23 +22,30 @@ namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm
     {
-
-        private List<Irradiation> _selectedIrradiations;
+        /// <summary>
+        /// List of Irradiations from selected irradiation register in TabPane
+        /// </summary>
+        private List<Irradiation> _chosenIrradiations;
 
         private void InitIrradiationsRegisters()
         {
             mainForm.TabsPane[0, 0].MultiSelect = false;
 
-            //mainForm.TabsPane[0, 1].DataSource = _selectedIrradiations;
-
-            #region Getting samples from selected irradiation register
 
             mainForm.TabsPane[0, 0].SelectionChanged += async (e, s) =>
             {
                 await FillSelectedIrradiations();
             };
 
-            #endregion
+
+            mainForm.TabsPane[0, 0].Scroll += IrrRegisters_Scrolling_Handler;
+
+        }
+
+        private void IrrRegisters_Scrolling_Handler(object sender, System.Windows.Forms.ScrollEventArgs e)
+        {
+            if (e.NewValue >= mainForm.TabsPane[0, 0].RowCount - 5)
+                ;
 
         }
 
@@ -62,8 +69,8 @@ namespace Regata.Desktop.WinForms.Measurements
             if (mainForm.TabsPane[0, 0].SelectedCells.Count <= 0) return;
 
             mainForm.TabsPane[0, 1].DataSource = null;
-            _selectedIrradiations.Clear();
-            _selectedIrradiations.Capacity = 99;
+            _chosenIrradiations.Clear();
+            _chosenIrradiations.Capacity = 99;
             
             var date = mainForm.TabsPane[0, 0].SelectedCells[1].Value as DateTime?;
 
@@ -93,11 +100,11 @@ namespace Regata.Desktop.WinForms.Measurements
                                                        .ToArrayAsync()
                 };
 
-                _selectedIrradiations.AddRange(_tmpList);
+                _chosenIrradiations.AddRange(_tmpList);
 
-                mainForm.TabsPane[0, 1].DataSource = _selectedIrradiations;
+                mainForm.TabsPane[0, 1].DataSource = _chosenIrradiations;
 
-                _selectedIrradiations.TrimExcess();
+                _chosenIrradiations.TrimExcess();
 
                 //mainForm.TabsPane[0, 1].DataSource = await r.Irradiations
                 //                                .AsNoTracking()

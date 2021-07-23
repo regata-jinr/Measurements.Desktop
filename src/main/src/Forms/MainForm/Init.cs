@@ -25,19 +25,21 @@ namespace Regata.Desktop.WinForms.Measurements
     {
 
         public RegisterForm<Measurement> mainForm;
-        public MeasurementsRegister CurrentMeasurementsRegister;
+        private MeasurementsRegister CurrentMeasurementsRegister;
+        private RegataContext _regataContext;
         EnumItem<MeasurementsType> MeasurementsTypeItems;
 
 
         public MainForm()
         {
             Settings<MeasurementsSettings>.AssemblyName = "Measurements.Desktop";
-            
+
+            _regataContext = new RegataContext();
             mainForm = new RegisterForm<Measurement>();
             CurrentMeasurementsRegister = new MeasurementsRegister() { Type = -1, Id = 0 };
             MeasurementsTypeItems = new EnumItem<MeasurementsType>();
-            _selectedIrradiations = new List<Irradiation>();
-            _selectedMeasurements = new List<Measurement>();
+            _chosenIrradiations = new List<Irradiation>();
+            _chosenMeasurements = new List<Measurement>();
 
 
             Settings<MeasurementsSettings>.CurrentSettings.LanguageChanged += () => Labels.SetControlsLabels(mainForm.Controls);
