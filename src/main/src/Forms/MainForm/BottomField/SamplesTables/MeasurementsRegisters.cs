@@ -13,6 +13,7 @@
 using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
 using System.Linq;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,8 @@ namespace Regata.Desktop.WinForms.Measurements
             mainForm.TabsPane[1, 0].SelectionChanged += async (e, s) =>
             {
                 await FillSelectedMeasurements();
+                if (mainForm.TabsPane[1, 0].SelectedRows.Count > 0)
+                    CurrentMeasurementsRegister.IrradiationDate = (DateTime)mainForm.TabsPane[1, 0].SelectedRows[0].Cells[2].Value;
             };
 
             mainForm.TabsPane[1, 0].Scroll += async (s, e) =>
@@ -69,7 +72,6 @@ namespace Regata.Desktop.WinForms.Measurements
         private async Task FillSelectedMeasurements()
         {
             if (mainForm.TabsPane[1, 0].SelectedCells.Count <= 0) return;
-
 
             _chosenMeasurements.Clear();
             _chosenMeasurements.Capacity = 499;

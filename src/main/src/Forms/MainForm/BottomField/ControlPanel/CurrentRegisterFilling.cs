@@ -22,68 +22,86 @@ namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm
     {
-
         private ControlsGroupBox buttonsRegForm;
-        private Button buttonRemoveSamples;
+        private Button buttonRemoveSelectedSamples;
         private Button buttonCancel;
-        private Button buttonAddSamplesToReg;
+        private Button buttonAddSelectedSamplesToReg;
+        private Button buttonClearRegister;
+        private Button buttonAddAllSamples;
         private CancellationTokenSource _cancToken;
 
         private void InitializeRegFormingControls()
         {
-            buttonRemoveSamples = new Button() {   AutoSize = false, Dock=DockStyle.Fill, Name = "buttonRemoveSamples" };
-            buttonAddSamplesToReg = new Button() { AutoSize = false, Dock=DockStyle.Fill, Name = "buttonAddSamplesToReg" };
+            buttonRemoveSelectedSamples = new Button() {   AutoSize = false, Dock=DockStyle.Fill, Name = "buttonRemoveSelectedSamples" };
+            buttonAddSelectedSamplesToReg = new Button() { AutoSize = false, Dock=DockStyle.Fill, Name = "buttonAddSelectedSamplesToReg" };
+            buttonClearRegister = new Button() { AutoSize = false, Dock=DockStyle.Fill, Name = "buttonClearRegister" };
+            buttonAddAllSamples = new Button() { AutoSize = false, Dock=DockStyle.Fill, Name = "buttonAddAllSamples" };
             buttonCancel = new Button() {  AutoSize = false, Dock=DockStyle.Fill, Name = "buttonCancel" };
-            buttonsRegForm = new ControlsGroupBox(new Button[] { buttonAddSamplesToReg, buttonRemoveSamples, buttonCancel,  });
+            buttonsRegForm = new ControlsGroupBox(new Button[] { buttonAddSelectedSamplesToReg, buttonAddAllSamples, buttonRemoveSelectedSamples, buttonClearRegister }) { Name = "buttonsRegFormBox" } ;
             buttonsRegForm.groupBoxTitle.Dock = DockStyle.Fill;
 
             FunctionalLayoutPanel.Controls.Add(buttonsRegForm, 0, 0);
 
             buttonCancel.Click += ButtonCancel_Click;
-            buttonAddSamplesToReg.Click += ButtonAddSamplesToReg_Click;
-            buttonRemoveSamples.Click += ButtonRemoveSamples_Click;
+            buttonAddSelectedSamplesToReg.Click += ButtonAddSelectedSamplesToReg_Click;
+            buttonRemoveSelectedSamples.Click += ButtonRemoveSelectedSamples_Click;
+            buttonClearRegister.Click += ButtonClearRegister_Click;
+            buttonAddAllSamples.Click += ButtonAddAllSamples_Click;
+
 
         }
 
-        private async void ButtonRemoveSamples_Click(object sender, EventArgs e)
+        private void ButtonAddAllSamples_Click(object sender, EventArgs e)
+        {
+            for(int i = 0; i < mainForm.TabsPane[0, 1].RowCount; ++i)
+                AddRecord((int)mainForm.TabsPane[0, 1].Rows[i].Cells["Id"].Value);
+        }
+
+        private void ButtonClearRegister_Click(object sender, EventArgs e)
+        {
+            ClearCurrentRegister();
+        }
+
+        private void ButtonRemoveSelectedSamples_Click(object sender, EventArgs e)
+        {
+            foreach (var i in mainForm.MainRDGV.SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct())
+                RemoveRecord((int)mainForm.MainRDGV.Rows[i].Cells["Id"].Value);
+        }
+
+        private void ButtonAddSelectedSamplesToReg_Click(object sender, EventArgs e)
+        {
+            foreach (var i in mainForm.TabsPane[0, 1].SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct())
+                AddRecord((int)mainForm.TabsPane[0, 1].Rows[i].Cells["Id"].Value);
+        }
+
+        private async void ButtonRemoveSelectedSamples_ClickAsync(object sender, EventArgs e)
         {
             try
             {
-                buttonRemoveSamples.Enabled = false;
-
-                if (mainForm.MainRDGV.SelectedCells.Count <= 0) return;
+                buttonRemoveSelectedSamples.Enabled = false;
                 _cancToken = new CancellationTokenSource();
-                var RemovingTasks = mainForm.MainRDGV.SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct().Select(c => RemoveRecordAsync((int)mainForm.MainRDGV.Rows[c].Cells["Id"].Value, _cancToken.Token)).ToList();
 
+                await RemoveSelectedRecordsAsync(_cancToken.Token);
 
-
-                while (RemovingTasks.Any())
-                {
-                    var completedTask = await Task.WhenAny(RemovingTasks);
-                    RemovingTasks.Remove(completedTask);
-                }
-
-
-                mainForm.MainRDGV.ClearSelection();
+                //mainForm.MainRDGV.ClearSelection();
             }
             catch (OperationCanceledException)
             {
-
+                throw new OperationCanceledException();
             }
             finally
             {
                 _cancToken = null;
-                buttonRemoveSamples.Enabled = true;
+                buttonRemoveSelectedSamples.Enabled = true;
             }
-
         }
 
-        private async void ButtonAddSamplesToReg_Click(object sender, EventArgs e)
+        private async void ButtonAddSelectedSamplesToReg_ClickAsync(object sender, EventArgs e)
         {
 
             try
             {
-                buttonAddSamplesToReg.Enabled = false;
+                buttonAddSelectedSamplesToReg.Enabled = false;
 
                 if (mainForm.TabsPane.SelectedRowsLastDGV.Count <= 0) return;
 
@@ -112,15 +130,12 @@ namespace Regata.Desktop.WinForms.Measurements
             finally
             {
                 _cancToken = null;
-                buttonAddSamplesToReg.Enabled = true;
+                buttonAddSelectedSamplesToReg.Enabled = true;
             }
-
-
-               
 
         }
 
-        private async void ButtonCancel_Click(object sender, EventArgs e)
+        private void ButtonCancel_Click(object sender, EventArgs e)
         {
             buttonCancel.Enabled = false;
             _cancToken?.Cancel();

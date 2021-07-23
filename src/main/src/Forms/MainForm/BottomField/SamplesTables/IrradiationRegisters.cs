@@ -29,11 +29,14 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void InitIrradiationsRegisters()
         {
+            mainForm.TabsPane[0, 0].SuspendLayout();
             mainForm.TabsPane[0, 0].MultiSelect = false;
 
             mainForm.TabsPane[0, 0].SelectionChanged += async (e, s) =>
             {
                 await FillSelectedIrradiations();
+                if (mainForm.TabsPane[0, 0].SelectedRows.Count > 0)
+                    CurrentMeasurementsRegister.IrradiationDate = (DateTime)mainForm.TabsPane[0, 0].SelectedRows[0].Cells[1].Value;
             };
 
 
@@ -42,6 +45,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 if (e.NewValue >= mainForm.TabsPane[0, 0].RowCount - 10)
                     await FillIrradiationRegisters();
             };
+            mainForm.TabsPane[0, 0].ResumeLayout(false);
 
         }
 

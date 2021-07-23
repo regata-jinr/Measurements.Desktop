@@ -29,7 +29,6 @@ namespace Regata.Desktop.WinForms.Measurements
         private RegataContext _regataContext;
         EnumItem<MeasurementsType> MeasurementsTypeItems;
 
-
         public MainForm()
         {
             Settings<MeasurementsSettings>.AssemblyName = "Measurements.Desktop";
@@ -41,7 +40,6 @@ namespace Regata.Desktop.WinForms.Measurements
             _chosenIrradiations = new List<Irradiation>();
             _chosenMeasurements = new List<Measurement>();
 
-
             Settings<MeasurementsSettings>.CurrentSettings.LanguageChanged += () => Labels.SetControlsLabels(mainForm.Controls);
 
             InitMenuStrip();
@@ -52,15 +50,8 @@ namespace Regata.Desktop.WinForms.Measurements
             InitializeFuntionalField();
             InitializeRegFormingControls();
 
-
-
             Labels.SetControlsLabels(mainForm.Controls);
         }
-
-
-         
-
-        
 
     } //public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements
