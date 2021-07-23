@@ -32,15 +32,16 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             mainForm.TabsPane[1, 0].MultiSelect = false;
 
-
-            #region Getting samples from selected measurement register
-
             mainForm.TabsPane[1, 0].SelectionChanged += async (e, s) =>
             {
                 await FillSelectedMeasurements();
             };
 
-            #endregion
+            mainForm.TabsPane[1, 0].Scroll += async (s, e) =>
+            {
+                if (e.NewValue >= mainForm.TabsPane[1, 0].RowCount - 10)
+                    await FillMeasurementsRegisters();
+            };
 
         }
 
@@ -56,11 +57,11 @@ namespace Regata.Desktop.WinForms.Measurements
                                                 .Select(m => new { m.Id, m.LoadNumber, m.IrradiationDate })
                                                 .Distinct()
                                                 .OrderByDescending(m => m.IrradiationDate)
-                                                .Take(20)
+                                                .Take(mainForm.TabsPane[1, 0].RowCount + 20)
                                                 .ToArrayAsync();
             }
 
-       
+            mainForm.TabsPane[1, 0].FirstDisplayedScrollingRowIndex = mainForm.TabsPane[1, 0].RowCount - 20;
 
             mainForm.TabsPane[1, 0].Columns[0].Visible = false;
         }

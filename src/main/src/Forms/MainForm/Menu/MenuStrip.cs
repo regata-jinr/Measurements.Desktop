@@ -40,7 +40,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 await FillMeasurementsRegisters();
 
                 #endregion
-                
+
                 Labels.SetControlsLabels(mainForm.Controls);
 
             };

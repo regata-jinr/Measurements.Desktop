@@ -31,26 +31,24 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             mainForm.TabsPane[0, 0].MultiSelect = false;
 
-
             mainForm.TabsPane[0, 0].SelectionChanged += async (e, s) =>
             {
                 await FillSelectedIrradiations();
             };
 
 
-            mainForm.TabsPane[0, 0].Scroll += IrrRegisters_Scrolling_Handler;
-
-        }
-
-        private void IrrRegisters_Scrolling_Handler(object sender, System.Windows.Forms.ScrollEventArgs e)
-        {
-            if (e.NewValue >= mainForm.TabsPane[0, 0].RowCount - 5)
-                ;
+            mainForm.TabsPane[0, 0].Scroll += async (s, e) =>
+            {
+                if (e.NewValue >= mainForm.TabsPane[0, 0].RowCount - 10)
+                    await FillIrradiationRegisters();
+            };
 
         }
 
         private async Task FillIrradiationRegisters()
         {
+
+
             using (var r = new RegataContext())
             {
                 mainForm.TabsPane[0, 0].DataSource = await r.Irradiations
@@ -59,9 +57,11 @@ namespace Regata.Desktop.WinForms.Measurements
                                                 .Select(ir => new { ir.LoadNumber, ir.DateTimeStart.Value.Date })
                                                 .Distinct()
                                                 .OrderByDescending(i => i.Date)
-                                                .Take(20)
+                                                .Take(mainForm.TabsPane[0, 0].RowCount + 20)
                                                 .ToArrayAsync();
             }
+
+            mainForm.TabsPane[0, 0].FirstDisplayedScrollingRowIndex = mainForm.TabsPane[0, 0].RowCount - 20;
         }
 
         private async Task FillSelectedIrradiations()
