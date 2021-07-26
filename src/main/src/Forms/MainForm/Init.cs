@@ -21,7 +21,7 @@ using System;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
-    public partial class MainForm
+    public partial class MainForm : IDisposable
     {
 
         public RegisterForm<Measurement> mainForm;
@@ -51,6 +51,35 @@ namespace Regata.Desktop.WinForms.Measurements
             InitializeRegFormingControls();
 
             Labels.SetControlsLabels(mainForm.Controls);
+        }
+
+        private bool _isDisposed;
+
+        ~MainForm()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (_isDisposed)
+                return;
+
+            if (isDisposing)
+            {
+                // освободить управляемые ресурсы
+                mainForm.Dispose();
+            }
+
+            // очистить неуправляемые ресурсы
+
+            _isDisposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
     } //public partial class MainForm

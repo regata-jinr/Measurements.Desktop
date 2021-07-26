@@ -17,6 +17,8 @@ using System.Linq;
 using Regata.Core.DataBase.Models;
 using Regata.Core.DataBase;
 using Regata.Core.UI.WinForms.Controls;
+using Regata.Core.UI.WinForms.Items;
+
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -32,12 +34,12 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void InitializeRegFormingControls()
         {
-            buttonRemoveSelectedSamples = new Button() {   AutoSize = false, Dock=DockStyle.Fill, Name = "buttonRemoveSelectedSamples" };
-            buttonAddSelectedSamplesToReg = new Button() { AutoSize = false, Dock=DockStyle.Fill, Name = "buttonAddSelectedSamplesToReg" };
-            buttonClearRegister = new Button() { AutoSize = false, Dock=DockStyle.Fill, Name = "buttonClearRegister" };
-            buttonAddAllSamples = new Button() { AutoSize = false, Dock=DockStyle.Fill, Name = "buttonAddAllSamples" };
-            buttonCancel = new Button() {  AutoSize = false, Dock=DockStyle.Fill, Name = "buttonCancel" };
-            buttonsRegForm = new ControlsGroupBox(new Button[] { buttonAddSelectedSamplesToReg, buttonAddAllSamples, buttonRemoveSelectedSamples, buttonClearRegister }) { Name = "buttonsRegFormBox" } ;
+            buttonRemoveSelectedSamples = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonRemoveSelectedSamples" };
+            buttonAddSelectedSamplesToReg = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonAddSelectedSamplesToReg" };
+            buttonClearRegister = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonClearRegister" };
+            buttonAddAllSamples = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonAddAllSamples" };
+            buttonCancel = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonCancel" };
+            buttonsRegForm = new ControlsGroupBox(new Button[] { buttonAddSelectedSamplesToReg, buttonAddAllSamples, buttonRemoveSelectedSamples, buttonClearRegister }) { Name = "buttonsRegFormBox" };
             buttonsRegForm.groupBoxTitle.Dock = DockStyle.Fill;
 
             FunctionalLayoutPanel.Controls.Add(buttonsRegForm, 0, 0);
@@ -47,14 +49,20 @@ namespace Regata.Desktop.WinForms.Measurements
             buttonRemoveSelectedSamples.Click += ButtonRemoveSelectedSamples_Click;
             buttonClearRegister.Click += ButtonClearRegister_Click;
             buttonAddAllSamples.Click += ButtonAddAllSamples_Click;
-
-
         }
 
         private void ButtonAddAllSamples_Click(object sender, EventArgs e)
         {
-            for(int i = 0; i < mainForm.TabsPane[0, 1].RowCount; ++i)
-                AddRecord((int)mainForm.TabsPane[0, 1].Rows[i].Cells["Id"].Value);
+            var cti = mainForm.TabsPane.SelectedTabIndex;
+
+            for (int i = 0; i < mainForm.TabsPane[cti, 1].RowCount; ++i)
+            {
+                var cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["Id"].Value;
+                if (cti == 0)
+                    AddRecordFromIrradiations(cellId);
+                else
+                    AddRecordFromMeasurements(cellId);
+            }
         }
 
         private void ButtonClearRegister_Click(object sender, EventArgs e)
@@ -70,8 +78,20 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void ButtonAddSelectedSamplesToReg_Click(object sender, EventArgs e)
         {
-            foreach (var i in mainForm.TabsPane[0, 1].SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct())
-                AddRecord((int)mainForm.TabsPane[0, 1].Rows[i].Cells["Id"].Value);
+            var cti = mainForm.TabsPane.SelectedTabIndex;
+
+            foreach (var i in mainForm.TabsPane[cti, 1].SelectedCells.OfType<DataGridViewCell>()
+                                                                      .Select(c => c.RowIndex)
+                                                                      .Where(c => c >= 0)
+                                                                      .Distinct()
+                                                                      .OrderBy(c => c))
+            {
+                var cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["Id"].Value;
+                if (cti == 0)
+                    AddRecordFromIrradiations(cellId);
+                else
+                    AddRecordFromMeasurements(cellId);
+            }
         }
 
         private async void ButtonRemoveSelectedSamples_ClickAsync(object sender, EventArgs e)

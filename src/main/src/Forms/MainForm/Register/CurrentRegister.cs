@@ -24,7 +24,7 @@ namespace Regata.Desktop.WinForms.Measurements
     public partial class MainForm
     {
 
-        private void AddRecord(int id)
+        private void AddRecordFromIrradiations(int id)
         {
             var ir = _regataContext.Irradiations.Where(i => i.Id == id).FirstOrDefault();
             if (ir == null) return;
@@ -32,6 +32,21 @@ namespace Regata.Desktop.WinForms.Measurements
             var m = new Measurement(ir);
             m.RegId = CurrentMeasurementsRegister.Id;
             _regataContext.Measurements.Add(m);
+            _regataContext.SaveChanges();
+        }
+
+        private void AddRecordFromMeasurements(int id)
+        {
+            var ms = _regataContext.Measurements.Where(i => i.Id == id).FirstOrDefault();
+            if (ms == null) return;
+
+            ms.Id = 0;
+            ms.FileSpectra = null;
+            ms.DateTimeStart = null;
+            ms.DateTimeFinish = null;
+            ms.Detector = null;
+            ms.RegId = CurrentMeasurementsRegister.Id;
+            _regataContext.Measurements.Add(ms);
             _regataContext.SaveChanges();
         }
 
@@ -57,6 +72,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private async Task RemoveRecordAsync(int id, CancellationToken _ct)
         {
+            throw new NotImplementedException("Here is the problem related with _regataContext call from different threads.");
+
             try
             {
                 var m = _regataContext.Measurements.Where(m => m.Id == id).FirstOrDefault();
@@ -70,6 +87,7 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 var ee = e;
             }
+
             //using (var rc = new RegataContext())
             //{
             //    var m = await rc.Measurements.Where(i => i.Id == id).FirstOrDefaultAsync();
@@ -130,18 +148,18 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void InitCurrentRegister()
         {
-            //using (var r = new RegataContext())
-            //{
             CreateNewMeasurementsRegister();
             _regataContext.Measurements.Where(m => m.Id == 0).Load();
             mainForm.MainRDGV.DataSource = _regataContext.Measurements.Local.ToBindingList();
-            //}
 
-             //= _measurementsList;
+            CurrentMeasurementsRegister.PropertyChanged += (s,e) => { UpdateCurrentReigster(); };
+
+            //HideMainRDGVRedundantColumns();
 
             mainForm.Disposed += (s, e) =>
             {
-                // adding samples creates measurement register. in case of after disposing the form there are not measurements records for register the last one will be deleted
+                // running creates measurement register.
+                // in case of after disposing the form there are not measurements records for register the last one will be deleted
                 using (var r = new RegataContext())
                 {
                     if (
@@ -153,21 +171,30 @@ namespace Regata.Desktop.WinForms.Measurements
                         r.SaveChanges();
                     }
                 }
+                _regataContext.Dispose();
             };
         }
 
+        private void HideMainRDGVRedundantColumns()
+        {
+            mainForm.MainRDGV.Columns["Id"].Visible = false;
+            mainForm.MainRDGV.Columns["IrradiationId"].Visible = false;
+            mainForm.MainRDGV.Columns["RegId"].Visible = false;
+        }
+
+        private void UpdateCurrentReigster()
+        {
+            using (var r = new RegataContext())
+            {
+                r.MeasurementsRegisters.Update(CurrentMeasurementsRegister);
+                r.SaveChanges();
+            }
+        }
 
         private void CreateNewMeasurementsRegister()
         {
-            //if (CurrentMeasurementsRegister.Type < 0) // || !CurrentMeasurementsRegister.IrradiationDate.HasValue)
-                //return;
-
-
             using (var r = new RegataContext())
             {
-                //if (r.MeasurementsRegisters.AsNoTracking().Where(m => m.Id == CurrentMeasurementsRegister.Id).Any())
-                    //return;
-
                 r.MeasurementsRegisters.Add(CurrentMeasurementsRegister);
                 r.SaveChanges();
             }

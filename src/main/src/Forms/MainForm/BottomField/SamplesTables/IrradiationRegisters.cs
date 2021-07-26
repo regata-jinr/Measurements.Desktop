@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-
+using Regata.Core.UI.WinForms;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -45,14 +45,14 @@ namespace Regata.Desktop.WinForms.Measurements
                 if (e.NewValue >= mainForm.TabsPane[0, 0].RowCount - 10)
                     await FillIrradiationRegisters();
             };
+
+
             mainForm.TabsPane[0, 0].ResumeLayout(false);
 
         }
 
         private async Task FillIrradiationRegisters()
         {
-
-
             using (var r = new RegataContext())
             {
                 mainForm.TabsPane[0, 0].DataSource = await r.Irradiations
@@ -77,6 +77,8 @@ namespace Regata.Desktop.WinForms.Measurements
             _chosenIrradiations.Capacity = 99;
             
             var date = mainForm.TabsPane[0, 0].SelectedCells[1].Value as DateTime?;
+
+            if (!date.HasValue) return;
 
             CurrentMeasurementsRegister.IrradiationDate = date.Value;
 
@@ -107,36 +109,32 @@ namespace Regata.Desktop.WinForms.Measurements
                 _chosenIrradiations.AddRange(_tmpList);
 
                 mainForm.TabsPane[0, 1].DataSource = _chosenIrradiations;
-
                 _chosenIrradiations.TrimExcess();
+                HideIrradiationsRedundantColumns();
+                Labels.SetControlsLabels(mainForm.Controls);
 
-                //mainForm.TabsPane[0, 1].DataSource = await r.Irradiations
-                //                                .AsNoTracking()
-                //                                .Where(
-                //                                         ir =>
-                //                                                ir.Type == (int)MeasurementsTypeItems.CheckedItem &&
-                //                                                ir.DateTimeStart != null &&
-                //                                                ir.DateTimeStart.Value.Date == date
-                //                                      )
-                //                                .Select(ir => new
-                //                                {
-                //                                    ir.CountryCode,
-                //                                    ir.ClientNumber,
-                //                                    ir.Year,
-                //                                    ir.SetNumber,
-                //                                    ir.SetIndex,
-                //                                    ir.SampleNumber,
-                //                                    ir.Id,
-                //                                    ir.Container,
-                //                                    ir.Position
-                //                                }
-                //                                       )
-                //                                .OrderBy(ir => ir.Container)
-                //                                .ThenBy(ir => ir.Position)
-                //                                .ToArrayAsync();
             }
-
         }
 
-    } //public partial class MainForm
+        private void HideIrradiationsRedundantColumns()
+        {
+            if (mainForm.TabsPane[0, 1].Columns.Count <= 0) return;
+
+            mainForm.TabsPane[0, 1].Columns["Id"].Visible = false;
+            mainForm.TabsPane[0, 1].Columns["Type"].Visible = false;
+            mainForm.TabsPane[0, 1].Columns["DateTimeStart"].Visible = false;
+            mainForm.TabsPane[0, 1].Columns["Duration"].Visible = false;
+            mainForm.TabsPane[0, 1].Columns["DateTimeFinish"].Visible = false;
+            mainForm.TabsPane[0, 1].Columns["Container"].Visible = false;
+            mainForm.TabsPane[0, 1].Columns["Position"].Visible = false;
+            mainForm.TabsPane[0, 1].Columns["Channel"].Visible = false;
+            mainForm.TabsPane[0, 1].Columns["LoadNumber"].Visible = false;
+            mainForm.TabsPane[0, 1].Columns["Rehandler"].Visible = false;
+            mainForm.TabsPane[0, 1].Columns["Assistant"].Visible = false;
+            mainForm.TabsPane[0, 1].Columns["Note"].Visible = false;
+            mainForm.TabsPane[0, 1].Columns["SetKey"].Visible = false;
+            mainForm.TabsPane[0, 1].Columns["SampleKey"].Visible = false;
+        }
+
+    } // public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements
