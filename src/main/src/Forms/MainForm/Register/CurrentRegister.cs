@@ -24,29 +24,16 @@ namespace Regata.Desktop.WinForms.Measurements
     public partial class MainForm
     {
 
-        private void AddRecordFromIrradiations(int id)
+        private void AddRecord(int IrradiationId)
         {
-            var ir = _regataContext.Irradiations.Where(i => i.Id == id).FirstOrDefault();
+            var ir = _regataContext.Irradiations.Where(i => i.Id == IrradiationId).FirstOrDefault();
             if (ir == null) return;
 
             var m = new Measurement(ir);
             m.RegId = CurrentMeasurementsRegister.Id;
+            m.Duration = (int)DurationControl.Duration.TotalSeconds;
+            m.Height = CheckedHeightArrayControl.SelectedItem;
             _regataContext.Measurements.Add(m);
-            _regataContext.SaveChanges();
-        }
-
-        private void AddRecordFromMeasurements(int id)
-        {
-            var ms = _regataContext.Measurements.Where(i => i.Id == id).FirstOrDefault();
-            if (ms == null) return;
-
-            ms.Id = 0;
-            ms.FileSpectra = null;
-            ms.DateTimeStart = null;
-            ms.DateTimeFinish = null;
-            ms.Detector = null;
-            ms.RegId = CurrentMeasurementsRegister.Id;
-            _regataContext.Measurements.Add(ms);
             _regataContext.SaveChanges();
         }
 
@@ -87,18 +74,6 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 var ee = e;
             }
-
-            //using (var rc = new RegataContext())
-            //{
-            //    var m = await rc.Measurements.Where(i => i.Id == id).FirstOrDefaultAsync();
-            //    if (m == null) return;
-
-            //    rc.Measurements.Remove(m);
-            //    await rc.SaveChangesAsync(_ct);
-            //    //_regataContext.Measurements.Local.Remove(m);
-            //    //_regataContext.
-            //    //_regataContext.Measurements.Where(mm => mm.RegId == CurrentMeasurementsRegister.Id).Load();
-            //}
         }
 
         private async Task RemoveSelectedRecordsAsync(CancellationToken _ct)

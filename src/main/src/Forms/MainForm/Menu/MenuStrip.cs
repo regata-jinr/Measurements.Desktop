@@ -34,6 +34,14 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 CurrentMeasurementsRegister.Type = (int)MeasurementsTypeItems.CheckedItem;
 
+                DurationControl.Duration = CurrentMeasurementsRegister.Type switch
+                {
+                    0 => new System.TimeSpan(0, 0, 15, 0),
+                    1 => new System.TimeSpan(0, 2, 0, 0),
+                    2 => new System.TimeSpan(0, 2, 0, 0),
+                    _ => new System.TimeSpan(),
+                };
+
                 #region Filling list of registers
 
                 await FillIrradiationRegisters();

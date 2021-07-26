@@ -49,6 +49,7 @@ namespace Regata.Desktop.WinForms.Measurements
             InitMeasurementsRegisters();
             InitializeFuntionalField();
             InitializeRegFormingControls();
+            InitializeMeasurementsParamsControls();
 
             Labels.SetControlsLabels(mainForm.Controls);
         }

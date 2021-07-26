@@ -57,11 +57,13 @@ namespace Regata.Desktop.WinForms.Measurements
 
             for (int i = 0; i < mainForm.TabsPane[cti, 1].RowCount; ++i)
             {
-                var cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["Id"].Value;
+                int cellId;
                 if (cti == 0)
-                    AddRecordFromIrradiations(cellId);
+                    cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["Id"].Value;
                 else
-                    AddRecordFromMeasurements(cellId);
+                    cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["IrradiationId"].Value;
+
+                AddRecord(cellId);
             }
         }
 
@@ -88,9 +90,11 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 var cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["Id"].Value;
                 if (cti == 0)
-                    AddRecordFromIrradiations(cellId);
+                    cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["Id"].Value;
                 else
-                    AddRecordFromMeasurements(cellId);
+                    cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["IrradiationId"].Value;
+
+                AddRecord(cellId);
             }
         }
 
