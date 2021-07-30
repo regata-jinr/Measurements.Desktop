@@ -6,7 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <StartupObject>Regata.Desktop.WinForms.Measurements.Program</StartupObject>
 	<PlatformTarget>x86</PlatformTarget>
-    <Version>0.0.1</Version>
+    <Version>0.8.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

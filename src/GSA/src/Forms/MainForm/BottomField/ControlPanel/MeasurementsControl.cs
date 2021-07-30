@@ -9,12 +9,12 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core.DataBase.Models;
 using Regata.Core.Hardware;
 using Regata.Core.UI.WinForms.Controls;
 using System;
 using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Regata.Desktop.WinForms.Measurements
@@ -36,6 +36,8 @@ namespace Regata.Desktop.WinForms.Measurements
             buttonClear = new Button() { Name = "buttonClear",  Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.White };
             buttonPause = new Button() { Name = "buttonPause",  Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Yellow };
             buttonStart = new Button() { Name = "buttonStart",  Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Green };
+
+            buttonStart.Click += ButtonStart_Click;
             
             MeasurementsStartPanel = new TableLayoutPanel();
             MeasurementsStartPanel.ColumnCount = 2;
@@ -56,16 +58,56 @@ namespace Regata.Desktop.WinForms.Measurements
             controlsMeasControl = new ControlsGroupBox(new Control[] { CheckedAvailableDetectorArrayControl, MeasurementsStartPanel } ) { Name = "controlsMeasControl" };
 
             FunctionalLayoutPanel.Controls.Add(controlsMeasControl, 2, 0);
+
+            CheckedAvailableDetectorArrayControl.SelectionChanged += () => AssignRecordsMainRDGV("Detector", CheckedAvailableDetectorArrayControl.SelectedItem);
+        }
+
+        private void ButtonStart_Click(object sender, EventArgs e)
+        {
+            // TODO: check correcntess of measurements info
+            // TODO: detectors availability
+            InitializeDetectors();
+            //buttonStart.Enabled = false;
+
+            foreach (var d in _detectors)
+            {
+                MStart(d.Name);
+            }
         }
 
         private async void MainForm_Load(object sender, EventArgs e)
         {
             await foreach (var d in Detector.GetAvailableDetectorsAsyncStream())
+            {
                 if (!string.IsNullOrEmpty(d))
                     CheckedAvailableDetectorArrayControl.Add(d);
-
+            }
         }
 
+        private void MStart(string dName)
+        {
+            var d = _detectors.Where(det => det.Name == dName).FirstOrDefault();
+            var m = GetFirstNotMeasuredForDetector(d.Name);
+            if (m == null)
+            {
+                
+                return;
+            }
+            var i = _regataContext.Irradiations.Where(ir => ir.Id == m.IrradiationId).FirstOrDefault();
+            if (i == null) return;
+
+            d.LoadMeasurementInfoToDevice(m, i);
+            d.Start();
+        }
+
+        private void ColorizeRDGVRow(Measurement m, Color clr)
+        {
+            DataGridViewRow r = mainForm.MainRDGV.Rows.OfType<DataGridViewRow>().Where(r => (int)r.Cells["Id"].Value == m.Id).FirstOrDefault();
+
+            if (r == null) return;
+
+            r.DefaultCellStyle.BackColor = clr;
+        }
 
     } // public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements

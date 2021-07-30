@@ -12,7 +12,6 @@
 using Regata.Core.UI.WinForms.Controls;
 using System.Windows.Forms;
 using System.Linq;
-using System;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -33,20 +32,7 @@ namespace Regata.Desktop.WinForms.Measurements
             FunctionalLayoutPanel.Controls.Add(controlsMeasParams, 1, 0);
 
             DurationControl.DurationChanged += (s, e) => FillDurationToSelectedRecords();
-            CheckedHeightArrayControl.SelectionChanged += CheckedHeightArrayControl_SelectionChanged;
-        }
-
-        private void CheckedHeightArrayControl_SelectionChanged()
-        {
-            foreach (var i in mainForm.MainRDGV.SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct())
-            {
-                var m = _regataContext.Measurements.Where(m => m.Id == (int)mainForm.MainRDGV.Rows[i].Cells["Id"].Value).FirstOrDefault();
-                if (m == null) continue;
-                m.Height = CheckedHeightArrayControl.SelectedItem;
-                _regataContext.Update(m);
-            }
-            _regataContext.SaveChanges();
-            mainForm.MainRDGV.Refresh();
+            CheckedHeightArrayControl.SelectionChanged += () => AssignRecordsMainRDGV("Height", CheckedHeightArrayControl.SelectedItem);
         }
 
         private void FillDurationToSelectedRecords()

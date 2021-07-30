@@ -9,23 +9,26 @@
  *                                                                         *
  ***************************************************************************/
 
-using Regata.Core.UI.WinForms.Forms;
-using Regata.Core.UI.WinForms;
-using Regata.Core.UI.WinForms.Items;
-using Regata.Core.DataBase;
-using Regata.Core.DataBase.Models;
-using Regata.Core.Settings;
 using System.Linq;
-
+using System.Windows.Forms;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm
     {
-        private void InitStatusStrip()
+        private void AssignRecordsMainRDGV<T>(string prop, T val)
         {
-            mainForm.StatusStrip.Items.Add(MeasurementsTypeItems.EnumStatusLabel);
-            mainForm.StatusStrip.Items.Add(AcquisitionModeItems.EnumStatusLabel);
+            foreach (var i in mainForm.MainRDGV.SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct())
+            {
+                var m = _regataContext.Measurements.Where(m => m.Id == (int)mainForm.MainRDGV.Rows[i].Cells["Id"].Value).FirstOrDefault();
+                if (m == null) continue;
+                var setPropValue = m.GetType().GetProperty(prop).GetSetMethod();
+                setPropValue.Invoke(m, new object[] { val });
+                _regataContext.Update(m);
+            }
+            _regataContext.SaveChanges();
+            mainForm.MainRDGV.Refresh();
         }
-    } //public partial class MainForm
+
+    } // public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements

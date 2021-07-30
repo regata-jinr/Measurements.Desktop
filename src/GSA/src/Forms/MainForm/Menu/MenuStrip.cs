@@ -9,8 +9,10 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core.Hardware;
 using Regata.Core.Settings;
 using Regata.Core.UI.WinForms;
+using Regata.Core.UI.WinForms.Items;
 
 
 namespace Regata.Desktop.WinForms.Measurements
@@ -23,7 +25,13 @@ namespace Regata.Desktop.WinForms.Measurements
             mainForm.LangItem.CheckedChanged += () => Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage = mainForm.LangItem.CheckedItem;
             mainForm.LangItem.CheckItem(Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage);
 
+            AcquisitionModeItems.CheckItem(CanberraDeviceAccessLib.AcquisitionModes.aCountToRealTime);
+
+            AcquisitionModeItems.CheckedChanged += () => AssignRecordsMainRDGV("AcqMode", (int)AcquisitionModeItems.CheckedItem);
+
+
             mainForm.MenuStrip.Items.Add(MeasurementsTypeItems.EnumMenuItem);
+            mainForm.MenuStrip.Items.Add(AcquisitionModeItems.EnumMenuItem);
 
             MeasurementsTypeItems.CheckedChanged += async () =>
             {
@@ -49,7 +57,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 #endregion
 
-                Labels.SetControlsLabels(mainForm.Controls);
+                Labels.SetControlsLabels(mainForm);
 
             };
 

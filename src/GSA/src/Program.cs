@@ -11,8 +11,6 @@
 
 using System;
 using System.Windows.Forms;
-using System.Threading.Tasks;
-using Regata.Core.Settings;
 
 namespace Regata.Desktop.WinForms.Measurements
 {

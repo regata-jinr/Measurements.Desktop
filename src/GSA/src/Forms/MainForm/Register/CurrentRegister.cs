@@ -30,6 +30,7 @@ namespace Regata.Desktop.WinForms.Measurements
             if (ir == null) return;
 
             var m = new Measurement(ir);
+            m.AcqMode = (int)AcquisitionModeItems.CheckedItem;
             m.RegId = CurrentMeasurementsRegister.Id;
             m.Duration = (int)DurationControl.Duration.TotalSeconds;
             m.Height = CheckedHeightArrayControl.SelectedItem;

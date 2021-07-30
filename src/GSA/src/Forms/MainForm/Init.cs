@@ -11,14 +11,12 @@
 
 using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
-using Regata.Core.Hardware;
 using Regata.Core.Settings;
 using Regata.Core.UI.WinForms;
 using Regata.Core.UI.WinForms.Forms;
 using Regata.Core.UI.WinForms.Items;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -27,20 +25,23 @@ namespace Regata.Desktop.WinForms.Measurements
         public RegisterForm<Measurement> mainForm;
         private MeasurementsRegister CurrentMeasurementsRegister;
         private RegataContext _regataContext;
-        EnumItem<MeasurementsType> MeasurementsTypeItems;
+        private EnumItem<MeasurementsType> MeasurementsTypeItems;
+        private EnumItem<CanberraDeviceAccessLib.AcquisitionModes> AcquisitionModeItems;
+
 
         public MainForm()
         {
             Settings<MeasurementsSettings>.AssemblyName = "Measurements.Desktop";
 
             _regataContext = new RegataContext();
-            mainForm = new RegisterForm<Measurement>();
+            mainForm = new RegisterForm<Measurement>() { Name = "GSAMainForm", Text = "GSAMainForm" };
             CurrentMeasurementsRegister = new MeasurementsRegister() { Type = -1, Id = 0 };
             MeasurementsTypeItems = new EnumItem<MeasurementsType>();
+            AcquisitionModeItems = new EnumItem<CanberraDeviceAccessLib.AcquisitionModes>();
             _chosenIrradiations = new List<Irradiation>();
             _chosenMeasurements = new List<Measurement>();
 
-            Settings<MeasurementsSettings>.CurrentSettings.LanguageChanged += () => Labels.SetControlsLabels(mainForm.Controls);
+            Settings<MeasurementsSettings>.CurrentSettings.LanguageChanged += () => Labels.SetControlsLabels(mainForm);
 
             InitMenuStrip();
             InitStatusStrip();
@@ -52,11 +53,10 @@ namespace Regata.Desktop.WinForms.Measurements
             InitializeMeasurementsParamsControls();
             InitializeMeasurementsControls();
 
-            Labels.SetControlsLabels(mainForm.Controls);
+            Labels.SetControlsLabels(mainForm);
 
             mainForm.Load += MainForm_Load;
         }
-
 
         private bool _isDisposed;
 
@@ -74,6 +74,19 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 // освободить управляемые ресурсы
                 mainForm.Dispose();
+
+                if (_detectors != null)
+                {
+                    foreach (var d in _detectors)
+                    {
+                        d.AcquireDone -= Det_AcquireDone;
+                        d.AcquireStart -= Det_AcquireStart;
+                        d.HardwareError -= Det_HardwareError;
+                        d.ParamChange -= Det_ParamChange;
+                        d.StatusChanged -= Det_StatusChanged;
+                        d.Dispose();
+                    }
+                }
             }
 
             // очистить неуправляемые ресурсы
