@@ -33,6 +33,7 @@ namespace Regata.Desktop.WinForms.Measurements
             m.AcqMode = (int)AcquisitionModeItems.CheckedItem;
             m.RegId = CurrentMeasurementsRegister.Id;
             m.Duration = (int)DurationControl.Duration.TotalSeconds;
+            m.Detector = CheckedAvailableDetectorArrayControl.SelectedItem;
             m.Height = CheckedHeightArrayControl.SelectedItem;
             _regataContext.Measurements.Add(m);
             _regataContext.SaveChanges();

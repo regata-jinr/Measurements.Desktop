@@ -37,6 +37,7 @@ namespace Regata.Desktop.WinForms.Measurements
             buttonPause = new Button() { Name = "buttonPause",  Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Yellow };
             buttonStart = new Button() { Name = "buttonStart",  Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Green };
 
+            buttonStop.Click += ButtonStop_Click;
             buttonStart.Click += ButtonStart_Click;
             
             MeasurementsStartPanel = new TableLayoutPanel();
@@ -60,6 +61,14 @@ namespace Regata.Desktop.WinForms.Measurements
             FunctionalLayoutPanel.Controls.Add(controlsMeasControl, 2, 0);
 
             CheckedAvailableDetectorArrayControl.SelectionChanged += () => AssignRecordsMainRDGV("Detector", CheckedAvailableDetectorArrayControl.SelectedItem);
+        }
+
+        private void ButtonStop_Click(object sender, EventArgs e)
+        {
+            foreach (var d in _detectors)
+            {
+                d.Stop();
+            }
         }
 
         private void ButtonStart_Click(object sender, EventArgs e)

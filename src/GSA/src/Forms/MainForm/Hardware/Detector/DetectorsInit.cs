@@ -14,7 +14,6 @@ using Regata.Core.Hardware;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -24,7 +23,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void InitializeDetectors()
         {
-            _detectors = new List<Detector>();
+            _detectors = new List<Detector>(8);
             foreach (var d in _regataContext.Measurements.Local.Select(m => m.Detector).Distinct())
             {
                 var det = new Detector(d);
@@ -35,6 +34,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 det.StatusChanged += Det_StatusChanged;
                 _detectors.Add(det);
             }
+            _detectors.TrimExcess();
         }
 
         private Measurement GetFirstNotMeasuredForDetector(string detName)
@@ -57,8 +57,14 @@ namespace Regata.Desktop.WinForms.Measurements
             ColorizeRDGVRow(det.CurrentMeasurement, Color.LightYellow);
         }
 
-        private void Det_AcquireDone(Detector det)
+        private async void Det_AcquireDone(Detector det)
         {
+            
+
+            det.CurrentMeasurement.FileSpectra = await Detector.GenerateSpectraFileNameFromDBAsync(det.Name, det.CurrentMeasurement.Type);
+            det.Save();
+            _regataContext.Update(det.CurrentMeasurement);
+            _regataContext.SaveChanges();
             ColorizeRDGVRow(det.CurrentMeasurement, Color.LightGreen);
 
             if (!_regataContext.Measurements.Local.Where(m => m.FileSpectra == null).Any())
