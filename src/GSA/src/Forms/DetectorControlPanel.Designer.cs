@@ -9,7 +9,7 @@
  *                                                                         *
  ***************************************************************************/
 
-using Regata.Desktop.WinForms.Components;
+using Regata.Core.Hardware;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -26,20 +26,14 @@ namespace Regata.Desktop.WinForms.Measurements
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            //foreach (var d in _session.ManagedDetectors)
-            //{
-            //    d.Stop();
-            //    ProcessManager.CloseDetector(d.Name);
-            //    System.Threading.Thread.Sleep(1000);
-            //}
-            ProcessManager.CloseMvcg();
-
             if (disposing && (components != null))
             {
                 components.Dispose();
             }
             base.Dispose(disposing);
         }
+
+        
 
         #region Windows Form Designer generated code
 
@@ -181,15 +175,14 @@ namespace Regata.Desktop.WinForms.Measurements
             this.DCPComboBoxHeight.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DCPComboBoxHeight.FormattingEnabled = true;
             this.DCPComboBoxHeight.Items.AddRange(new object[] {
-            "2.5",
-            "5.0",
-            "10.0",
-            "20.0"});
+            2.5f,
+            5.0f,
+            10.0f,
+            20.0f });
             this.DCPComboBoxHeight.Location = new System.Drawing.Point(409, 138);
             this.DCPComboBoxHeight.Name = "DCPComboBoxHeight";
             this.DCPComboBoxHeight.Size = new System.Drawing.Size(58, 24);
             this.DCPComboBoxHeight.TabIndex = 15;
-            this.DCPComboBoxHeight.Text = "20.0";
             this.DCPComboBoxHeight.SelectedIndexChanged += new System.EventHandler(this.HeightChangedHandler);
             // 
             // DCPLabelHeight

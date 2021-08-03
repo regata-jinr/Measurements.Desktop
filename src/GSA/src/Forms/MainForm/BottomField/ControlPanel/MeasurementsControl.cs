@@ -23,6 +23,7 @@ namespace Regata.Desktop.WinForms.Measurements
     {
         private ControlsGroupBox controlsMeasControl;
         private CheckedArrayControl<string> CheckedAvailableDetectorArrayControl;
+        private DetectorControlPanel _dcp;
 
         private TableLayoutPanel MeasurementsStartPanel;
         private Button buttonStop;
@@ -39,6 +40,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
             buttonStop.Click += ButtonStop_Click;
             buttonStart.Click += ButtonStart_Click;
+            buttonClear.Click += ButtonClear_Click;
+            buttonPause.Click += ButtonPause_Click;
             
             MeasurementsStartPanel = new TableLayoutPanel();
             MeasurementsStartPanel.ColumnCount = 2;
@@ -63,25 +66,57 @@ namespace Regata.Desktop.WinForms.Measurements
             CheckedAvailableDetectorArrayControl.SelectionChanged += () => AssignRecordsMainRDGV("Detector", CheckedAvailableDetectorArrayControl.SelectedItem);
         }
 
+        private bool _isMeasurementsPaused = false;
+
+        private void ButtonPause_Click(object sender, EventArgs e)
+        {
+            foreach (var d in _detectors)
+            {
+                if (_isMeasurementsPaused)
+                    d.Start();
+                else
+                {
+                    _isMeasurementsPaused = true;
+                    d.Pause();
+                }
+            }
+        }
+
+        private void ButtonClear_Click(object sender, EventArgs e)
+        {
+            foreach (var d in _detectors)
+            {
+                d.Clear();
+            }
+        }
+
         private void ButtonStop_Click(object sender, EventArgs e)
         {
             foreach (var d in _detectors)
             {
                 d.Stop();
+                d.Dispose();
             }
+            _detectors.Clear();
+            buttonStart.Enabled = true;
+            _dcp?.Dispose();
         }
 
-        private void ButtonStart_Click(object sender, EventArgs e)
+        private async void ButtonStart_Click(object sender, EventArgs e)
         {
             // TODO: check correcntess of measurements info
             // TODO: detectors availability
-            InitializeDetectors();
-            //buttonStart.Enabled = false;
+            buttonStart.Enabled = false;
+
+            await InitializeDetectors();
 
             foreach (var d in _detectors)
             {
                 MStart(d.Name);
             }
+
+            _dcp = new DetectorControlPanel(_detectors);
+            _dcp.Show();
         }
 
         private async void MainForm_Load(object sender, EventArgs e)

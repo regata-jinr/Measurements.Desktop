@@ -12,64 +12,69 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
-using Regata.Desktop.WinForms.Components;
 using Regata.Core.Hardware;
 using Regata.Core;
-using Regata.Core.DataBase.Models;
 using RCM=Regata.Core.Messages;
+using Regata.Core.Collections;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class DetectorControlPanel : Form
     {
         //TODO: deny decrease preset number below then elapsed time
-        private CircularList<string> _namesArray;
-        private Detector _currentDet;
+        private CircleArray<Detector> _dets;
 
-        private IEnumerable<Detector> _dets;
 
         public DetectorControlPanel(IEnumerable<Detector> dets)
         {
             InitializeComponent();
-            _dets = dets;
-            _namesArray = new CircularList<string>(_dets.Select(d => d.Name).ToArray());
+            _dets = new CircleArray<Detector>(dets);
 
             foreach (var d in dets)
                 d.StatusChanged += DetStatusChangedHandler;
 
             DesktopLocation = new Point(Screen.PrimaryScreen.Bounds.Left + 10, Screen.PrimaryScreen.Bounds.Bottom - Size.Height - 50);
 
-            //_session.CurrentSampleChanged += SourcesInitialize;
             DCPNumericUpDownPresetHours.ValueChanged   += ChangePresetTimeHandler;
             DCPNumericUpDownPresetMinutes.ValueChanged += ChangePresetTimeHandler;
             DCPNumericUpDownPresetSeconds.ValueChanged += ChangePresetTimeHandler;
 
-            SourcesInitialize();
+            Disposed += DetectorControlPanel_Disposed;
+
+            Load += DetectorControlPanel_Load;
+
 
         }
 
-        private uint PresetSeconds => _currentDet.PresetRealTime;
-        private uint ElapsedSecond => (uint)_currentDet.ElapsedRealTime;
+        private async void DetectorControlPanel_Load(object sender, EventArgs e)
+        {
+            await SourcesInitialize();
+        }
+
+        private async void DetectorControlPanel_Disposed(object sender, EventArgs e)
+        {
+                await Detector.CloseMvcgAsync();
+        }
+
+        private uint PresetSeconds => _dets.Current.PresetRealTime;
+        private uint ElapsedSecond => (uint)_dets.Current.ElapsedRealTime;
         private uint LeftSeconds => PresetSeconds - ElapsedSecond;
 
-        public async void SourcesInitialize()
+        public async Task SourcesInitialize()
         {
             try
             {
-                DCPLabelCurrentSrcName.Text = _namesArray.CurrentItem;
-                Text = $"Панель управления детектором  {_namesArray.CurrentItem}";
-                DCPLabelNextSrcName.Text = _namesArray.NextItem;
-                DCPLabelPrevSrcName.Text = _namesArray.PrevItem;
-                ProcessManager.SelectDetector(_namesArray.CurrentItem);
-                _currentDet = _dets.Where(d => d.Name == _namesArray.CurrentItem).First();
+                DCPLabelCurrentSrcName.Text = _dets.Current.Name;
+                Text = $"Панель управления детектором  {_dets.Current.Name}";
+                DCPLabelNextSrcName.Text = _dets.Next.Name;
+                DCPLabelPrevSrcName.Text = _dets.Prev.Name;
+                await Detector.SelectDetectorAsync(_dets.Current.Name);
                 DetStatusChangedHandler(null, EventArgs.Empty);
-                DCPLabelCurrentSumpleOnCurrentSrc.Text = _currentDet.CurrentMeasurement.ToString();
-                DCPLabelCurrentSumpleOnNextSrc.Text = _dets.Where(d => d.Name == _namesArray.NextItem).First().CurrentMeasurement.ToString();
-                DCPLabelCurrentSumpleOnPrevSrc.Text = _dets.Where(d => d.Name == _namesArray.PrevItem).First().CurrentMeasurement.ToString();
+                DCPLabelCurrentSumpleOnCurrentSrc.Text = _dets.Current.CurrentMeasurement.ToString();
+                DCPLabelCurrentSumpleOnNextSrc.Text = _dets.Next.CurrentMeasurement.ToString();
+                DCPLabelCurrentSumpleOnPrevSrc.Text = _dets.Prev.CurrentMeasurement.ToString();
 
                 var timePreset = TimeSpan.FromSeconds(PresetSeconds);
                 DCPNumericUpDownPresetHours.Value = timePreset.Hours;
@@ -80,7 +85,10 @@ namespace Regata.Desktop.WinForms.Measurements
                 DCPNumericUpDownElapsedHours.Value = timeLeft.Hours;
                 DCPNumericUpDownElapsedMinutes.Value = timeLeft.Minutes;
                 DCPNumericUpDownElapsedSeconds.Value = timeLeft.Seconds;
-                DCPLabelDeadTimeValue.Text = $"{_currentDet.DeadTime.ToString("f2")}%";
+                DCPLabelDeadTimeValue.Text = $"{_dets.Current.DeadTime.ToString("f2")}%";
+
+                DCPComboBoxHeight.SelectedItem = _dets.Current.CurrentMeasurement.Height.Value;
+
                 await Task.Run(() => RefreshTime());
             }
             catch (Exception ex)
@@ -89,22 +97,21 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
-        // FIXME: make async
         private async Task RefreshTime()
         {
             try
             {
-                while (LeftSeconds > 0 && _currentDet.Status == DetectorStatus.busy)
+                while (LeftSeconds > 0 && _dets.Current.Status == DetectorStatus.busy)
                 {
                     await Task.Delay(TimeSpan.FromSeconds(1));
 
                     var time = TimeSpan.FromSeconds(LeftSeconds);
 
-                    DCPNumericUpDownElapsedHours?.Invoke(new Action(() => { DCPNumericUpDownElapsedHours.Value = time.Hours; }));
+                    DCPNumericUpDownElapsedHours?.Invoke(  new Action(() => { DCPNumericUpDownElapsedHours.Value = time.Hours; }));
                     DCPNumericUpDownElapsedMinutes?.Invoke(new Action(() => { DCPNumericUpDownElapsedMinutes.Value = time.Minutes; }));
                     DCPNumericUpDownElapsedSeconds?.Invoke(new Action(() => { DCPNumericUpDownElapsedSeconds.Value = time.Seconds; }));
 
-                    DCPLabelDeadTimeValue?.Invoke(new Action(() => { DCPLabelDeadTimeValue.Text = $"{_currentDet.DeadTime.ToString()}%"; }));
+                    DCPLabelDeadTimeValue?.Invoke(new Action(() => { DCPLabelDeadTimeValue.Text = $"{_dets.Current.DeadTime.ToString()}%"; }));
 
                 }
             }
@@ -115,23 +122,23 @@ namespace Regata.Desktop.WinForms.Measurements
         }
 
 
-        private void DCPButtonNextSrc_Click(object sender, EventArgs e)
+        private async void DCPButtonNextSrc_Click(object sender, EventArgs e)
         {
-            _namesArray.Next();
-            SourcesInitialize();
+            _dets.MoveForward();
+            await SourcesInitialize();
         }
 
-        private void DCPButtonPrevSrc_Click(object sender, EventArgs e)
+        private async void DCPButtonPrevSrc_Click(object sender, EventArgs e)
         {
-            _namesArray.Prev();
-            SourcesInitialize();
+            _dets.MoveBack();
+            await SourcesInitialize();
         }
 
         private void DCPButtonClear_Click(object sender, EventArgs e)
         {
             try
             {
-                _currentDet.Clear();
+                _dets.Current.Clear();
                 var time = TimeSpan.FromSeconds(PresetSeconds);
                 DCPNumericUpDownElapsedHours.Value = time.Hours;
                 DCPNumericUpDownElapsedMinutes.Value = time.Minutes;
@@ -148,14 +155,14 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
-                if (_currentDet.Status == DetectorStatus.busy)
+                if (_dets.Current.Status == DetectorStatus.busy)
                 {
-                    _currentDet.Pause();
+                    _dets.Current.Pause();
                     return;
                 }
 
-                if (_currentDet.Status == DetectorStatus.ready)
-                    _currentDet.Start();
+                if (_dets.Current.Status == DetectorStatus.ready)
+                    _dets.Current.Start();
             }
             catch (Exception ex)
             {
@@ -167,16 +174,16 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
-                if (_currentDet.Status == DetectorStatus.busy)
+                if (_dets.Current.Status == DetectorStatus.busy)
                 {
                     DCPButtonStartPause.Text = "Пауза";
                     await Task.Run(() => RefreshTime());
                 }
 
-                if (_currentDet.Status == DetectorStatus.ready && _currentDet.IsPaused)
+                if (_dets.Current.Status == DetectorStatus.ready && _dets.Current.IsPaused)
                     DCPButtonStartPause.Text = "Продолжить";
 
-                if (_currentDet.Status == DetectorStatus.ready && !_currentDet.IsPaused)
+                if (_dets.Current.Status == DetectorStatus.ready && !_dets.Current.IsPaused)
                     DCPButtonStartPause.Text = "Старт";
             }
             catch (Exception ex)
@@ -190,8 +197,7 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
-                //ISampleInfo si = _currentDet;
-                //si.Height = float.Parse(DCPComboBoxHeight.GetItemText(DCPComboBoxHeight.SelectedItem));
+                _dets.Current.Sample.Height = (float)DCPComboBoxHeight.SelectedItem;
             }
             catch (Exception ex)
             {
@@ -203,7 +209,7 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
-                _currentDet.Stop();
+                _dets.Current.Stop();
             }
             catch (Exception ex)
             {
@@ -216,18 +222,18 @@ namespace Regata.Desktop.WinForms.Measurements
             try
             {
                 var itWasBusy = false;
-                if (_currentDet.Status == DetectorStatus.busy)
+                if (_dets.Current.Status == DetectorStatus.busy)
                 {
-                    _currentDet.Pause();
+                    _dets.Current.Pause();
                     itWasBusy = true;
                 }
 
                 var dr = saveFileDialogSaveCurrentSpectra.ShowDialog();
                 if (dr == DialogResult.OK)
-                    _currentDet.Save(saveFileDialogSaveCurrentSpectra.FileName);
+                    _dets.Current.Save(saveFileDialogSaveCurrentSpectra.FileName);
 
                 if (itWasBusy)
-                    _currentDet.Start();
+                    _dets.Current.Start();
             }
             catch (Exception ex)
             {
@@ -241,9 +247,9 @@ namespace Regata.Desktop.WinForms.Measurements
             try
             {
                 var itWasBusy = false;
-                if (_currentDet.Status == DetectorStatus.busy)
+                if (_dets.Current.Status == DetectorStatus.busy)
                 {
-                    _currentDet.Pause();
+                    _dets.Current.Pause();
                     itWasBusy = true;
                 }
 
@@ -254,11 +260,12 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 var time = new TimeSpan((int)DCPNumericUpDownPresetHours.Value, (int)DCPNumericUpDownPresetMinutes.Value, (int)DCPNumericUpDownPresetSeconds.Value);
 
-                _currentDet.PresetRealTime = (uint)time.TotalSeconds;
+                _dets.Current.PresetRealTime = (uint)time.TotalSeconds;
 
                 if (LeftSeconds < 0)
                 {
-                    _currentDet.Clear();
+                    _dets.Current.Clear();
+                    _dets.Current.Pause();
                     return;
                 }
 
@@ -268,7 +275,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 DCPNumericUpDownElapsedSeconds.Value = timeLeft.Seconds;
 
                 if (itWasBusy)
-                    _currentDet.Start();
+                    _dets.Current.Start();
 
                 DCPNumericUpDownPresetHours.Enabled = true;
                 DCPNumericUpDownPresetMinutes.Enabled = true;

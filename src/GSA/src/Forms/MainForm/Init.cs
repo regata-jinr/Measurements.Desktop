@@ -74,6 +74,8 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 // освободить управляемые ресурсы
                 mainForm.Dispose();
+                _regataContext.Dispose();
+                _dcp?.Dispose();
 
                 if (_detectors != null)
                 {

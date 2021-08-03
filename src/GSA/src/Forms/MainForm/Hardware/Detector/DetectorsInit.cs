@@ -14,6 +14,7 @@ using Regata.Core.Hardware;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -21,11 +22,15 @@ namespace Regata.Desktop.WinForms.Measurements
     {
         private List<Detector> _detectors;
 
-        private void InitializeDetectors()
+        private async Task InitializeDetectors()
         {
+            await Detector.RunMvcgAsync();
+
             _detectors = new List<Detector>(8);
             foreach (var d in _regataContext.Measurements.Local.Select(m => m.Detector).Distinct())
             {
+                await Detector.ShowDetectorInMvcgAsync(d);
+
                 var det = new Detector(d);
                 det.AcquireDone   += Det_AcquireDone;
                 det.AcquireStart  += Det_AcquireStart;
@@ -59,7 +64,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private async void Det_AcquireDone(Detector det)
         {
-            
+            // FIXME: A random AcquireDone generated events?
+            if (System.Math.Abs(det.ElapsedRealTime - det.PresetRealTime) > 3) return;
 
             det.CurrentMeasurement.FileSpectra = await Detector.GenerateSpectraFileNameFromDBAsync(det.Name, det.CurrentMeasurement.Type);
             det.Save();

@@ -52,6 +52,9 @@
     <Reference Include="base">
       <HintPath>..\..\..\..\..\..\Core\artifacts\Debug\base\base.dll</HintPath>
     </Reference>
+    <Reference Include="collections">
+      <HintPath>..\..\..\..\..\..\Core\artifacts\Debug\collections\collections.dll</HintPath>
+    </Reference>
     <Reference Include="Detector">
       <HintPath>..\..\..\..\..\..\Core\artifacts\Debug\Detector\Detector.dll</HintPath>
     </Reference>
