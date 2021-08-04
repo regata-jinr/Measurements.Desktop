@@ -27,7 +27,7 @@ namespace Regata.Desktop.WinForms.Measurements
             await Detector.RunMvcgAsync();
 
             _detectors = new List<Detector>(8);
-            foreach (var d in _regataContext.Measurements.Local.Select(m => m.Detector).Distinct())
+            foreach (var d in _regataContext.Measurements.Local.Select(m => m.Detector).Distinct().OrderBy(n => n))
             {
                 await Detector.ShowDetectorInMvcgAsync(d);
 
@@ -44,7 +44,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private Measurement GetFirstNotMeasuredForDetector(string detName)
         {
-            return _regataContext.Measurements.Local.Where(m => m.Detector == detName && string.IsNullOrEmpty(m.FileSpectra)).FirstOrDefault();
+            // FIXME: regataContext.Measurements.Local inversed
+            return _regataContext.Measurements.Local.Where(m => m.Detector == detName && string.IsNullOrEmpty(m.FileSpectra)).LastOrDefault();
         }
 
         private void Det_ParamChange(Detector det)
@@ -69,6 +70,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
             det.CurrentMeasurement.FileSpectra = await Detector.GenerateSpectraFileNameFromDBAsync(det.Name, det.CurrentMeasurement.Type);
             det.Save();
+            mainForm.ProgressBar.Value++;
             _regataContext.Update(det.CurrentMeasurement);
             _regataContext.SaveChanges();
             ColorizeRDGVRow(det.CurrentMeasurement, Color.LightGreen);
@@ -86,8 +88,6 @@ namespace Regata.Desktop.WinForms.Measurements
         private void Det_StatusChanged(object sender, System.EventArgs e)
         {
         }
-
-
 
     
     } // public partial class MainForm

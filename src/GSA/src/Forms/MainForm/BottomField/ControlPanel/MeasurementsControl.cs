@@ -9,10 +9,12 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core.Collections;
 using Regata.Core.DataBase.Models;
 using Regata.Core.Hardware;
 using Regata.Core.UI.WinForms.Controls;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -70,6 +72,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void ButtonPause_Click(object sender, EventArgs e)
         {
+            if (_detectors == null) return;
+
             foreach (var d in _detectors)
             {
                 if (_isMeasurementsPaused)
@@ -84,6 +88,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void ButtonClear_Click(object sender, EventArgs e)
         {
+            if (_detectors == null) return;
+
             foreach (var d in _detectors)
             {
                 d.Clear();
@@ -92,6 +98,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void ButtonStop_Click(object sender, EventArgs e)
         {
+            if (_detectors == null) return;
+
             foreach (var d in _detectors)
             {
                 d.Stop();
@@ -100,15 +108,23 @@ namespace Regata.Desktop.WinForms.Measurements
             _detectors.Clear();
             buttonStart.Enabled = true;
             _dcp?.Dispose();
+            mainForm.ProgressBar.Value = 0;
+
         }
 
         private async void ButtonStart_Click(object sender, EventArgs e)
         {
             // TODO: check correcntess of measurements info
             // TODO: detectors availability
+
+            if (!_regataContext.Measurements.Local.Any()) return;
+
             buttonStart.Enabled = false;
 
+            mainForm.ProgressBar.Maximum = mainForm.MainRDGV.RowCount;
+
             await InitializeDetectors();
+
 
             foreach (var d in _detectors)
             {
@@ -121,11 +137,18 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private async void MainForm_Load(object sender, EventArgs e)
         {
+            var tmpArr = new List<string>(8);
             await foreach (var d in Detector.GetAvailableDetectorsAsyncStream())
             {
                 if (!string.IsNullOrEmpty(d))
+                {
                     CheckedAvailableDetectorArrayControl.Add(d);
+                    tmpArr.Add(d);
+                }
             }
+
+            _circleDetArray = new CircleArray<string>(tmpArr.OrderBy(d=>d).ToArray());
+
         }
 
         private void MStart(string dName)

@@ -77,9 +77,9 @@ namespace Regata.Desktop.WinForms.Measurements
             mainForm.TabsPane[1, 1].DataSource = null;
 
             var mRegId = mainForm.TabsPane[1, 0].SelectedCells[0].Value as int?;
-            var date   = mainForm.TabsPane[1, 0].SelectedCells[2].Value as DateTime?;
+            //var date   = mainForm.TabsPane[1, 0].SelectedCells[2].Value as DateTime?;
 
-            if (!mRegId.HasValue || !date.HasValue) return;
+            if (!mRegId.HasValue) return;
 
             using (var r = new RegataContext())
             {

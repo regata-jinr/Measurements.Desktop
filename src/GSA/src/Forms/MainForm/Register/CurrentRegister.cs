@@ -10,6 +10,7 @@
  ***************************************************************************/
 
 using Regata.Core.DataBase;
+using Regata.Core.Collections;
 using Regata.Core.DataBase.Models;
 using System.Linq;
 using System.Windows.Forms;
@@ -23,6 +24,7 @@ namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm
     {
+        private CircleArray<string> _circleDetArray;
 
         private void AddRecord(int IrradiationId)
         {
@@ -33,7 +35,15 @@ namespace Regata.Desktop.WinForms.Measurements
             m.AcqMode = (int)AcquisitionModeItems.CheckedItem;
             m.RegId = CurrentMeasurementsRegister.Id;
             m.Duration = (int)DurationControl.Duration.TotalSeconds;
-            m.Detector = CheckedAvailableDetectorArrayControl.SelectedItem;
+
+            m.Detector = MeasurementsTypeItems.CheckedItem switch
+            {   
+                MeasurementsType.sli => _circleDetArray?.Current,
+                _ => CheckedAvailableDetectorArrayControl.SelectedItem
+            };
+
+            _circleDetArray?.MoveForward();
+
             m.Height = CheckedHeightArrayControl.SelectedItem;
             _regataContext.Measurements.Add(m);
             _regataContext.SaveChanges();

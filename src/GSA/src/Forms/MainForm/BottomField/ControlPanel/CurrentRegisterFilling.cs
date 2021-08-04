@@ -69,6 +69,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void ButtonClearRegister_Click(object sender, EventArgs e)
         {
+            _circleDetArray.Reset();
             ClearCurrentRegister();
         }
 

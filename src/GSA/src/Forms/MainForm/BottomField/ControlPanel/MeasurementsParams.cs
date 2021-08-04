@@ -33,6 +33,16 @@ namespace Regata.Desktop.WinForms.Measurements
 
             DurationControl.DurationChanged += (s, e) => FillDurationToSelectedRecords();
             CheckedHeightArrayControl.SelectionChanged += () => AssignRecordsMainRDGV("Height", CheckedHeightArrayControl.SelectedItem);
+
+            buttonShowAcqQueue.Click += ButtonShowAcqQueue_Click;
+        }
+
+        private void ButtonShowAcqQueue_Click(object sender, System.EventArgs e)
+        {
+            var fq = GenerateSamplesQueueForm();
+            if (fq == null) return;
+
+          fq.Show();
         }
 
         private void FillDurationToSelectedRecords()
