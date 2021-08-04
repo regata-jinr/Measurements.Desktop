@@ -141,7 +141,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
             CurrentMeasurementsRegister.PropertyChanged += (s,e) => { UpdateCurrentReigster(); };
 
-            //HideMainRDGVRedundantColumns();
+            HideMainRDGVRedundantColumns();
 
             mainForm.Disposed += (s, e) =>
             {
@@ -160,6 +160,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 }
                 _regataContext.Dispose();
             };
+
         }
 
         private void HideMainRDGVRedundantColumns()
@@ -167,6 +168,11 @@ namespace Regata.Desktop.WinForms.Measurements
             mainForm.MainRDGV.Columns["Id"].Visible = false;
             mainForm.MainRDGV.Columns["IrradiationId"].Visible = false;
             mainForm.MainRDGV.Columns["RegId"].Visible = false;
+            mainForm.MainRDGV.Columns["Assistant"].Visible = false;
+            mainForm.MainRDGV.Columns["AcqMode"].Visible = false;
+            mainForm.MainRDGV.Columns["Type"].Visible = false;
+            mainForm.MainRDGV.Columns["SetKey"].Visible = false;
+            mainForm.MainRDGV.Columns["SampleKey"].Visible = false;
         }
 
         private void UpdateCurrentReigster()

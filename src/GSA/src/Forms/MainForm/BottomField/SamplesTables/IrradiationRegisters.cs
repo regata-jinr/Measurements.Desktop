@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Regata.Core.UI.WinForms;
+using System.Reflection;
+using System.Windows.Forms;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -42,13 +44,20 @@ namespace Regata.Desktop.WinForms.Measurements
 
             mainForm.TabsPane[0, 0].Scroll += async (s, e) =>
             {
-                if (e.NewValue >= mainForm.TabsPane[0, 0].RowCount - 10)
+                if (RowIsVisible(mainForm.TabsPane[0, 0].Rows[mainForm.TabsPane[0, 0].RowCount - 1]))
                     await FillIrradiationRegisters();
             };
 
-
             mainForm.TabsPane[0, 0].ResumeLayout(false);
 
+        }
+
+        private bool RowIsVisible(DataGridViewRow row)
+        {
+            DataGridView dgv = row.DataGridView;
+            int firstVisibleRowIndex = dgv.FirstDisplayedCell.RowIndex;
+            int lastVisibleRowIndex = firstVisibleRowIndex + dgv.DisplayedRowCount(false) - 1;
+            return row.Index >= firstVisibleRowIndex && row.Index <= lastVisibleRowIndex;
         }
 
         private async Task FillIrradiationRegisters()
@@ -65,7 +74,7 @@ namespace Regata.Desktop.WinForms.Measurements
                                                 .ToArrayAsync();
             }
 
-            mainForm.TabsPane[0, 0].FirstDisplayedScrollingRowIndex = mainForm.TabsPane[0, 0].RowCount - 20;
+            mainForm.TabsPane[0, 0].FirstDisplayedScrollingRowIndex = mainForm.TabsPane[0, 0].RowCount - 20; ;
         }
 
         private async Task FillSelectedIrradiations()

@@ -31,6 +31,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void InitMeasurementsRegisters()
         {
+            mainForm.TabsPane[1, 0].SuspendLayout();
+
             mainForm.TabsPane[1, 0].MultiSelect = false;
 
             mainForm.TabsPane[1, 0].SelectionChanged += async (e, s) =>
@@ -42,10 +44,11 @@ namespace Regata.Desktop.WinForms.Measurements
 
             mainForm.TabsPane[1, 0].Scroll += async (s, e) =>
             {
-                if (e.NewValue >= mainForm.TabsPane[1, 0].RowCount - 10)
+                if (RowIsVisible(mainForm.TabsPane[1, 0].Rows[mainForm.TabsPane[1, 0].RowCount - 1]))
                     await FillMeasurementsRegisters();
             };
 
+            mainForm.TabsPane[1, 0].ResumeLayout(false);
         }
 
         private async Task FillMeasurementsRegisters()
@@ -62,7 +65,8 @@ namespace Regata.Desktop.WinForms.Measurements
                                                 .ToArrayAsync();
             }
 
-            mainForm.TabsPane[1, 0].FirstDisplayedScrollingRowIndex = mainForm.TabsPane[1, 0].RowCount - 20;
+
+            mainForm.TabsPane[1, 0].FirstDisplayedScrollingRowIndex = mainForm.TabsPane[1, 0].RowCount - 20; ;
 
             //mainForm.TabsPane[1, 0].Columns[0].Visible = false;
         }

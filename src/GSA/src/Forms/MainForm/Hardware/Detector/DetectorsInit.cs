@@ -69,6 +69,7 @@ namespace Regata.Desktop.WinForms.Measurements
             if (System.Math.Abs(det.ElapsedRealTime - det.PresetRealTime) > 3) return;
 
             det.CurrentMeasurement.FileSpectra = await Detector.GenerateSpectraFileNameFromDBAsync(det.Name, det.CurrentMeasurement.Type);
+            det.CurrentMeasurement.DeadTime = det.DeadTime;
             det.Save();
             mainForm.ProgressBar.Value++;
             _regataContext.Update(det.CurrentMeasurement);
