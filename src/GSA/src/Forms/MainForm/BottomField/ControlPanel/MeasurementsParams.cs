@@ -10,8 +10,8 @@
  ***************************************************************************/
 
 using Regata.Core.UI.WinForms.Controls;
-using System.Windows.Forms;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
