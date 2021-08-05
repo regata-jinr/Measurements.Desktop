@@ -9,14 +9,18 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core.Collections;
 using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
+using Regata.Core.Hardware;
 using Regata.Core.Settings;
 using Regata.Core.UI.WinForms;
 using Regata.Core.UI.WinForms.Forms;
 using Regata.Core.UI.WinForms.Items;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -101,6 +105,36 @@ namespace Regata.Desktop.WinForms.Measurements
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        private async void MainForm_Load(object sender, EventArgs e)
+        {
+            var tmpArr = new List<string>(8);
+            await foreach (var d in Detector.GetAvailableDetectorsAsyncStream())
+            {
+                if (!string.IsNullOrEmpty(d))
+                {
+                    CheckedAvailableDetectorArrayControl.Add(d);
+                    tmpArr.Add(d);
+                }
+            }
+
+            _circleDetArray = new CircleArray<string>(tmpArr.OrderBy(d => d).ToArray());
+
+            await BackGroundTask();
+
+        }
+
+        private async Task BackGroundTask()
+        {
+
+            while (true)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(60));
+                await FillSelectedIrradiations();
+            }
+            
+        }
+
 
     } // public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements

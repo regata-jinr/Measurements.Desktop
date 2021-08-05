@@ -9,9 +9,7 @@
  *                                                                         *
  ***************************************************************************/
 
-using Regata.Core.Collections;
 using Regata.Core.DataBase.Models;
-using Regata.Core.Hardware;
 using Regata.Core.UI.WinForms.Controls;
 using System;
 using System.Collections.Generic;
@@ -133,22 +131,6 @@ namespace Regata.Desktop.WinForms.Measurements
 
             _dcp = new DetectorControlPanel(_detectors);
             _dcp.Show();
-        }
-
-        private async void MainForm_Load(object sender, EventArgs e)
-        {
-            var tmpArr = new List<string>(8);
-            await foreach (var d in Detector.GetAvailableDetectorsAsyncStream())
-            {
-                if (!string.IsNullOrEmpty(d))
-                {
-                    CheckedAvailableDetectorArrayControl.Add(d);
-                    tmpArr.Add(d);
-                }
-            }
-
-            _circleDetArray = new CircleArray<string>(tmpArr.OrderBy(d=>d).ToArray());
-
         }
 
         private void MStart(string dName)
