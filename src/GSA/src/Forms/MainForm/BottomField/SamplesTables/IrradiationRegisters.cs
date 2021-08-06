@@ -9,15 +9,16 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core;
 using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
+using RCM = Regata.Core.Messages;
 using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Regata.Core.UI.WinForms;
-using System.Reflection;
 using System.Windows.Forms;
 
 namespace Regata.Desktop.WinForms.Measurements
@@ -31,25 +32,34 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void InitIrradiationsRegisters()
         {
-            mainForm.TabsPane[0, 0].SuspendLayout();
-            mainForm.TabsPane[0, 0].MultiSelect = false;
-
-            mainForm.TabsPane[0, 0].SelectionChanged += async (e, s) =>
+            try
             {
-                await FillSelectedIrradiations();
-                if (mainForm.TabsPane[0, 0].SelectedRows.Count > 0)
-                    CurrentMeasurementsRegister.IrradiationDate = (DateTime)mainForm.TabsPane[0, 0].SelectedRows[0].Cells[1].Value;
-            };
+                mainForm.TabsPane[0, 0].SuspendLayout();
+                mainForm.TabsPane[0, 0].MultiSelect = false;
+
+                mainForm.TabsPane[0, 0].SelectionChanged += async (e, s) =>
+                {
+                    await FillSelectedIrradiations();
+                    if (mainForm.TabsPane[0, 0].SelectedRows.Count > 0)
+                        CurrentMeasurementsRegister.IrradiationDate = (DateTime)mainForm.TabsPane[0, 0].SelectedRows[0].Cells[1].Value;
+                };
 
 
-            mainForm.TabsPane[0, 0].Scroll += async (s, e) =>
+                mainForm.TabsPane[0, 0].Scroll += async (s, e) =>
+                {
+                    if (RowIsVisible(mainForm.TabsPane[0, 0].Rows[mainForm.TabsPane[0, 0].RowCount - 1]))
+                        await FillIrradiationRegisters();
+                };
+
+                mainForm.TabsPane[0, 0].ResumeLayout(false);
+            }
+            catch (Exception ex)
             {
-                if (RowIsVisible(mainForm.TabsPane[0, 0].Rows[mainForm.TabsPane[0, 0].RowCount - 1]))
-                    await FillIrradiationRegisters();
-            };
-
-            mainForm.TabsPane[0, 0].ResumeLayout(false);
-
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_INI_IRR_REGS)
+                {
+                    DetailedText = ex.ToString()
+                });
+            }
         }
 
         private bool RowIsVisible(DataGridViewRow row)
@@ -62,60 +72,73 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private async Task FillIrradiationRegisters()
         {
-            using (var r = new RegataContext())
+            try
             {
-                mainForm.TabsPane[0, 0].DataSource = await r.Irradiations
-                                                .AsNoTracking()
-                                                .Where(ir => ir.Type == (int)MeasurementsTypeItems.CheckedItem && ir.DateTimeStart != null)
-                                                .Select(ir => new { ir.LoadNumber, ir.DateTimeStart.Value.Date })
-                                                .Distinct()
-                                                .OrderByDescending(i => i.Date)
-                                                .Take(mainForm.TabsPane[0, 0].RowCount + 20)
-                                                .ToArrayAsync();
-            }
+                using (var r = new RegataContext())
+                {
+                    mainForm.TabsPane[0, 0].DataSource = await r.Irradiations
+                                                    .AsNoTracking()
+                                                    .Where(ir => ir.Type == (int)MeasurementsTypeItems.CheckedItem && ir.DateTimeStart != null)
+                                                    .Select(ir => new { ir.LoadNumber, ir.DateTimeStart.Value.Date })
+                                                    .Distinct()
+                                                    .OrderByDescending(i => i.Date)
+                                                    .Take(mainForm.TabsPane[0, 0].RowCount + 20)
+                                                    .ToArrayAsync();
+                }
 
-            mainForm.TabsPane[0, 0].FirstDisplayedScrollingRowIndex = mainForm.TabsPane[0, 0].RowCount - 20; ;
+                mainForm.TabsPane[0, 0].FirstDisplayedScrollingRowIndex = mainForm.TabsPane[0, 0].RowCount - 20;
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_FILL_IRR_REGS)
+                {
+                    DetailedText = ex.ToString()
+                });
+            }
         }
 
         private async Task FillSelectedIrradiations()
         {
-            if (mainForm.TabsPane[0, 0].SelectedCells.Count <= 0) return;
-
-            mainForm.TabsPane[0, 1].DataSource = null;
-            _chosenIrradiations.Clear();
-            _chosenIrradiations.Capacity = 99;
-            
-            var date = mainForm.TabsPane[0, 0].SelectedCells[1].Value as DateTime?;
-
-            if (!date.HasValue) return;
-
-            CurrentMeasurementsRegister.IrradiationDate = date.Value;
-
-            using (var r = new RegataContext())
+            try
             {
-                var query = r.Irradiations.AsNoTracking()
-                                          .Where(
-                                                ir =>
-                                                      ir.Type == (int)MeasurementsTypeItems.CheckedItem &&
-                                                      ir.DateTimeStart != null &&
-                                                      ir.DateTimeStart.Value.Date == date
-                                                 );
+                if (mainForm.TabsPane[0, 0].SelectedCells.Count <= 0) return;
 
-                var _tmpList = MeasurementsTypeItems.CheckedItem switch
+                mainForm.TabsPane[0, 1].DataSource = null;
+                _chosenIrradiations.Clear();
+                _chosenIrradiations.Capacity = 99;
+
+                var date = mainForm.TabsPane[0, 0].SelectedCells[1].Value as DateTime?;
+
+                if (!date.HasValue) return;
+
+                CurrentMeasurementsRegister.IrradiationDate = date.Value;
+
+                using (var r = new RegataContext())
                 {
-                    MeasurementsType.sli => await query.OrderBy(ir => ir.Year)
-                                                       .ThenBy(ir => ir.CountryCode)
-                                                       .ThenBy(ir => ir.SetNumber)
-                                                       .ThenBy(ir => ir.SetIndex)
-                                                       .ThenBy(ir => ir.SampleNumber)
-                                                       .ToArrayAsync(),
-                    // for both: lli-1 and lli-2
-                    _                    => await query.OrderBy(ir => ir.Container)
-                                                       .ThenBy(ir => ir.Position)
-                                                       .ToArrayAsync()
-                };
+                    var query = r.Irradiations.AsNoTracking()
+                                              .Where(
+                                                    ir =>
+                                                          ir.Type == (int)MeasurementsTypeItems.CheckedItem &&
+                                                          ir.DateTimeStart != null &&
+                                                          ir.DateTimeStart.Value.Date == date
+                                                     );
 
-                _chosenIrradiations.AddRange(_tmpList);
+                    var _tmpList = MeasurementsTypeItems.CheckedItem switch
+                    {
+                        MeasurementsType.sli => await query.OrderBy(ir => ir.Year)
+                                                           .ThenBy(ir => ir.CountryCode)
+                                                           .ThenBy(ir => ir.SetNumber)
+                                                           .ThenBy(ir => ir.SetIndex)
+                                                           .ThenBy(ir => ir.SampleNumber)
+                                                           .ToArrayAsync(),
+                        // for both: lli-1 and lli-2
+                        _ => await query.OrderBy(ir => ir.Container)
+                                                           .ThenBy(ir => ir.Position)
+                                                           .ToArrayAsync()
+                    };
+
+                    _chosenIrradiations.AddRange(_tmpList);
+                }
 
                 mainForm.TabsPane[0, 1].DataSource = _chosenIrradiations;
                 _chosenIrradiations.TrimExcess();
@@ -123,10 +146,19 @@ namespace Regata.Desktop.WinForms.Measurements
                 Labels.SetControlsLabels(mainForm);
 
             }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_FILL_SEL_IRR)
+                {
+                    DetailedText = ex.ToString()
+                });
+            }
         }
 
         private void HideIrradiationsRedundantColumns()
         {
+            try
+            { 
             if (mainForm.TabsPane[0, 1].Columns.Count <= 0) return;
 
             mainForm.TabsPane[0, 1].Columns["Id"].Visible = false;
@@ -143,6 +175,14 @@ namespace Regata.Desktop.WinForms.Measurements
             mainForm.TabsPane[0, 1].Columns["Note"].Visible = false;
             mainForm.TabsPane[0, 1].Columns["SetKey"].Visible = false;
             mainForm.TabsPane[0, 1].Columns["SampleKey"].Visible = false;
+        }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_HIDE_IRR_COLS)
+                {
+                    DetailedText = ex.ToString()
+    });
+            }
         }
 
     } // public partial class MainForm

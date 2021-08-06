@@ -9,10 +9,12 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core;
 using Regata.Core.DataBase.Models;
+using Regata.Core.Hardware;
+using RCM = Regata.Core.Messages;
 using Regata.Core.UI.WinForms.Controls;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -33,81 +35,115 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void InitializeMeasurementsControls()
         {
-            buttonStop  = new Button() { Name = "buttonStop",   Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Red };
-            buttonClear = new Button() { Name = "buttonClear",  Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.White };
-            buttonPause = new Button() { Name = "buttonPause",  Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Yellow };
-            buttonStart = new Button() { Name = "buttonStart",  Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Green };
+            try
+            {
+                buttonStop = new Button() { Name = "buttonStop", Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Red };
+                buttonClear = new Button() { Name = "buttonClear", Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.White };
+                buttonPause = new Button() { Name = "buttonPause", Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Yellow };
+                buttonStart = new Button() { Name = "buttonStart", Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Green };
 
-            buttonStop.Click += ButtonStop_Click;
-            buttonStart.Click += ButtonStart_Click;
-            buttonClear.Click += ButtonClear_Click;
-            buttonPause.Click += ButtonPause_Click;
-            
-            MeasurementsStartPanel = new TableLayoutPanel();
-            MeasurementsStartPanel.ColumnCount = 2;
-            MeasurementsStartPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            MeasurementsStartPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            MeasurementsStartPanel.Name = "MeasurementsStartPanel";
-            MeasurementsStartPanel.RowCount = 2;
-            MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            MeasurementsStartPanel.Dock = DockStyle.Fill;
-            MeasurementsStartPanel.Controls.Add(buttonStop, 0, 0);
-            MeasurementsStartPanel.Controls.Add(buttonClear, 1, 0);
-            MeasurementsStartPanel.Controls.Add(buttonPause, 0, 1);
-            MeasurementsStartPanel.Controls.Add(buttonStart, 1, 1);
+                buttonStop.Click += ButtonStop_Click;
+                buttonStart.Click += ButtonStart_Click;
+                buttonClear.Click += ButtonClear_Click;
+                buttonPause.Click += ButtonPause_Click;
 
-            CheckedAvailableDetectorArrayControl = new CheckedArrayControl<string>(new string[0]) { Name = "CheckedAvailableDetectorArrayControl" };
+                MeasurementsStartPanel = new TableLayoutPanel();
+                MeasurementsStartPanel.ColumnCount = 2;
+                MeasurementsStartPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+                MeasurementsStartPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+                MeasurementsStartPanel.Name = "MeasurementsStartPanel";
+                MeasurementsStartPanel.RowCount = 2;
+                MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+                MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+                MeasurementsStartPanel.Dock = DockStyle.Fill;
+                MeasurementsStartPanel.Controls.Add(buttonStop, 0, 0);
+                MeasurementsStartPanel.Controls.Add(buttonClear, 1, 0);
+                MeasurementsStartPanel.Controls.Add(buttonPause, 0, 1);
+                MeasurementsStartPanel.Controls.Add(buttonStart, 1, 1);
 
-            controlsMeasControl = new ControlsGroupBox(new Control[] { CheckedAvailableDetectorArrayControl, MeasurementsStartPanel } ) { Name = "controlsMeasControl" };
+                CheckedAvailableDetectorArrayControl = new CheckedArrayControl<string>(new string[0]) { Name = "CheckedAvailableDetectorArrayControl" };
 
-            FunctionalLayoutPanel.Controls.Add(controlsMeasControl, 2, 0);
+                controlsMeasControl = new ControlsGroupBox(new Control[] { CheckedAvailableDetectorArrayControl, MeasurementsStartPanel }) { Name = "controlsMeasControl" };
 
-            CheckedAvailableDetectorArrayControl.SelectionChanged += () => AssignRecordsMainRDGV("Detector", CheckedAvailableDetectorArrayControl.SelectedItem);
+                FunctionalLayoutPanel.Controls.Add(controlsMeasControl, 2, 0);
+
+                CheckedAvailableDetectorArrayControl.SelectionChanged += () => AssignRecordsMainRDGV("Detector", CheckedAvailableDetectorArrayControl.SelectedItem);
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_INI_MEAS_CONTR) { DetailedText = ex.ToString() });
+
+            }
         }
 
         private bool _isMeasurementsPaused = false;
 
         private void ButtonPause_Click(object sender, EventArgs e)
         {
-            if (_detectors == null) return;
-
-            foreach (var d in _detectors)
+            try
             {
-                if (_isMeasurementsPaused)
-                    d.Start();
-                else
+                if (_detectors == null) return;
+
+                foreach (var d in _detectors)
                 {
-                    _isMeasurementsPaused = true;
-                    d.Pause();
+                    if (_isMeasurementsPaused)
+                        d.Start();
+                    else
+                    {
+                        _isMeasurementsPaused = true;
+                        d.Pause();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_ACQ_PAUSE)
+                {
+                    DetailedText = ex.ToString()
+                });
             }
         }
 
         private void ButtonClear_Click(object sender, EventArgs e)
         {
-            if (_detectors == null) return;
-
-            foreach (var d in _detectors)
+            try
             {
-                d.Clear();
+                if (_detectors == null) return;
+
+                foreach (var d in _detectors)
+                {
+                    d.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_ACQ_CLEAR)
+                {
+                    DetailedText = ex.ToString()
+                });
             }
         }
 
         private void ButtonStop_Click(object sender, EventArgs e)
         {
-            if (_detectors == null) return;
-
-            foreach (var d in _detectors)
+            try
             {
-                d.Stop();
-                d.Dispose();
-            }
-            _detectors.Clear();
-            buttonStart.Enabled = true;
-            _dcp?.Dispose();
-            mainForm.ProgressBar.Value = 0;
+                if (_detectors == null) return;
 
+                foreach (var d in _detectors)
+                {
+                    d.Stop();
+                    d.Dispose();
+                }
+                _detectors.Clear();
+                buttonStart.Enabled = true;
+                _dcp?.Dispose();
+                mainForm.ProgressBar.Value = 0;
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_ACQ_STOP) { DetailedText = ex.ToString() });
+            }
         }
 
         private async void ButtonStart_Click(object sender, EventArgs e)
@@ -118,44 +154,63 @@ namespace Regata.Desktop.WinForms.Measurements
             if (!_regataContext.Measurements.Local.Any()) return;
 
             buttonStart.Enabled = false;
-
+            //mainForm.ProgressBar.Value = 0;
             mainForm.ProgressBar.Maximum = mainForm.MainRDGV.RowCount;
 
-            await InitializeDetectors();
+            if (_detectors == null)
+                await InitializeDetectors();
 
 
             foreach (var d in _detectors)
             {
-                MStart(d.Name);
+                MStart(d);
             }
 
-            _dcp = new DetectorControlPanel(_detectors);
-            _dcp.Show();
+            if (_dcp == null)
+            {
+                _dcp = new DetectorControlPanel(_detectors);
+                _dcp.Show();
+            }
         }
 
-        private void MStart(string dName)
+        private void MStart(Detector d)
         {
-            var d = _detectors.Where(det => det.Name == dName).FirstOrDefault();
-            var m = GetFirstNotMeasuredForDetector(d.Name);
-            if (m == null)
+            try
             {
-                
-                return;
-            }
-            var i = _regataContext.Irradiations.Where(ir => ir.Id == m.IrradiationId).FirstOrDefault();
-            if (i == null) return;
+                var m = GetFirstNotMeasuredForDetector(d.Name);
+                if (m == null)
+                {
+                    return;
+                }
+                var i = _regataContext.Irradiations.Where(ir => ir.Id == m.IrradiationId).FirstOrDefault();
+                if (i == null) return;
 
-            d.LoadMeasurementInfoToDevice(m, i);
-            d.Start();
+                d.LoadMeasurementInfoToDevice(m, i);
+                d.Start();
+                Report.Notify(new RCM.Message(Codes.SUCC_UI_WF_ACQ_START) { Head = $"{d.Name} complete acq for {d.CurrentMeasurement}" });
+
+            }
+            catch (Exception ex)
+            {
+                Det_HardwareError(d);
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_ACQ_START) { DetailedText = ex.ToString() });
+            }
         }
 
         private void ColorizeRDGVRow(Measurement m, Color clr)
         {
-            DataGridViewRow r = mainForm.MainRDGV.Rows.OfType<DataGridViewRow>().Where(r => (int)r.Cells["Id"].Value == m.Id).FirstOrDefault();
+            try
+            {
+                DataGridViewRow r = mainForm.MainRDGV.Rows.OfType<DataGridViewRow>().Where(r => (int)r.Cells["Id"].Value == m.Id).FirstOrDefault();
 
-            if (r == null) return;
+                if (r == null) return;
 
-            r.DefaultCellStyle.BackColor = clr;
+                r.DefaultCellStyle.BackColor = clr;
+            }
+            catch
+            {
+                
+            }
         }
 
     } // public partial class MainForm

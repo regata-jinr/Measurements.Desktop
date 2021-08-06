@@ -9,9 +9,13 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core;
 using Regata.Core.DataBase.Models;
 using Regata.Core.Hardware;
+using Regata.Core.Messages;
+using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,28 +28,40 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private async Task InitializeDetectors()
         {
-            await Detector.RunMvcgAsync();
-
-            _detectors = new List<Detector>(8);
-            foreach (var d in _regataContext.Measurements.Local.Select(m => m.Detector).Distinct().OrderBy(n => n))
+            try
             {
-                await Detector.ShowDetectorInMvcgAsync(d);
+                await Detector.RunMvcgAsync();
 
-                var det = new Detector(d);
-                det.AcquireDone   += Det_AcquireDone;
-                det.AcquireStart  += Det_AcquireStart;
-                det.HardwareError += Det_HardwareError;
-                det.ParamChange   += Det_ParamChange;
-                det.StatusChanged += Det_StatusChanged;
-                _detectors.Add(det);
+                _detectors = new List<Detector>(8);
+                foreach (var d in _regataContext.Measurements.Local.Select(m => m.Detector).Distinct().OrderBy(n => n))
+                {
+                    await Detector.ShowDetectorInMvcgAsync(d);
+
+                    var det = new Detector(d);
+                    det.AcquireDone += Det_AcquireDone;
+                    det.AcquireStart += Det_AcquireStart;
+                    det.HardwareError += Det_HardwareError;
+                    det.ParamChange += Det_ParamChange;
+                    det.StatusChanged += Det_StatusChanged;
+                    _detectors.Add(det);
+                }
+                _detectors.TrimExcess();
             }
-            _detectors.TrimExcess();
+            catch (Exception ex)
+            {
+                Report.Notify(new Message(Codes.ERR_UI_WF_INI_DET) { DetailedText = ex.ToString() });
+
+            }
         }
 
         private Measurement GetFirstNotMeasuredForDetector(string detName)
         {
             // FIXME: regataContext.Measurements.Local inversed
-            return _regataContext.Measurements.Local.Where(m => m.Detector == detName && string.IsNullOrEmpty(m.FileSpectra)).LastOrDefault();
+            return _regataContext.Measurements.Local.Where(m => m.Detector == detName &&
+                                                                string.IsNullOrEmpty(m.FileSpectra) &&
+                                                                m.DateTimeFinish.HasValue
+                                                          )
+                                                    .LastOrDefault();
         }
 
         private void Det_ParamChange(Detector det)
@@ -65,24 +81,46 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private async void Det_AcquireDone(Detector det)
         {
-            // FIXME: A random AcquireDone generated events?
-            if (System.Math.Abs(det.ElapsedRealTime - det.PresetRealTime) > 3) return;
-
-            det.CurrentMeasurement.FileSpectra = await Detector.GenerateSpectraFileNameFromDBAsync(det.Name, det.CurrentMeasurement.Type);
-            det.CurrentMeasurement.DeadTime = det.DeadTime;
-            det.Save();
-            mainForm.ProgressBar.Value++;
-            _regataContext.Update(det.CurrentMeasurement);
-            _regataContext.SaveChanges();
-            ColorizeRDGVRow(det.CurrentMeasurement, Color.LightGreen);
-
-            if (!_regataContext.Measurements.Local.Where(m => m.FileSpectra == null).Any())
+            try
             {
-                buttonStart.Enabled = true;
+                // FIXME: A random AcquireDone generated events?
+                if (Math.Abs(det.ElapsedRealTime - det.PresetRealTime) > 3) return;
+
+                det.CurrentMeasurement.FileSpectra = await Detector.GenerateSpectraFileNameFromDBAsync(det.Name, det.CurrentMeasurement.Type);
+                det.CurrentMeasurement.DeadTime = det.DeadTime;
+                det.Save();
+
+                mainForm.ProgressBar.Value++;
+                _regataContext.Measurements.Update(det.CurrentMeasurement);
+                _regataContext.SaveChanges();
+
+                ColorizeRDGVRow(det.CurrentMeasurement, Color.LightGreen);
+
+                Report.Notify(new Message(Codes.SUCC_UI_WF_ACQ_DONE) { Head = $"{det.Name} complete acq for {det.CurrentMeasurement}"});
+
             }
-            else
+            catch (DbUpdateException dbe)
             {
-                MStart(det.Name);
+                Det_HardwareError(det);
+                Report.Notify(new Message(Codes.ERR_UI_WF_ACQ_DONE_DB) { DetailedText = dbe.ToString() });
+            }
+            //catch () 
+            // hardware exception
+            catch (Exception ex)
+            {
+                Det_HardwareError(det);
+                Report.Notify(new Message(Codes.ERR_UI_WF_ACQ_DONE_UNREG) { DetailedText = string.Join("--", ex.Message, ex?.InnerException.Message) });
+            }
+            finally
+            {
+                if (!_regataContext.Measurements.Local.Where(m => m.FileSpectra == null).Any())
+                {
+                    buttonStart.Enabled = true;
+                }
+                else
+                {
+                    MStart(det);
+                }
             }
         }
 

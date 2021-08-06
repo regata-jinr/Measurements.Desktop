@@ -9,7 +9,10 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core;
+using RCM = Regata.Core.Messages;
 using Regata.Core.UI.WinForms.Controls;
+using System;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -24,17 +27,27 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void InitializeMeasurementsParamsControls()
         {
-            DurationControl = new DurationControl();
-            CheckedHeightArrayControl = new CheckedArrayControl<float>(new float[] { 2.5f, 5f, 10f, 20f }) { Name = "CheckedArrayControlHeights" };
-            buttonShowAcqQueue = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonShowAcqQueue" };
-            controlsMeasParams = new ControlsGroupBox(new Control[] { DurationControl, CheckedHeightArrayControl, buttonShowAcqQueue }) { Name = "controlsMeasParams" };
+            try
+            {
+                DurationControl = new DurationControl();
+                CheckedHeightArrayControl = new CheckedArrayControl<float>(new float[] { 2.5f, 5f, 10f, 20f }) { Name = "CheckedArrayControlHeights" };
+                buttonShowAcqQueue = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonShowAcqQueue" };
+                controlsMeasParams = new ControlsGroupBox(new Control[] { DurationControl, CheckedHeightArrayControl, buttonShowAcqQueue }) { Name = "controlsMeasParams" };
 
-            FunctionalLayoutPanel.Controls.Add(controlsMeasParams, 1, 0);
+                FunctionalLayoutPanel.Controls.Add(controlsMeasParams, 1, 0);
 
-            DurationControl.DurationChanged += (s, e) => FillDurationToSelectedRecords();
-            CheckedHeightArrayControl.SelectionChanged += () => AssignRecordsMainRDGV("Height", CheckedHeightArrayControl.SelectedItem);
+                DurationControl.DurationChanged += (s, e) => FillDurationToSelectedRecords();
+                CheckedHeightArrayControl.SelectionChanged += () => AssignRecordsMainRDGV("Height", CheckedHeightArrayControl.SelectedItem);
 
-            buttonShowAcqQueue.Click += ButtonShowAcqQueue_Click;
+                buttonShowAcqQueue.Click += ButtonShowAcqQueue_Click;
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_INI_MEAS_PARAMS)
+                {
+                    DetailedText = ex.ToString()
+                });
+            }
         }
 
         private void ButtonShowAcqQueue_Click(object sender, System.EventArgs e)
@@ -42,20 +55,30 @@ namespace Regata.Desktop.WinForms.Measurements
             var fq = GenerateSamplesQueueForm();
             if (fq == null) return;
 
-          fq.Show();
+            fq.Show();
         }
 
         private void FillDurationToSelectedRecords()
         {
-            foreach (var i in mainForm.MainRDGV.SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct())
+            try
             {
-                var m = _regataContext.Measurements.Where(m => m.Id == (int)mainForm.MainRDGV.Rows[i].Cells["Id"].Value).FirstOrDefault();
-                if (m == null) continue;
-                m.Duration = (int)DurationControl.Duration.TotalSeconds;
-                _regataContext.Update(m);
+                foreach (var i in mainForm.MainRDGV.SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct())
+                {
+                    var m = _regataContext.Measurements.Where(m => m.Id == (int)mainForm.MainRDGV.Rows[i].Cells["Id"].Value).FirstOrDefault();
+                    if (m == null) continue;
+                    m.Duration = (int)DurationControl.Duration.TotalSeconds;
+                    _regataContext.Update(m);
+                }
+                _regataContext.SaveChanges();
+                mainForm.MainRDGV.Refresh();
             }
-            _regataContext.SaveChanges();
-            mainForm.MainRDGV.Refresh();
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_FILL_DUR)
+                {
+                    DetailedText = ex.ToString()
+                });
+            }
         }
 
     } //public partial class MainForm

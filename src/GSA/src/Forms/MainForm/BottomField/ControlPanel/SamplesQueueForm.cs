@@ -9,17 +9,14 @@
  *                                                                         *
  ***************************************************************************/
 
-using System.Windows.Forms;
-using System;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Linq;
-using System.Collections.Generic;
+using Regata.Core;
 using Regata.Core.DataBase.Models;
-using Regata.Core.DataBase;
+using RCM = Regata.Core.Messages;
 using Regata.Core.UI.WinForms.Controls;
-using Regata.Core.UI.WinForms.Items;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -28,27 +25,36 @@ namespace Regata.Desktop.WinForms.Measurements
         //TODO: add title to each dgv
         private Form GenerateSamplesQueueForm()
         {
-            if (!_regataContext.Measurements.Local.Any())
-                return null;
-
-            if (!_regataContext.Measurements.Local.Where(m => !string.IsNullOrEmpty(m.Detector)).Any())
-                return null;
-
-            var _ctrs = new List<DataGridView>(8);
-
-
-            foreach (var d in _regataContext.Measurements.Local.Select(m => m.Detector).Distinct().OrderBy(d => d))
-            {
-                if (string.IsNullOrEmpty(d)) continue;
-                _ctrs.Add(GenerateDataGridView(_regataContext.Measurements.Local.Where(m => m.Detector == d).ToArray(), d));
-            }
-
-            var f = new Form();
+            Form f = new Form();
             f.Name = "SamplesQueueForm";
             f.Size = new System.Drawing.Size(1000, 700);
 
-            f.Controls.Add(new ControlsGroupBox(_ctrs.ToArray(), false));
+            try
+            {
+                if (!_regataContext.Measurements.Local.Any())
+                    return null;
 
+                if (!_regataContext.Measurements.Local.Where(m => !string.IsNullOrEmpty(m.Detector)).Any())
+                    return null;
+
+                var _ctrs = new List<DataGridView>(8);
+
+                foreach (var d in _regataContext.Measurements.Local.Select(m => m.Detector).Distinct().OrderBy(d => d))
+                {
+                    if (string.IsNullOrEmpty(d)) continue;
+                    _ctrs.Add(GenerateDataGridView(_regataContext.Measurements.Local.Where(m => m.Detector == d).ToArray(), d));
+                }
+
+                f.Controls.Add(new ControlsGroupBox(_ctrs.ToArray(), false));
+
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_GEN_QUE_FORM)
+                {
+                    DetailedText = ex.ToString()
+                });
+            }
             return f;
         }
 

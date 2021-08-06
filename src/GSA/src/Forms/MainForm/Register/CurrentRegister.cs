@@ -9,9 +9,11 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core;
 using Regata.Core.DataBase;
 using Regata.Core.Collections;
 using Regata.Core.DataBase.Models;
+using RCM = Regata.Core.Messages;
 using System.Linq;
 using System.Windows.Forms;
 using System.Threading.Tasks;
@@ -28,25 +30,35 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void AddRecord(int IrradiationId)
         {
-            var ir = _regataContext.Irradiations.Where(i => i.Id == IrradiationId).FirstOrDefault();
-            if (ir == null) return;
+            try
+            {
+                var ir = _regataContext.Irradiations.Where(i => i.Id == IrradiationId).FirstOrDefault();
+                if (ir == null) return;
 
-            var m = new Measurement(ir);
-            m.AcqMode = (int)AcquisitionModeItems.CheckedItem;
-            m.RegId = CurrentMeasurementsRegister.Id;
-            m.Duration = (int)DurationControl.Duration.TotalSeconds;
+                var m = new Measurement(ir);
+                m.AcqMode = (int)AcquisitionModeItems.CheckedItem;
+                m.RegId = CurrentMeasurementsRegister.Id;
+                m.Duration = (int)DurationControl.Duration.TotalSeconds;
 
-            m.Detector = MeasurementsTypeItems.CheckedItem switch
-            {   
-                MeasurementsType.sli => _circleDetArray?.Current,
-                _ => CheckedAvailableDetectorArrayControl.SelectedItem
-            };
+                m.Detector = MeasurementsTypeItems.CheckedItem switch
+                {
+                    MeasurementsType.sli => _circleDetArray?.Current,
+                    _ => CheckedAvailableDetectorArrayControl.SelectedItem
+                };
 
-            _circleDetArray?.MoveForward();
+                _circleDetArray?.MoveForward();
 
-            m.Height = CheckedHeightArrayControl.SelectedItem;
-            _regataContext.Measurements.Add(m);
-            _regataContext.SaveChanges();
+                m.Height = CheckedHeightArrayControl.SelectedItem;
+                _regataContext.Measurements.Add(m);
+                _regataContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_ADD_REC)
+                {
+                    DetailedText = ex.ToString()
+                });
+            }
         }
 
         private void RemoveRecord(int id)
@@ -125,73 +137,128 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void ClearCurrentRegister()
         {
-            _regataContext.Measurements.Local.Clear();
-            _regataContext.SaveChanges();
-        }
-
-        private async Task ClearCurrentRegisterAsync()
-        {
+            try
+            {
+                _regataContext.Measurements.Local.Clear();
+                _regataContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_CLR_CUR_REG)
+                {
+                    DetailedText = ex.ToString()
+                });
+            }
         }
 
         private void InitCurrentRegister()
         {
-            CreateNewMeasurementsRegister();
-            _regataContext.Measurements.Where(m => m.Id == 0).Load();
-            mainForm.MainRDGV.DataSource = _regataContext.Measurements.Local.ToBindingList();
-
-            CurrentMeasurementsRegister.PropertyChanged += (s,e) => { UpdateCurrentReigster(); };
-
-            HideMainRDGVRedundantColumns();
-
-            mainForm.Disposed += (s, e) =>
+            try
             {
-                // running creates measurement register.
-                // in case of after disposing the form there are not measurements records for register the last one will be deleted
-                using (var r = new RegataContext())
-                {
-                    if (
-                            !r.Measurements.AsNoTracking().Where(m => m.RegId == CurrentMeasurementsRegister.Id).Any() &&
-                            r.MeasurementsRegisters.AsNoTracking().Where(m => m.Id == CurrentMeasurementsRegister.Id).Any()
-                       )
-                    {
-                        r.MeasurementsRegisters.Remove(CurrentMeasurementsRegister);
-                        r.SaveChanges();
-                    }
-                }
-                _regataContext.Dispose();
-            };
+                CreateNewMeasurementsRegister();
+                _regataContext.Measurements.Where(m => m.Id == 0).Load();
+                mainForm.MainRDGV.DataSource = _regataContext.Measurements.Local.ToBindingList();
 
+                CurrentMeasurementsRegister.PropertyChanged += (s, e) => { UpdateCurrentReigster(); };
+
+                HideMainRDGVRedundantColumns();
+
+                mainForm.Disposed += (s, e) =>
+                {
+                    try
+                    {
+                    // running creates measurement register.
+                    // in case of after disposing the form there are not measurements records for register the last one will be deleted
+                    using (var r = new RegataContext())
+                        {
+                            if (
+                                    !r.Measurements.AsNoTracking().Where(m => m.RegId == CurrentMeasurementsRegister.Id).Any() &&
+                                    r.MeasurementsRegisters.AsNoTracking().Where(m => m.Id == CurrentMeasurementsRegister.Id).Any()
+                               )
+                            {
+                                r.MeasurementsRegisters.Remove(CurrentMeasurementsRegister);
+                                r.SaveChanges();
+                            }
+                        }
+                        _regataContext.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        Report.Notify(new RCM.Message(Codes.ERR_UI_WF_MAIN_FORM_DISP)
+                        {
+                            DetailedText = ex.ToString()
+                        });
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_INIT_CUR_REG)
+                {
+                    DetailedText = ex.ToString()
+                });
+            }
         }
 
         private void HideMainRDGVRedundantColumns()
         {
-            mainForm.MainRDGV.Columns["Id"].Visible = false;
-            mainForm.MainRDGV.Columns["IrradiationId"].Visible = false;
-            mainForm.MainRDGV.Columns["RegId"].Visible = false;
-            mainForm.MainRDGV.Columns["Assistant"].Visible = false;
-            mainForm.MainRDGV.Columns["AcqMode"].Visible = false;
-            mainForm.MainRDGV.Columns["Type"].Visible = false;
-            mainForm.MainRDGV.Columns["SetKey"].Visible = false;
-            mainForm.MainRDGV.Columns["SampleKey"].Visible = false;
+            try
+            {
+                mainForm.MainRDGV.Columns["Id"].Visible = false;
+                mainForm.MainRDGV.Columns["IrradiationId"].Visible = false;
+                mainForm.MainRDGV.Columns["RegId"].Visible = false;
+                mainForm.MainRDGV.Columns["Assistant"].Visible = false;
+                mainForm.MainRDGV.Columns["AcqMode"].Visible = false;
+                mainForm.MainRDGV.Columns["Type"].Visible = false;
+                mainForm.MainRDGV.Columns["SetKey"].Visible = false;
+                mainForm.MainRDGV.Columns["SampleKey"].Visible = false;
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_HIDE_MRDGV_COLS)
+                {
+                    DetailedText = ex.ToString()
+                });
+            }
         }
 
         private void UpdateCurrentReigster()
         {
-            using (var r = new RegataContext())
+            try
             {
-                r.MeasurementsRegisters.Update(CurrentMeasurementsRegister);
-                r.SaveChanges();
+                using (var r = new RegataContext())
+                {
+                    r.MeasurementsRegisters.Update(CurrentMeasurementsRegister);
+                    r.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_UPD_CUR_MEAS_REG)
+                {
+                    DetailedText = ex.ToString()
+                });
             }
         }
 
         private void CreateNewMeasurementsRegister()
         {
-            using (var r = new RegataContext())
+            try
             {
-                r.MeasurementsRegisters.Add(CurrentMeasurementsRegister);
-                r.SaveChanges();
+                using (var r = new RegataContext())
+                {
+                    r.MeasurementsRegisters.Add(CurrentMeasurementsRegister);
+                    r.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_CRT_MEAS_REG)
+                {
+                    DetailedText = ex.ToString()
+                });
             }
         }
 
-    } //public partial class MainForm
+    } // public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements
