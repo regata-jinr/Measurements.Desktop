@@ -9,6 +9,9 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core;
+using RCM=Regata.Core.Messages;
+using System;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -18,6 +21,8 @@ namespace Regata.Desktop.WinForms.Measurements
     {
         private void AssignRecordsMainRDGV<T>(string prop, T val)
         {
+            try
+            { 
             foreach (var i in mainForm.MainRDGV.SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct())
             {
                 var m = _regataContext.Measurements.Where(m => m.Id == (int)mainForm.MainRDGV.Rows[i].Cells["Id"].Value).FirstOrDefault();
@@ -28,6 +33,11 @@ namespace Regata.Desktop.WinForms.Measurements
             }
             _regataContext.SaveChanges();
             mainForm.MainRDGV.Refresh();
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_ASSIGN_REC_TMPL) { DetailedText = ex.Message });
+            }
         }
 
     } // public partial class MainForm

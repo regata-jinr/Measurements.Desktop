@@ -9,18 +9,18 @@
  *                                                                         *
  ***************************************************************************/
 
+using Microsoft.EntityFrameworkCore;
 using Regata.Core;
-using Regata.Core.DataBase;
 using Regata.Core.Collections;
+using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
 using RCM = Regata.Core.Messages;
+using System;
 using System.Linq;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -63,10 +63,20 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void RemoveRecord(int id)
         {
-            var m = _regataContext.Measurements.Where(i => i.Id == id).FirstOrDefault();
+            try
+            {
+                var m = _regataContext.Measurements.Where(i => i.Id == id).FirstOrDefault();
             if (m == null) return;
             _regataContext.Measurements.Remove(m);
             _regataContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_REM_REC)
+                {
+                    DetailedText = ex.ToString()
+                });
+            }
         }
 
         private async Task AddRecordAsync(int id, CancellationToken _ct)
@@ -159,7 +169,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 _regataContext.Measurements.Where(m => m.Id == 0).Load();
                 mainForm.MainRDGV.DataSource = _regataContext.Measurements.Local.ToBindingList();
 
-                CurrentMeasurementsRegister.PropertyChanged += (s, e) => { UpdateCurrentReigster(); };
+                //CurrentMeasurementsRegister.PropertyChanged += (s, e) => { UpdateCurrentReigster(); };
 
                 HideMainRDGVRedundantColumns();
 
@@ -222,14 +232,23 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
-        private void UpdateCurrentReigster()
+        private async Task UpdateCurrentReigster()
         {
             try
             {
                 using (var r = new RegataContext())
                 {
+                   var ir  =  r.Irradiations.Where(ir => ir.Id == _regataContext.Measurements.Local.Select(m => m.IrradiationId).Min()).FirstOrDefault();
+                    CurrentMeasurementsRegister.IrradiationDate = ir.DateTimeStart.Value.Date;
+                    CurrentMeasurementsRegister.LoadNumber = ir.LoadNumber;
+                    CurrentMeasurementsRegister.DateTimeStart = _regataContext.Measurements.Local.Select(m => m.DateTimeStart).Min();
+                    CurrentMeasurementsRegister.DateTimeFinish = _regataContext.Measurements.Local.Select(m => m.DateTimeFinish).Max();
+                    CurrentMeasurementsRegister.SamplesCnt = _regataContext.Measurements.Local.Where(m => m.FileSpectra != null).Count();
+                    CurrentMeasurementsRegister.Detectors = string.Join(',', _regataContext.Measurements.Local.Select(m => m.Detector).Distinct().ToArray());
+                    //CurrentMeasurementsRegister.Assistant = _regataContext.Measurements.Local.Where(m => m.Assistant.HasValue).FirstOrDefault().Assistant;
+
                     r.MeasurementsRegisters.Update(CurrentMeasurementsRegister);
-                    r.SaveChanges();
+                    await r.SaveChangesAsync();
                 }
             }
             catch (Exception ex)

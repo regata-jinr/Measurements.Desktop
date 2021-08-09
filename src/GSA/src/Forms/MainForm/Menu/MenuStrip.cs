@@ -9,11 +9,11 @@
  *                                                                         *
  ***************************************************************************/
 
-using Regata.Core.Hardware;
+using Regata.Core;
+using Regata.Core.Messages;
 using Regata.Core.Settings;
 using Regata.Core.UI.WinForms;
-using Regata.Core.UI.WinForms.Items;
-
+using System;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -22,46 +22,49 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void InitMenuStrip()
         {
-            mainForm.LangItem.CheckedChanged += () => Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage = mainForm.LangItem.CheckedItem;
-            mainForm.LangItem.CheckItem(Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage);
-
-            AcquisitionModeItems.CheckItem(CanberraDeviceAccessLib.AcquisitionModes.aCountToRealTime);
-
-            AcquisitionModeItems.CheckedChanged += () => AssignRecordsMainRDGV("AcqMode", (int)AcquisitionModeItems.CheckedItem);
-
-
-            mainForm.MenuStrip.Items.Add(MeasurementsTypeItems.EnumMenuItem);
-            mainForm.MenuStrip.Items.Add(AcquisitionModeItems.EnumMenuItem);
-
-            MeasurementsTypeItems.CheckedChanged += async () =>
+            try
             {
-                mainForm.TabsPane[0, 0].DataSource = null;
-                mainForm.TabsPane[1, 0].DataSource = null;
-                mainForm.TabsPane[0, 1].DataSource = null;
-                mainForm.TabsPane[1, 1].DataSource = null;
+                mainForm.LangItem.CheckedChanged += () => Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage = mainForm.LangItem.CheckedItem;
+                mainForm.LangItem.CheckItem(Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage);
 
-                CurrentMeasurementsRegister.Type = (int)MeasurementsTypeItems.CheckedItem;
+                AcquisitionModeItems.CheckItem(CanberraDeviceAccessLib.AcquisitionModes.aCountToRealTime);
 
-                DurationControl.Duration = CurrentMeasurementsRegister.Type switch
+                AcquisitionModeItems.CheckedChanged += () => AssignRecordsMainRDGV("AcqMode", (int)AcquisitionModeItems.CheckedItem);
+
+
+                mainForm.MenuStrip.Items.Add(MeasurementsTypeItems.EnumMenuItem);
+                mainForm.MenuStrip.Items.Add(AcquisitionModeItems.EnumMenuItem);
+
+                MeasurementsTypeItems.CheckedChanged += async () =>
                 {
-                    0 => new System.TimeSpan(0, 0, 15, 0),
-                    1 => new System.TimeSpan(0, 2, 0, 0),
-                    2 => new System.TimeSpan(0, 2, 0, 0),
-                    _ => new System.TimeSpan(),
+                    mainForm.TabsPane[0, 0].DataSource = null;
+                    mainForm.TabsPane[1, 0].DataSource = null;
+                    mainForm.TabsPane[0, 1].DataSource = null;
+                    mainForm.TabsPane[1, 1].DataSource = null;
+
+                    CurrentMeasurementsRegister.Type = (int)MeasurementsTypeItems.CheckedItem;
+
+                    DurationControl.Duration = CurrentMeasurementsRegister.Type switch
+                    {
+                        0 => new System.TimeSpan(0, 0, 15, 0),
+                        1 => new System.TimeSpan(0, 2, 0, 0),
+                        2 => new System.TimeSpan(0, 2, 0, 0),
+                        _ => new System.TimeSpan(),
+                    };
+
+                    ClearCurrentRegister();
+
+                    await FillIrradiationRegisters();
+                    await FillMeasurementsRegisters();
+
+                    Labels.SetControlsLabels(mainForm);
+
                 };
-
-                #region Filling list of registers
-
-                await FillIrradiationRegisters();
-                await FillMeasurementsRegisters();
-
-                #endregion
-
-                Labels.SetControlsLabels(mainForm);
-
-            };
-
-
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new Message(Codes.ERR_UI_WF_INI_MENU) { DetailedText = string.Join("--", ex.Message, ex?.InnerException?.Message) });
+            }
         }
 
     } //public partial class MainForm

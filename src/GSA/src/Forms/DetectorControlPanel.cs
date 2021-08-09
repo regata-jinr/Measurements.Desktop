@@ -26,25 +26,30 @@ namespace Regata.Desktop.WinForms.Measurements
         //TODO: deny decrease preset number below then elapsed time
         private CircleArray<Detector> _dets;
 
-
         public DetectorControlPanel(IEnumerable<Detector> dets)
         {
-            InitializeComponent();
-            _dets = new CircleArray<Detector>(dets);
+            try
+            {
+                InitializeComponent();
+                _dets = new CircleArray<Detector>(dets);
 
-            foreach (var d in dets)
-                d.StatusChanged += DetStatusChangedHandler;
+                foreach (var d in dets)
+                    d.StatusChanged += DetStatusChangedHandler;
 
-            DesktopLocation = new Point(Screen.PrimaryScreen.Bounds.Left + 10, Screen.PrimaryScreen.Bounds.Bottom - Size.Height - 50);
+                DesktopLocation = new Point(Screen.PrimaryScreen.Bounds.Left + 10, Screen.PrimaryScreen.Bounds.Bottom - Size.Height - 50);
 
-            DCPNumericUpDownPresetHours.ValueChanged   += ChangePresetTimeHandler;
-            DCPNumericUpDownPresetMinutes.ValueChanged += ChangePresetTimeHandler;
-            DCPNumericUpDownPresetSeconds.ValueChanged += ChangePresetTimeHandler;
+                DCPNumericUpDownPresetHours.ValueChanged += ChangePresetTimeHandler;
+                DCPNumericUpDownPresetMinutes.ValueChanged += ChangePresetTimeHandler;
+                DCPNumericUpDownPresetSeconds.ValueChanged += ChangePresetTimeHandler;
 
-            Disposed += DetectorControlPanel_Disposed;
+                Disposed += DetectorControlPanel_Disposed;
 
-            Load += DetectorControlPanel_Load;
-
+                Load += DetectorControlPanel_Load;
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_DCP_CTOR_UNREG) { DetailedText = ex.ToString() });
+            }
 
         }
 
@@ -58,7 +63,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 await Detector.CloseMvcgAsync();
         }
 
-        private uint PresetSeconds => _dets.Current.PresetRealTime;
+        private uint PresetSeconds => (uint)_dets.Current.Counts;
         private uint ElapsedSecond => (uint)_dets.Current.ElapsedRealTime;
         private uint LeftSeconds => PresetSeconds - ElapsedSecond;
 
@@ -111,7 +116,7 @@ namespace Regata.Desktop.WinForms.Measurements
                     DCPNumericUpDownElapsedMinutes?.Invoke(new Action(() => { DCPNumericUpDownElapsedMinutes.Value = time.Minutes; }));
                     DCPNumericUpDownElapsedSeconds?.Invoke(new Action(() => { DCPNumericUpDownElapsedSeconds.Value = time.Seconds; }));
 
-                    DCPLabelDeadTimeValue?.Invoke(new Action(() => { DCPLabelDeadTimeValue.Text = $"{_dets.Current.DeadTime.ToString()}%"; }));
+                    DCPLabelDeadTimeValue?.Invoke(new Action(() => { DCPLabelDeadTimeValue.Text = $"{_dets.Current.DeadTime}%"; }));
 
                 }
             }
@@ -260,7 +265,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 var time = new TimeSpan((int)DCPNumericUpDownPresetHours.Value, (int)DCPNumericUpDownPresetMinutes.Value, (int)DCPNumericUpDownPresetSeconds.Value);
 
-                _dets.Current.PresetRealTime = (uint)time.TotalSeconds;
+                _dets.Current.Counts = (int)time.TotalSeconds;
 
                 if (LeftSeconds < 0)
                 {

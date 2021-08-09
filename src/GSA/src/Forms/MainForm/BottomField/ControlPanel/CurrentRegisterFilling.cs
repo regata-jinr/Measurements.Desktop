@@ -9,16 +9,11 @@
  *                                                                         *
  ***************************************************************************/
 
-using System.Windows.Forms;
-using System;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Linq;
-using Regata.Core.DataBase.Models;
-using Regata.Core.DataBase;
 using Regata.Core.UI.WinForms.Controls;
-using Regata.Core.UI.WinForms.Items;
-
+using System;
+using System.Linq;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace Regata.Desktop.WinForms.Measurements
 {

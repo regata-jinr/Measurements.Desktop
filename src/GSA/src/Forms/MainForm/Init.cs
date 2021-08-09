@@ -9,6 +9,7 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core;
 using Regata.Core.Collections;
 using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
@@ -32,7 +33,6 @@ namespace Regata.Desktop.WinForms.Measurements
         private EnumItem<MeasurementsType> MeasurementsTypeItems;
         private EnumItem<CanberraDeviceAccessLib.AcquisitionModes> AcquisitionModeItems;
 
-
         public MainForm()
         {
             Settings<MeasurementsSettings>.AssemblyName = "Measurements.Desktop";
@@ -46,6 +46,10 @@ namespace Regata.Desktop.WinForms.Measurements
             _chosenMeasurements = new List<Measurement>();
 
             Settings<MeasurementsSettings>.CurrentSettings.LanguageChanged += () => Labels.SetControlsLabels(mainForm);
+            
+            // Call event only for warnings and errors
+            GlobalSettings.Verbosity = Status.Warning;
+            Report.NotificationEvent += Report_NotificationEvent;
 
             InitMenuStrip();
             InitStatusStrip();
@@ -60,6 +64,11 @@ namespace Regata.Desktop.WinForms.Measurements
             Labels.SetControlsLabels(mainForm);
 
             mainForm.Load += MainForm_Load;
+        }
+
+        private void Report_NotificationEvent(Core.Messages.Message msg)
+        {
+            PopUpMessage.Show(msg);
         }
 
         private bool _isDisposed;
@@ -126,13 +135,11 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private async Task BackGroundTask()
         {
-
             while (true)
             {
                 await Task.Delay(TimeSpan.FromSeconds(60));
                 await FillSelectedIrradiations();
             }
-            
         }
 
 

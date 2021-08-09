@@ -9,14 +9,9 @@
  *                                                                         *
  ***************************************************************************/
 
-using Regata.Core.UI.WinForms.Forms;
-using Regata.Core.UI.WinForms;
-using Regata.Core.UI.WinForms.Items;
-using Regata.Core.DataBase;
-using Regata.Core.DataBase.Models;
-using Regata.Core.Settings;
-using System.Linq;
-
+using Regata.Core;
+using Regata.Core.Messages;
+using System;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -24,8 +19,15 @@ namespace Regata.Desktop.WinForms.Measurements
     {
         private void InitStatusStrip()
         {
-            mainForm.StatusStrip.Items.Add(MeasurementsTypeItems.EnumStatusLabel);
-            mainForm.StatusStrip.Items.Add(AcquisitionModeItems.EnumStatusLabel);
+            try
+            {
+                mainForm.StatusStrip.Items.Add(MeasurementsTypeItems.EnumStatusLabel);
+                mainForm.StatusStrip.Items.Add(AcquisitionModeItems.EnumStatusLabel);
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new Message(Codes.ERR_UI_WF_INI_STAT) { DetailedText = ex.ToString() });
+            }
         }
     } //public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements

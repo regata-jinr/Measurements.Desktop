@@ -71,12 +71,14 @@ namespace Regata.Desktop.WinForms.Measurements
                 {
                     mainForm.TabsPane[1, 0].DataSource = await r.MeasurementsRegisters
                                                     .AsNoTracking()
-                                                    .Where(m => m.Type == (int)MeasurementsTypeItems.CheckedItem)
+                                                    .Where(m => m.Type == (int)MeasurementsTypeItems.CheckedItem && m.DateTimeStart.HasValue)
                                                     .Select(m => new { m.Id, m.LoadNumber, m.IrradiationDate })
                                                     .Distinct()
                                                     .OrderByDescending(m => m.Id)
                                                     .Take(mainForm.TabsPane[1, 0].RowCount + 20)
                                                     .ToArrayAsync();
+                    
+
                 }
 
 

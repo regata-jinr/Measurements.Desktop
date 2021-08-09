@@ -59,7 +59,7 @@ namespace Regata.Desktop.WinForms.Measurements
             // FIXME: regataContext.Measurements.Local inversed
             return _regataContext.Measurements.Local.Where(m => m.Detector == detName &&
                                                                 string.IsNullOrEmpty(m.FileSpectra) &&
-                                                                m.DateTimeFinish.HasValue
+                                                                !m.DateTimeFinish.HasValue
                                                           )
                                                     .LastOrDefault();
         }
@@ -74,9 +74,11 @@ namespace Regata.Desktop.WinForms.Measurements
 
         }
 
-        private void Det_AcquireStart(Detector det)
+        private async void Det_AcquireStart(Detector det)
         {
             ColorizeRDGVRow(det.CurrentMeasurement, Color.LightYellow);
+            if (_dcp != null)
+                await _dcp.SourcesInitialize();
         }
 
         private async void Det_AcquireDone(Detector det)
@@ -84,7 +86,7 @@ namespace Regata.Desktop.WinForms.Measurements
             try
             {
                 // FIXME: A random AcquireDone generated events?
-                if (Math.Abs(det.ElapsedRealTime - det.PresetRealTime) > 3) return;
+                if (Math.Abs(det.ElapsedRealTime - det.Counts) > 3) return;
 
                 det.CurrentMeasurement.FileSpectra = await Detector.GenerateSpectraFileNameFromDBAsync(det.Name, det.CurrentMeasurement.Type);
                 det.CurrentMeasurement.DeadTime = det.DeadTime;
@@ -93,6 +95,8 @@ namespace Regata.Desktop.WinForms.Measurements
                 mainForm.ProgressBar.Value++;
                 _regataContext.Measurements.Update(det.CurrentMeasurement);
                 _regataContext.SaveChanges();
+
+                await UpdateCurrentReigster();
 
                 ColorizeRDGVRow(det.CurrentMeasurement, Color.LightGreen);
 

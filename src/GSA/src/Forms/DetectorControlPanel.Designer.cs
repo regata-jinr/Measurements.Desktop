@@ -498,9 +498,9 @@ namespace Regata.Desktop.WinForms.Measurements
         private System.Windows.Forms.Label DCPLabelCurrentSrcName;
         private System.Windows.Forms.ComboBox DCPComboBoxHeight;
         private System.Windows.Forms.Label DCPLabelHeight;
-        private System.Windows.Forms.Label DCPLabelCurrentSumpleOnCurrentSrc;
-        private System.Windows.Forms.Label DCPLabelCurrentSumpleOnNextSrc;
-        private System.Windows.Forms.Label DCPLabelCurrentSumpleOnPrevSrc;
+        public  System.Windows.Forms.Label DCPLabelCurrentSumpleOnCurrentSrc;
+        public  System.Windows.Forms.Label DCPLabelCurrentSumpleOnNextSrc;
+        public  System.Windows.Forms.Label DCPLabelCurrentSumpleOnPrevSrc;
         private System.Windows.Forms.Button DCPButtonStop;
         private System.Windows.Forms.NumericUpDown DCPNumericUpDownElapsedHours;
         private System.Windows.Forms.NumericUpDown DCPNumericUpDownElapsedMinutes;
