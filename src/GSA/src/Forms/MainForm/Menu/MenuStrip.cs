@@ -46,10 +46,10 @@ namespace Regata.Desktop.WinForms.Measurements
 
                     DurationControl.Duration = CurrentMeasurementsRegister.Type switch
                     {
-                        0 => new System.TimeSpan(0, 0, 15, 0),
-                        1 => new System.TimeSpan(0, 2, 0, 0),
-                        2 => new System.TimeSpan(0, 2, 0, 0),
-                        _ => new System.TimeSpan(),
+                        0 => TimeSpan.FromSeconds(Settings<MeasurementsSettings>.CurrentSettings.DefaultSLITime),
+                        1 => TimeSpan.FromSeconds(Settings<MeasurementsSettings>.CurrentSettings.DefaultLLI1Time),
+                        2 => TimeSpan.FromSeconds(Settings<MeasurementsSettings>.CurrentSettings.DefaultLLI2Time),
+                        _ => TimeSpan.FromSeconds(0),
                     };
 
                     ClearCurrentRegister();

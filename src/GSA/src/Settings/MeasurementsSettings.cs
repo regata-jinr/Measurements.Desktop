@@ -13,8 +13,14 @@ using Regata.Core.Settings;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
-    class MeasurementsSettings : ASettings
+    public class MeasurementsSettings : ASettings
     {
+        public int DefaultSLITime { get; set; } = 900;
+        public int DefaultLLI1Time { get; set; } = 7200;
+        public int DefaultLLI2Time { get; set; }  = 7200;
+        public int BackgroundRegistersUpdateTime { get; set; } = 60;
+        public int DefaultPopUpMessageTimeout { get; set; } = 5;
+
 
     } // class MeasurementsSettings : ASettings
 }     // namespace Regata.Desktop.WinForms.Measurements

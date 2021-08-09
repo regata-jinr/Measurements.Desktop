@@ -91,8 +91,9 @@ namespace Regata.Desktop.WinForms.Measurements
                 DCPNumericUpDownElapsedMinutes.Value = timeLeft.Minutes;
                 DCPNumericUpDownElapsedSeconds.Value = timeLeft.Seconds;
                 DCPLabelDeadTimeValue.Text = $"{_dets.Current.DeadTime.ToString("f2")}%";
-
-                DCPComboBoxHeight.SelectedItem = _dets.Current.CurrentMeasurement.Height.Value;
+                
+                if (_dets.Current.CurrentMeasurement.Height.HasValue)
+                    DCPComboBoxHeight.SelectedItem = _dets.Current.CurrentMeasurement.Height.Value;
 
                 await Task.Run(() => RefreshTime());
             }

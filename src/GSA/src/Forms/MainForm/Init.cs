@@ -20,6 +20,7 @@ using Regata.Core.UI.WinForms.Forms;
 using Regata.Core.UI.WinForms.Items;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,20 +36,21 @@ namespace Regata.Desktop.WinForms.Measurements
 
         public MainForm()
         {
-            Settings<MeasurementsSettings>.AssemblyName = "Measurements.Desktop";
 
             _regataContext = new RegataContext();
             mainForm = new RegisterForm<Measurement>() { Name = "GSAMainForm", Text = "GSAMainForm" };
+
+            mainForm.Icon = new Icon("MeasurementsLogoCircle.ico");
             CurrentMeasurementsRegister = new MeasurementsRegister() { Type = -1, Id = 0 };
             MeasurementsTypeItems = new EnumItem<MeasurementsType>();
             AcquisitionModeItems = new EnumItem<CanberraDeviceAccessLib.AcquisitionModes>();
             _chosenIrradiations = new List<Irradiation>();
             _chosenMeasurements = new List<Measurement>();
 
-            Settings<MeasurementsSettings>.CurrentSettings.LanguageChanged += () => Labels.SetControlsLabels(mainForm);
-            
+            Settings<MeasurementsSettings>.CurrentSettings.PropertyChanged += (s,e) => Labels.SetControlsLabels(mainForm);
+
             // Call event only for warnings and errors
-            GlobalSettings.Verbosity = Status.Warning;
+            Settings<MeasurementsSettings>.CurrentSettings.Verbosity = Status.Warning;
             Report.NotificationEvent += Report_NotificationEvent;
 
             InitMenuStrip();
@@ -64,11 +66,13 @@ namespace Regata.Desktop.WinForms.Measurements
             Labels.SetControlsLabels(mainForm);
 
             mainForm.Load += MainForm_Load;
+
+            Settings<MeasurementsSettings>.Save();
         }
 
         private void Report_NotificationEvent(Core.Messages.Message msg)
         {
-            PopUpMessage.Show(msg);
+            PopUpMessage.Show(msg, Settings<MeasurementsSettings>.CurrentSettings.DefaultPopUpMessageTimeout);
         }
 
         private bool _isDisposed;
@@ -137,7 +141,7 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             while (true)
             {
-                await Task.Delay(TimeSpan.FromSeconds(60));
+                await Task.Delay(TimeSpan.FromSeconds(Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTime));
                 await FillSelectedIrradiations();
             }
         }

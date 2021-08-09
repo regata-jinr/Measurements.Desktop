@@ -103,7 +103,6 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 await RemoveSelectedRecordsAsync(_cancToken.Token);
 
-                //mainForm.MainRDGV.ClearSelection();
             }
             catch (OperationCanceledException)
             {

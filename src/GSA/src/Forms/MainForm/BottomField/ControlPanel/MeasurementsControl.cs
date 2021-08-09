@@ -154,10 +154,10 @@ namespace Regata.Desktop.WinForms.Measurements
             if (!_regataContext.Measurements.Local.Any()) return;
 
             buttonStart.Enabled = false;
-            //mainForm.ProgressBar.Value = 0;
+            mainForm.ProgressBar.Value = _regataContext.Measurements.Local.Where(m => !string.IsNullOrEmpty(m.FileSpectra)).Count();
             mainForm.ProgressBar.Maximum = mainForm.MainRDGV.RowCount;
 
-            if (_detectors == null)
+            if (_detectors == null || _detectors.Count == 0)
                 await InitializeDetectors();
 
 
@@ -166,7 +166,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 MStart(d);
             }
 
-            if (_dcp == null)
+            if (_dcp == null || _dcp.IsDisposed)
             {
                 _dcp = new DetectorControlPanel(_detectors);
                 _dcp.Show();

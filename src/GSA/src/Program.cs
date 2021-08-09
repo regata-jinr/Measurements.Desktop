@@ -9,6 +9,7 @@
  *                                                                         *
  ***************************************************************************/
 
+using Regata.Core.Settings;
 using System;
 using System.Windows.Forms;
 
@@ -19,6 +20,8 @@ namespace Regata.Desktop.WinForms.Measurements
         [STAThread]
         static void Main()
         {
+            Settings<MeasurementsSettings>.AssemblyName = "Measurements.Desktop";
+
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

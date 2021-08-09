@@ -6,19 +6,29 @@
     <UseWindowsForms>true</UseWindowsForms>
     <StartupObject>Regata.Desktop.WinForms.Measurements.Program</StartupObject>
 	<PlatformTarget>x86</PlatformTarget>
-    <Version>0.8.1</Version>
+    <Version>0.9.1</Version>
+    <ApplicationIcon>MeasurementsLogoCircle.ico</ApplicationIcon>
+    <Win32Resource />
+    <Company>FLNP | JINR</Company>
+    <Authors>Boris Rumyantsev</Authors>
+    <Product>Gamma Spectroscopy Automatisation</Product>
+    <PackageProjectUrl>https://github.com/regata-jinr/Measurements.Desktop</PackageProjectUrl>
+    <PackageIcon>MeasurementsLogoCircle_0.2.png</PackageIcon>
+    <PackageIconUrl />
+    <RepositoryUrl>https://github.com/regata-jinr/Measurements.Desktop</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="src\Classes\**" />
-    <Compile Remove="src\Managers\AppManager\**" />
     <Compile Remove="src\Session\**" />
     <EmbeddedResource Remove="src\Classes\**" />
-    <EmbeddedResource Remove="src\Managers\AppManager\**" />
     <EmbeddedResource Remove="src\Session\**" />
     <None Remove="src\Classes\**" />
-    <None Remove="src\Managers\AppManager\**" />
     <None Remove="src\Session\**" />
+    <None Include="..\..\..\..\..\..\..\logos\apps\Measurements\MeasurementsLogoCircle_0.2.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -67,7 +77,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="src\Settings\" />
+    <None Update="MeasurementsLogoCircle.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 
