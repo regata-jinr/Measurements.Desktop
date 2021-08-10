@@ -94,65 +94,7 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
-        private async void ButtonRemoveSelectedSamples_ClickAsync(object sender, EventArgs e)
-        {
-            try
-            {
-                buttonRemoveSelectedSamples.Enabled = false;
-                _cancToken = new CancellationTokenSource();
-
-                await RemoveSelectedRecordsAsync(_cancToken.Token);
-
-            }
-            catch (OperationCanceledException)
-            {
-                throw new OperationCanceledException();
-            }
-            finally
-            {
-                _cancToken = null;
-                buttonRemoveSelectedSamples.Enabled = true;
-            }
-        }
-
-        private async void ButtonAddSelectedSamplesToReg_ClickAsync(object sender, EventArgs e)
-        {
-
-            try
-            {
-                buttonAddSelectedSamplesToReg.Enabled = false;
-
-                if (mainForm.TabsPane.SelectedRowsLastDGV.Count <= 0) return;
-
-                _cancToken = new CancellationTokenSource();
-
-                //var AddingTasks = mainForm.TabsPane.SelectedRowsLastDGV.OfType<DataGridViewRow>().Select(r => (int)r.Cells["Id"].Value).Select(r => AddRecordAsync(r, _cancToken.Token)).ToList();
-                //var AddingTasks = mainForm.TabsPane[0, 1].SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct().Select(c => AddRecordAsync((int)mainForm.TabsPane[0,1].Rows[c].Cells["Id"].Value, _cancToken.Token)).ToList();
-
-                ////await Task.WhenAll(AddingTasks).ConfigureAwait(false);
-                //while (AddingTasks.Any())
-                //{
-                //    var completedTask = await Task.WhenAny(AddingTasks).ConfigureAwait(false);
-                //    AddingTasks.Remove(completedTask);
-                //}
-
-
-                foreach (var i in mainForm.TabsPane[0, 1].SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct())
-                    await AddRecordAsync((int)mainForm.TabsPane[0, 1].Rows[i].Cells["Id"].Value, _cancToken.Token);
-
-
-            }
-            catch (OperationCanceledException)
-            {
-
-            }
-            finally
-            {
-                _cancToken = null;
-                buttonAddSelectedSamplesToReg.Enabled = true;
-            }
-
-        }
+     
 
         private void ButtonCancel_Click(object sender, EventArgs e)
         {

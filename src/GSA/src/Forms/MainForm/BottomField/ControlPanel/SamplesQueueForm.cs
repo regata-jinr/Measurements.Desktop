@@ -31,18 +31,18 @@ namespace Regata.Desktop.WinForms.Measurements
 
             try
             {
-                if (!_regataContext.Measurements.Local.Any())
+                if (!mainForm.MainRDGV.CurrentDbSet.Local.Any())
                     return null;
 
-                if (!_regataContext.Measurements.Local.Where(m => !string.IsNullOrEmpty(m.Detector)).Any())
+                if (!mainForm.MainRDGV.CurrentDbSet.Local.Where(m => !string.IsNullOrEmpty(m.Detector)).Any())
                     return null;
 
                 var _ctrs = new List<DataGridView>(8);
 
-                foreach (var d in _regataContext.Measurements.Local.Select(m => m.Detector).Distinct().OrderBy(d => d))
+                foreach (var d in mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.Detector).Distinct().OrderBy(d => d))
                 {
                     if (string.IsNullOrEmpty(d)) continue;
-                    _ctrs.Add(GenerateDataGridView(_regataContext.Measurements.Local.Where(m => m.Detector == d).ToArray(), d));
+                    _ctrs.Add(GenerateDataGridView(mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.Detector == d).ToArray(), d));
                 }
 
                 f.Controls.Add(new ControlsGroupBox(_ctrs.ToArray(), false));

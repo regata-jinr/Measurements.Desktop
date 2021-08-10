@@ -10,6 +10,8 @@
  ***************************************************************************/
 
 using Regata.Core.Settings;
+using Regata.Core.UI.WinForms.Controls.Settings;
+using System.Collections.Generic;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
@@ -21,6 +23,11 @@ namespace Regata.Desktop.WinForms.Measurements
         public int BackgroundRegistersUpdateTime { get; set; } = 60;
         public int DefaultPopUpMessageTimeout { get; set; } = 5;
         public CanberraDeviceAccessLib.AcquisitionModes AcquisitionMode { get; set; } = CanberraDeviceAccessLib.AcquisitionModes.aCountToRealTime;
+
+        public RDataGridViewSettings MainTableSettings { get; set; } = new RDataGridViewSettings() 
+        { 
+            HidedColumns = new List<string>() { "Id", "IrradiationId", "RegId", "Assistant", "AcqMode", "Type", "SetKey", "SampleKey"} 
+        };
 
 
     } // class MeasurementsSettings : ASettings

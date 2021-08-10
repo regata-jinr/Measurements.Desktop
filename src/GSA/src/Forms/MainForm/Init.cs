@@ -30,7 +30,6 @@ namespace Regata.Desktop.WinForms.Measurements
     {
         public RegisterForm<Measurement> mainForm;
         private MeasurementsRegister CurrentMeasurementsRegister;
-        private RegataContext _regataContext;
         private EnumItem<MeasurementsType> MeasurementsTypeItems;
         private EnumItem<Status> VerbosityItems;
         private EnumItem<CanberraDeviceAccessLib.AcquisitionModes> AcquisitionModeItems;
@@ -38,7 +37,6 @@ namespace Regata.Desktop.WinForms.Measurements
         public MainForm()
         {
 
-            _regataContext = new RegataContext();
             mainForm = new RegisterForm<Measurement>() { Name = "GSAMainForm", Text = "GSAMainForm" };
 
             mainForm.Icon = new Icon("MeasurementsLogoCircle.ico");
@@ -50,6 +48,10 @@ namespace Regata.Desktop.WinForms.Measurements
             _chosenMeasurements = new List<Measurement>();
 
             Settings<MeasurementsSettings>.CurrentSettings.PropertyChanged += (s,e) => Labels.SetControlsLabels(mainForm);
+
+            Settings<MeasurementsSettings>.CurrentSettings.MainTableSettings = new MeasurementsSettings().MainTableSettings;
+
+            mainForm.MainRDGV.RDGV_Set = Settings<MeasurementsSettings>.CurrentSettings.MainTableSettings;
 
             // Call event only for warnings and errors
             Settings<MeasurementsSettings>.CurrentSettings.Verbosity = Status.Warning;
@@ -95,7 +97,6 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 // освободить управляемые ресурсы
                 mainForm.Dispose();
-                _regataContext.Dispose();
                 _dcp?.Dispose();
 
                 if (_detectors != null)

@@ -32,25 +32,29 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
-                var ir = _regataContext.Irradiations.Where(i => i.Id == IrradiationId).FirstOrDefault();
-                if (ir == null) return;
-
-                var m = new Measurement(ir);
-                m.AcqMode = (int)AcquisitionModeItems.CheckedItem;
-                m.RegId = CurrentMeasurementsRegister.Id;
-                m.Duration = (int)DurationControl.Duration.TotalSeconds;
-
-                m.Detector = MeasurementsTypeItems.CheckedItem switch
+                Measurement m = null;
+                using (var r = new RegataContext())
                 {
-                    MeasurementsType.sli => _circleDetArray?.Current,
-                    _ => CheckedAvailableDetectorArrayControl.SelectedItem
-                };
+                    var ir = r.Irradiations.Where(i => i.Id == IrradiationId).FirstOrDefault();
+                    if (ir == null) return;
 
-                _circleDetArray?.MoveForward();
+                    m = new Measurement(ir);
+                }
+                    m.AcqMode = (int)AcquisitionModeItems.CheckedItem;
+                    m.RegId = CurrentMeasurementsRegister.Id;
+                    m.Duration = (int)DurationControl.Duration.TotalSeconds;
 
-                m.Height = CheckedHeightArrayControl.SelectedItem;
-                _regataContext.Measurements.Add(m);
-                _regataContext.SaveChanges();
+                    m.Detector = MeasurementsTypeItems.CheckedItem switch
+                    {
+                        MeasurementsType.sli => _circleDetArray?.Current,
+                        _ => CheckedAvailableDetectorArrayControl.SelectedItem
+                    };
+
+                    _circleDetArray?.MoveForward();
+
+                    m.Height = CheckedHeightArrayControl.SelectedItem;
+                    mainForm.MainRDGV.CurrentDbSet.Add(m);
+                    mainForm.MainRDGV.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -65,10 +69,14 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
-                var m = _regataContext.Measurements.Where(i => i.Id == id).FirstOrDefault();
-            if (m == null) return;
-            _regataContext.Measurements.Remove(m);
-            _regataContext.SaveChanges();
+                var m = mainForm.MainRDGV.CurrentDbSet.Where(i => i.Id == id).FirstOrDefault();
+                if (m == null) return;
+
+                mainForm.MainRDGV.CurrentDbSet.Add(m);
+                mainForm.MainRDGV.SaveChanges();
+
+                //    mainForm.MainRDGV.CurrentDbSet.Remove(m);
+                //mainForm.MainRDGV.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -87,61 +95,8 @@ namespace Regata.Desktop.WinForms.Measurements
                 m.RegId = CurrentMeasurementsRegister.Id;
                 await rc.Measurements.AddAsync(m);
                 await rc.SaveChangesAsync(_ct);
-                _regataContext.Measurements.Where(mm => mm.RegId == CurrentMeasurementsRegister.Id).Load();
-            }
-        }
-
-        private async Task RemoveRecordAsync(int id, CancellationToken _ct)
-        {
-            throw new NotImplementedException("Here is the problem related with _regataContext call from different threads.");
-
-            try
-            {
-                var m = _regataContext.Measurements.Where(m => m.Id == id).FirstOrDefault();
-
-                if (m == null) return;
-
-                _regataContext.Measurements.Remove(m);
-                await _regataContext.SaveChangesAsync(_ct);
-            }
-            catch (Exception e)
-            {
-                var ee = e;
-            }
-        }
-
-        private async Task RemoveSelectedRecordsAsync(CancellationToken _ct)
-        {
-            try
-            {
-                if (mainForm.MainRDGV.SelectedCells.Count <= 0) return;
-                _cancToken = new CancellationTokenSource();
-
-                var RemovingTasks = mainForm.MainRDGV.SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct().Select(c => RemoveRecordAsync((int)mainForm.MainRDGV.Rows[c].Cells["Id"].Value, _cancToken.Token)).ToList();
-
-                while (RemovingTasks.Any())
-                {
-                    //await Task.Delay(TimeSpan.FromSeconds(5), _cancToken.Token);
-                    var completedTask = await Task.WhenAny(RemovingTasks);
-                    if (completedTask.IsCanceled) break;
-                    if (!completedTask.IsCompleted)
-                        completedTask.Start();
-                    if (!completedTask.IsFaulted)
-                        RemovingTasks.ToList().Remove(completedTask);
-                }
-
-                //mainForm.MainRDGV.ClearSelection();
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception e)
-            {
-                var ee = e;
-            }
-            finally
-            {
-                _cancToken = null;
+                //mainForm.MainRDGV.CurrentDbSet.Where(mm => mm.RegId == CurrentMeasurementsRegister.Id).Load();
+                mainForm.MainRDGV.CurrentDbSet.Where(mm => mm.RegId == CurrentMeasurementsRegister.Id).Load();
             }
         }
 
@@ -149,8 +104,9 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
-                _regataContext.Measurements.Local.Clear();
-                _regataContext.SaveChanges();
+                //mainForm.MainRDGV.CurrentDbSet.Local.Clear();
+                mainForm.MainRDGV.CurrentDbSet.Local.Clear();
+                mainForm.MainRDGV.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -166,12 +122,19 @@ namespace Regata.Desktop.WinForms.Measurements
             try
             {
                 CreateNewMeasurementsRegister();
-                _regataContext.Measurements.Where(m => m.Id == 0).Load();
-                mainForm.MainRDGV.DataSource = _regataContext.Measurements.Local.ToBindingList();
+                mainForm.MainRDGV.CurrentDbSet.Where(m => m.Id == 0).Load();
+                mainForm.MainRDGV.DataSource = mainForm.MainRDGV.CurrentDbSet.Local.ToBindingList();
+                //.DataSource = mainForm.MainRDGV.CurrentDbSet.Local.ToBindingList
+
+
+                //mainForm.MainRDGV.DataSource = mainForm.MainRDGV.CurrentDbSet.Local.ToBindingList();
+                //mainForm.MainRDGV.Data = mainForm.MainRDGV.CurrentDbSet.Local.ToBindingList();
 
                 //CurrentMeasurementsRegister.PropertyChanged += (s, e) => { UpdateCurrentReigster(); };
 
-                HideMainRDGVRedundantColumns();
+                //HideMainRDGVRedundantColumns();
+
+                mainForm.MainRDGV.HideColumns();
 
                 mainForm.Disposed += (s, e) =>
                 {
@@ -190,7 +153,6 @@ namespace Regata.Desktop.WinForms.Measurements
                                 r.SaveChanges();
                             }
                         }
-                        _regataContext.Dispose();
                     }
                     catch (Exception ex)
                     {
@@ -238,14 +200,14 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 using (var r = new RegataContext())
                 {
-                   var ir  =  r.Irradiations.Where(ir => ir.Id == _regataContext.Measurements.Local.Select(m => m.IrradiationId).Min()).FirstOrDefault();
+                   var ir  =  r.Irradiations.Where(ir => ir.Id == mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.IrradiationId).Min()).FirstOrDefault();
                     CurrentMeasurementsRegister.IrradiationDate = ir.DateTimeStart.Value.Date;
                     CurrentMeasurementsRegister.LoadNumber = ir.LoadNumber;
-                    CurrentMeasurementsRegister.DateTimeStart = _regataContext.Measurements.Local.Select(m => m.DateTimeStart).Min();
-                    CurrentMeasurementsRegister.DateTimeFinish = _regataContext.Measurements.Local.Select(m => m.DateTimeFinish).Max();
-                    CurrentMeasurementsRegister.SamplesCnt = _regataContext.Measurements.Local.Where(m => m.FileSpectra != null).Count();
-                    CurrentMeasurementsRegister.Detectors = string.Join(',', _regataContext.Measurements.Local.Select(m => m.Detector).Distinct().ToArray());
-                    //CurrentMeasurementsRegister.Assistant = _regataContext.Measurements.Local.Where(m => m.Assistant.HasValue).FirstOrDefault().Assistant;
+                    CurrentMeasurementsRegister.DateTimeStart = mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.DateTimeStart).Min();
+                    CurrentMeasurementsRegister.DateTimeFinish = mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.DateTimeFinish).Max();
+                    CurrentMeasurementsRegister.SamplesCnt = mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.FileSpectra != null).Count();
+                    CurrentMeasurementsRegister.Detectors = string.Join(',', mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.Detector).Distinct().ToArray());
+                    //CurrentMeasurementsRegister.Assistant = mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.Assistant.HasValue).FirstOrDefault().Assistant;
 
                     r.MeasurementsRegisters.Update(CurrentMeasurementsRegister);
                     await r.SaveChangesAsync();

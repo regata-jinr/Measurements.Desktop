@@ -10,6 +10,7 @@
  ***************************************************************************/
 
 using Regata.Core;
+using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
 using Regata.Core.Hardware;
 using RCM = Regata.Core.Messages;
@@ -151,10 +152,10 @@ namespace Regata.Desktop.WinForms.Measurements
             // TODO: check correcntess of measurements info
             // TODO: detectors availability
 
-            if (!_regataContext.Measurements.Local.Any()) return;
+            if (!mainForm.MainRDGV.CurrentDbSet.Local.Any()) return;
 
             buttonStart.Enabled = false;
-            mainForm.ProgressBar.Value = _regataContext.Measurements.Local.Where(m => !string.IsNullOrEmpty(m.FileSpectra)).Count();
+            mainForm.ProgressBar.Value = mainForm.MainRDGV.CurrentDbSet.Local.Where(m => !string.IsNullOrEmpty(m.FileSpectra)).Count();
             mainForm.ProgressBar.Maximum = mainForm.MainRDGV.RowCount;
 
             if (_detectors == null || _detectors.Count == 0)
@@ -180,10 +181,20 @@ namespace Regata.Desktop.WinForms.Measurements
                 var m = GetFirstNotMeasuredForDetector(d.Name);
                 if (m == null)
                 {
+                    Report.Notify(new RCM.Message(Codes.WARN_UI_WF_ACQ_START_ALL_MEAS));
                     return;
                 }
-                var i = _regataContext.Irradiations.Where(ir => ir.Id == m.IrradiationId).FirstOrDefault();
-                if (i == null) return;
+
+                Irradiation i = null;
+                using (var r = new RegataContext())
+                {
+                    i = r.Irradiations.Where(ir => ir.Id == m.IrradiationId).FirstOrDefault();
+                    if (i == null)
+                    {
+                        Report.Notify(new RCM.Message(Codes.ERR_UI_WF_ACQ_START_IRR_NF));
+                        return;
+                    }
+                }
 
                 d.LoadMeasurementInfoToDevice(m, i);
                 d.Start();

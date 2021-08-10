@@ -64,12 +64,12 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 foreach (var i in mainForm.MainRDGV.SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct())
                 {
-                    var m = _regataContext.Measurements.Where(m => m.Id == (int)mainForm.MainRDGV.Rows[i].Cells["Id"].Value).FirstOrDefault();
+                    var m = mainForm.MainRDGV.CurrentDbSet.Where(m => m.Id == (int)mainForm.MainRDGV.Rows[i].Cells["Id"].Value).FirstOrDefault();
                     if (m == null) continue;
                     m.Duration = (int)DurationControl.Duration.TotalSeconds;
-                    _regataContext.Update(m);
+                    mainForm.MainRDGV.CurrentDbSet.Update(m);
                 }
-                _regataContext.SaveChanges();
+                mainForm.MainRDGV.SaveChanges();
                 mainForm.MainRDGV.Refresh();
             }
             catch (Exception ex)

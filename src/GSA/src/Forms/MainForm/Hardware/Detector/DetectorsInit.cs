@@ -35,7 +35,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 _ = Task.Run(async () => { await Detector.RunMvcgAsync(); });
 
                 _detectors = new List<Detector>(8);
-                foreach (var d in _regataContext.Measurements.Local.Select(m => m.Detector).Distinct().OrderBy(n => n))
+                foreach (var d in mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.Detector).Distinct().OrderBy(n => n))
                 {
                     await Detector.ShowDetectorInMvcgAsync(d);
 
@@ -59,7 +59,7 @@ namespace Regata.Desktop.WinForms.Measurements
         private Measurement GetFirstNotMeasuredForDetector(string detName)
         {
             // FIXME: regataContext.Measurements.Local inversed
-            return _regataContext.Measurements.Local.Where(m => m.Detector == detName &&
+            return mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.Detector == detName &&
                                                                 string.IsNullOrEmpty(m.FileSpectra) &&
                                                                 !m.DateTimeFinish.HasValue
                                                           )
@@ -95,8 +95,8 @@ namespace Regata.Desktop.WinForms.Measurements
                 det.Save();
 
                 mainForm.ProgressBar.Value++;
-                _regataContext.Measurements.Update(det.CurrentMeasurement);
-                _regataContext.SaveChanges();
+                mainForm.MainRDGV.CurrentDbSet.Update(det.CurrentMeasurement);
+                mainForm.MainRDGV.SaveChanges();
 
                 await UpdateCurrentReigster();
 
@@ -119,7 +119,7 @@ namespace Regata.Desktop.WinForms.Measurements
             }
             finally
             {
-                if (!_regataContext.Measurements.Local.Where(m => m.FileSpectra == null).Any())
+                if (!mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.FileSpectra == null).Any())
                 {
                     buttonStart.Enabled = true;
                 }
