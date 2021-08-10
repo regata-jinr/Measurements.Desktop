@@ -26,7 +26,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
         public RDataGridViewSettings MainTableSettings { get; set; } = new RDataGridViewSettings() 
         { 
-            HidedColumns = new List<string>() { "Id", "IrradiationId", "RegId", "Assistant", "AcqMode", "Type", "SetKey", "SampleKey"} 
+            HidedColumns = new List<string>() { "Id", "IrradiationId", "RegId", "Assistant", "AcqMode", "Type", "SetKey", "SampleKey"},
+            WritableColumns = new List<string>() { "Note" }
         };
 
 

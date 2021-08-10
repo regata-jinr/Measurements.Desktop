@@ -107,6 +107,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 mainForm.MainRDGV.HideColumns();
 
+                mainForm.MainRDGV.SetUpWritableColumns();
+
                 mainForm.Disposed += (s, e) =>
                 {
                     try
