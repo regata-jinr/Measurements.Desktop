@@ -11,7 +11,6 @@
 
 using Regata.Core;
 using Regata.Core.Collections;
-using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
 using Regata.Core.Hardware;
 using Regata.Core.Settings;
@@ -36,6 +35,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
         public MainForm()
         {
+            Settings<MeasurementsSettings>.AssemblyName = "MeasurementsDesktop";
 
             mainForm = new RegisterForm<Measurement>() { Name = "GSAMainForm", Text = "GSAMainForm" };
 
@@ -49,7 +49,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
             Settings<MeasurementsSettings>.CurrentSettings.PropertyChanged += (s,e) => Labels.SetControlsLabels(mainForm);
 
-            Settings<MeasurementsSettings>.CurrentSettings.MainTableSettings = new MeasurementsSettings().MainTableSettings;
+            //Settings<MeasurementsSettings>.CurrentSettings.MainTableSettings = new MeasurementsSettings().MainTableSettings;
 
             mainForm.MainRDGV.RDGV_Set = Settings<MeasurementsSettings>.CurrentSettings.MainTableSettings;
 
@@ -57,6 +57,7 @@ namespace Regata.Desktop.WinForms.Measurements
             Settings<MeasurementsSettings>.CurrentSettings.Verbosity = Status.Warning;
             if (Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTime < 30)
                 Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTime = 30;
+
             Report.NotificationEvent += Report_NotificationEvent;
 
             InitMenuStrip();

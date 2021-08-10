@@ -17,9 +17,7 @@ using Regata.Core.DataBase.Models;
 using RCM = Regata.Core.Messages;
 using System;
 using System.Linq;
-using System.Windows.Forms;
 using System.Threading.Tasks;
-using System.Threading;
 using System.Collections.Generic;
 
 namespace Regata.Desktop.WinForms.Measurements
@@ -53,8 +51,7 @@ namespace Regata.Desktop.WinForms.Measurements
                     _circleDetArray?.MoveForward();
 
                     m.Height = CheckedHeightArrayControl.SelectedItem;
-                    mainForm.MainRDGV.CurrentDbSet.Add(m);
-                    mainForm.MainRDGV.SaveChanges();
+                    mainForm.MainRDGV.Add(m);
             }
             catch (Exception ex)
             {
@@ -72,11 +69,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 var m = mainForm.MainRDGV.CurrentDbSet.Where(i => i.Id == id).FirstOrDefault();
                 if (m == null) return;
 
-                mainForm.MainRDGV.CurrentDbSet.Add(m);
-                mainForm.MainRDGV.SaveChanges();
-
-                //    mainForm.MainRDGV.CurrentDbSet.Remove(m);
-                //mainForm.MainRDGV.SaveChanges();
+                mainForm.MainRDGV.Remove(m);
             }
             catch (Exception ex)
             {
@@ -87,25 +80,12 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
-        private async Task AddRecordAsync(int id, CancellationToken _ct)
-        {
-            using (var rc = new RegataContext())
-            {
-                var m = new Measurement(await rc.Irradiations.Where(i => i.Id == id).FirstOrDefaultAsync());
-                m.RegId = CurrentMeasurementsRegister.Id;
-                await rc.Measurements.AddAsync(m);
-                await rc.SaveChangesAsync(_ct);
-                //mainForm.MainRDGV.CurrentDbSet.Where(mm => mm.RegId == CurrentMeasurementsRegister.Id).Load();
-                mainForm.MainRDGV.CurrentDbSet.Where(mm => mm.RegId == CurrentMeasurementsRegister.Id).Load();
-            }
-        }
 
         private void ClearCurrentRegister()
         {
             try
             {
-                //mainForm.MainRDGV.CurrentDbSet.Local.Clear();
-                mainForm.MainRDGV.CurrentDbSet.Local.Clear();
+                mainForm.MainRDGV.Clear();
                 mainForm.MainRDGV.SaveChanges();
             }
             catch (Exception ex)
@@ -124,15 +104,6 @@ namespace Regata.Desktop.WinForms.Measurements
                 CreateNewMeasurementsRegister();
                 mainForm.MainRDGV.CurrentDbSet.Where(m => m.Id == 0).Load();
                 mainForm.MainRDGV.DataSource = mainForm.MainRDGV.CurrentDbSet.Local.ToBindingList();
-                //.DataSource = mainForm.MainRDGV.CurrentDbSet.Local.ToBindingList
-
-
-                //mainForm.MainRDGV.DataSource = mainForm.MainRDGV.CurrentDbSet.Local.ToBindingList();
-                //mainForm.MainRDGV.Data = mainForm.MainRDGV.CurrentDbSet.Local.ToBindingList();
-
-                //CurrentMeasurementsRegister.PropertyChanged += (s, e) => { UpdateCurrentReigster(); };
-
-                //HideMainRDGVRedundantColumns();
 
                 mainForm.MainRDGV.HideColumns();
 
@@ -172,27 +143,6 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
-        private void HideMainRDGVRedundantColumns()
-        {
-            try
-            {
-                mainForm.MainRDGV.Columns["Id"].Visible = false;
-                mainForm.MainRDGV.Columns["IrradiationId"].Visible = false;
-                mainForm.MainRDGV.Columns["RegId"].Visible = false;
-                mainForm.MainRDGV.Columns["Assistant"].Visible = false;
-                mainForm.MainRDGV.Columns["AcqMode"].Visible = false;
-                mainForm.MainRDGV.Columns["Type"].Visible = false;
-                mainForm.MainRDGV.Columns["SetKey"].Visible = false;
-                mainForm.MainRDGV.Columns["SampleKey"].Visible = false;
-            }
-            catch (Exception ex)
-            {
-                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_HIDE_MRDGV_COLS)
-                {
-                    DetailedText = ex.ToString()
-                });
-            }
-        }
 
         private async Task UpdateCurrentReigster()
         {
@@ -207,7 +157,7 @@ namespace Regata.Desktop.WinForms.Measurements
                     CurrentMeasurementsRegister.DateTimeFinish = mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.DateTimeFinish).Max();
                     CurrentMeasurementsRegister.SamplesCnt = mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.FileSpectra != null).Count();
                     CurrentMeasurementsRegister.Detectors = string.Join(',', mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.Detector).Distinct().ToArray());
-                    //CurrentMeasurementsRegister.Assistant = mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.Assistant.HasValue).FirstOrDefault().Assistant;
+                    // CurrentMeasurementsRegister.Assistant = mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.Assistant.HasValue).FirstOrDefault().Assistant;
 
                     r.MeasurementsRegisters.Update(CurrentMeasurementsRegister);
                     await r.SaveChangesAsync();

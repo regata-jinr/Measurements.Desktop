@@ -60,6 +60,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 AddRecord(cellId);
             }
+            mainForm.MainRDGV.SaveChanges();
+
         }
 
         private void ButtonClearRegister_Click(object sender, EventArgs e)
@@ -72,6 +74,8 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             foreach (var i in mainForm.MainRDGV.SelectedCells.OfType<DataGridViewCell>().Select(c => c.RowIndex).Where(c => c >= 0).Distinct())
                 RemoveRecord((int)mainForm.MainRDGV.Rows[i].Cells["Id"].Value);
+
+            mainForm.MainRDGV.SaveChanges();
         }
 
         private void ButtonAddSelectedSamplesToReg_Click(object sender, EventArgs e)
@@ -92,9 +96,10 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 AddRecord(cellId);
             }
+            mainForm.MainRDGV.SaveChanges();
         }
 
-     
+
 
         private void ButtonCancel_Click(object sender, EventArgs e)
         {

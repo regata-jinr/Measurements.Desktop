@@ -95,7 +95,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 det.Save();
 
                 mainForm.ProgressBar.Value++;
-                mainForm.MainRDGV.CurrentDbSet.Update(det.CurrentMeasurement);
+                mainForm.MainRDGV.Update(det.CurrentMeasurement);
                 mainForm.MainRDGV.SaveChanges();
 
                 await UpdateCurrentReigster();

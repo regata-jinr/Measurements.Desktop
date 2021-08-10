@@ -68,7 +68,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 FunctionalLayoutPanel.Controls.Add(controlsMeasControl, 2, 0);
 
-                CheckedAvailableDetectorArrayControl.SelectionChanged += () => AssignRecordsMainRDGV("Detector", CheckedAvailableDetectorArrayControl.SelectedItem);
+                CheckedAvailableDetectorArrayControl.SelectionChanged += () => mainForm.MainRDGV.FillDbSetValues("Detector", CheckedAvailableDetectorArrayControl.SelectedItem);
             }
             catch (Exception ex)
             {

@@ -38,7 +38,7 @@ namespace Regata.Desktop.WinForms.Measurements
                         CanberraDeviceAccessLib.AcquisitionModes.aCountToLiveTime => CanberraDeviceAccessLib.AcquisitionModes.aCountToLiveTime,
                         _ => CanberraDeviceAccessLib.AcquisitionModes.aCountToRealTime
                     };
-                    AssignRecordsMainRDGV("AcqMode", (int)currentMode);
+                    mainForm.MainRDGV.FillDbSetValues("AcqMode", (int)currentMode);
                     Settings<MeasurementsSettings>.CurrentSettings.AcquisitionMode = currentMode;
                     AcquisitionModeItems.CheckItem(currentMode);
                     Labels.SetControlsLabels(mainForm);
