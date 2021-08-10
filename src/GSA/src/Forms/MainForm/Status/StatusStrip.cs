@@ -23,6 +23,7 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 mainForm.StatusStrip.Items.Add(MeasurementsTypeItems.EnumStatusLabel);
                 mainForm.StatusStrip.Items.Add(AcquisitionModeItems.EnumStatusLabel);
+                mainForm.StatusStrip.Items.Add(VerbosityItems.EnumStatusLabel);
             }
             catch (Exception ex)
             {

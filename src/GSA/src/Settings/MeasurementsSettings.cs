@@ -20,6 +20,7 @@ namespace Regata.Desktop.WinForms.Measurements
         public int DefaultLLI2Time { get; set; }  = 7200;
         public int BackgroundRegistersUpdateTime { get; set; } = 60;
         public int DefaultPopUpMessageTimeout { get; set; } = 5;
+        public CanberraDeviceAccessLib.AcquisitionModes AcquisitionMode { get; set; } = CanberraDeviceAccessLib.AcquisitionModes.aCountToRealTime;
 
 
     } // class MeasurementsSettings : ASettings

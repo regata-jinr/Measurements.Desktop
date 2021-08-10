@@ -27,13 +27,35 @@ namespace Regata.Desktop.WinForms.Measurements
                 mainForm.LangItem.CheckedChanged += () => Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage = mainForm.LangItem.CheckedItem;
                 mainForm.LangItem.CheckItem(Settings<MeasurementsSettings>.CurrentSettings.CurrentLanguage);
 
-                AcquisitionModeItems.CheckItem(CanberraDeviceAccessLib.AcquisitionModes.aCountToRealTime);
+                AcquisitionModeItems.CheckItem(Settings<MeasurementsSettings>.CurrentSettings.AcquisitionMode);
 
-                AcquisitionModeItems.CheckedChanged += () => AssignRecordsMainRDGV("AcqMode", (int)AcquisitionModeItems.CheckedItem);
+                // NOTE: now we can use only two modes aCountToLiveTime or aCountToRealTime
+
+                AcquisitionModeItems.CheckedChanged += () => 
+                {
+                    var currentMode = AcquisitionModeItems.CheckedItem switch
+                    {
+                        CanberraDeviceAccessLib.AcquisitionModes.aCountToLiveTime => CanberraDeviceAccessLib.AcquisitionModes.aCountToLiveTime,
+                        _ => CanberraDeviceAccessLib.AcquisitionModes.aCountToRealTime
+                    };
+                    AssignRecordsMainRDGV("AcqMode", (int)currentMode);
+                    Settings<MeasurementsSettings>.CurrentSettings.AcquisitionMode = currentMode;
+                    AcquisitionModeItems.CheckItem(currentMode);
+                    Labels.SetControlsLabels(mainForm);
+                };
+
+                VerbosityItems.CheckItem(Settings<MeasurementsSettings>.CurrentSettings.Verbosity);
+
+                VerbosityItems.CheckedChanged += () =>
+                {
+                    Settings<MeasurementsSettings>.CurrentSettings.Verbosity = VerbosityItems.CheckedItem;
+                    Labels.SetControlsLabels(mainForm);
+                };
 
 
                 mainForm.MenuStrip.Items.Add(MeasurementsTypeItems.EnumMenuItem);
                 mainForm.MenuStrip.Items.Add(AcquisitionModeItems.EnumMenuItem);
+                mainForm.MenuStrip.Items.Add(VerbosityItems.EnumMenuItem);
 
                 MeasurementsTypeItems.CheckedChanged += async () =>
                 {

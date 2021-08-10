@@ -32,6 +32,7 @@ namespace Regata.Desktop.WinForms.Measurements
         private MeasurementsRegister CurrentMeasurementsRegister;
         private RegataContext _regataContext;
         private EnumItem<MeasurementsType> MeasurementsTypeItems;
+        private EnumItem<Status> VerbosityItems;
         private EnumItem<CanberraDeviceAccessLib.AcquisitionModes> AcquisitionModeItems;
 
         public MainForm()
@@ -43,6 +44,7 @@ namespace Regata.Desktop.WinForms.Measurements
             mainForm.Icon = new Icon("MeasurementsLogoCircle.ico");
             CurrentMeasurementsRegister = new MeasurementsRegister() { Type = -1, Id = 0 };
             MeasurementsTypeItems = new EnumItem<MeasurementsType>();
+            VerbosityItems = new EnumItem<Status>();
             AcquisitionModeItems = new EnumItem<CanberraDeviceAccessLib.AcquisitionModes>();
             _chosenIrradiations = new List<Irradiation>();
             _chosenMeasurements = new List<Measurement>();
@@ -51,6 +53,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
             // Call event only for warnings and errors
             Settings<MeasurementsSettings>.CurrentSettings.Verbosity = Status.Warning;
+            if (Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTime < 30)
+                Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTime = 30;
             Report.NotificationEvent += Report_NotificationEvent;
 
             InitMenuStrip();
@@ -111,6 +115,8 @@ namespace Regata.Desktop.WinForms.Measurements
             // очистить неуправляемые ресурсы
 
             _isDisposed = true;
+            Settings<MeasurementsSettings>.Save();
+
         }
 
         public void Dispose()
