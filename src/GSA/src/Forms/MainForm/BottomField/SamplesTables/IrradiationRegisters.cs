@@ -74,11 +74,18 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
+                var type = MeasurementsTypeItems.CheckedItem switch
+                    {
+                        MeasurementsType.sli => 0,
+                        MeasurementsType.bckg => 3,
+                        _ => 1
+                    };
+
                 using (var r = new RegataContext())
                 {
                     mainForm.TabsPane[0, 0].DataSource = await r.Irradiations
                                                     .AsNoTracking()
-                                                    .Where(ir => ir.Type == (int)MeasurementsTypeItems.CheckedItem && ir.DateTimeStart != null)
+                                                    .Where(ir => ir.Type == type && ir.DateTimeStart != null)
                                                     .Select(ir => new { ir.LoadNumber, ir.DateTimeStart.Value.Date })
                                                     .Distinct()
                                                     .OrderByDescending(i => i.Date)
@@ -113,25 +120,33 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 CurrentMeasurementsRegister.IrradiationDate = date.Value;
 
+                var type = MeasurementsTypeItems.CheckedItem switch
+                {
+                    MeasurementsType.sli => 0,
+                    MeasurementsType.bckg => 3,
+                    _ => 1
+                };
+
                 using (var r = new RegataContext())
                 {
                     var query = r.Irradiations.AsNoTracking()
                                               .Where(
                                                     ir =>
-                                                          ir.Type == (int)MeasurementsTypeItems.CheckedItem &&
+                                                          ir.Type == type &&
                                                           ir.DateTimeStart != null &&
                                                           ir.DateTimeStart.Value.Date == date
                                                      );
 
                     var _tmpList = MeasurementsTypeItems.CheckedItem switch
                     {
-                        MeasurementsType.sli => await query.OrderBy(ir => ir.Year)
-                                                           .ThenBy(ir => ir.CountryCode)
-                                                           .ThenBy(ir => ir.SetNumber)
-                                                           .ThenBy(ir => ir.SetIndex)
-                                                           .ThenBy(ir => ir.SampleNumber)
-                                                           .ToArrayAsync(),
-                        // for both: lli-1 and lli-2
+                        MeasurementsType.sli => await query.OrderByDescending(ir => ir.DateTimeStart).ToArrayAsync(),
+                                                //await query.OrderBy(ir => ir.Year)
+                                                //           .ThenBy(ir => ir.CountryCode)
+                                                //           .ThenBy(ir => ir.SetNumber)
+                                                //           .ThenBy(ir => ir.SetIndex)
+                                                //           .ThenBy(ir => ir.SampleNumber)
+                                                //           .ToArrayAsync(),
+                                                // for both: lli-1 and lli-2
                         _ => await query.OrderBy(ir => ir.Container)
                                                            .ThenBy(ir => ir.Position)
                                                            .ToArrayAsync()

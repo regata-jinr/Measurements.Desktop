@@ -18,6 +18,7 @@ using Regata.Core.UI.WinForms;
 using Regata.Core.UI.WinForms.Forms;
 using Regata.Core.UI.WinForms.Items;
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -33,13 +34,14 @@ namespace Regata.Desktop.WinForms.Measurements
         private EnumItem<Status> VerbosityItems;
         private EnumItem<CanberraDeviceAccessLib.AcquisitionModes> AcquisitionModeItems;
 
+
         public MainForm()
         {
             Settings<MeasurementsSettings>.AssemblyName = "MeasurementsDesktop";
 
             mainForm = new RegisterForm<Measurement>() { Name = "GSAMainForm", Text = "GSAMainForm" };
 
-            mainForm.Icon = new Icon("MeasurementsLogoCircle.ico");
+            mainForm.Icon = Properties.Resources.MeasurementsLogoCircle2;
             CurrentMeasurementsRegister = new MeasurementsRegister() { Type = -1, Id = 0 };
             MeasurementsTypeItems = new EnumItem<MeasurementsType>();
             VerbosityItems = new EnumItem<Status>();
@@ -96,7 +98,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
             if (isDisposing)
             {
-                // освободить управляемые ресурсы
+                RemoveCurrentRegisterIfEmpty();
                 mainForm.Dispose();
                 _dcp?.Dispose();
 
@@ -113,8 +115,6 @@ namespace Regata.Desktop.WinForms.Measurements
                     }
                 }
             }
-
-            // очистить неуправляемые ресурсы
 
             _isDisposed = true;
             Settings<MeasurementsSettings>.Save();

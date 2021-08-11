@@ -41,6 +41,7 @@ namespace Regata.Desktop.WinForms.Measurements
                     m.AcqMode = (int)AcquisitionModeItems.CheckedItem;
                     m.RegId = CurrentMeasurementsRegister.Id;
                     m.Duration = (int)DurationControl.Duration.TotalSeconds;
+                    m.Type = (int)MeasurementsTypeItems.CheckedItem;
 
                     m.Detector = MeasurementsTypeItems.CheckedItem switch
                     {
@@ -109,32 +110,6 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 mainForm.MainRDGV.SetUpWritableColumns();
 
-                mainForm.Disposed += (s, e) =>
-                {
-                    try
-                    {
-                    // running creates measurement register.
-                    // in case of after disposing the form there are not measurements records for register the last one will be deleted
-                    using (var r = new RegataContext())
-                        {
-                            if (
-                                    !r.Measurements.AsNoTracking().Where(m => m.RegId == CurrentMeasurementsRegister.Id).Any() &&
-                                    r.MeasurementsRegisters.AsNoTracking().Where(m => m.Id == CurrentMeasurementsRegister.Id).Any()
-                               )
-                            {
-                                r.MeasurementsRegisters.Remove(CurrentMeasurementsRegister);
-                                r.SaveChanges();
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Report.Notify(new RCM.Message(Codes.ERR_UI_WF_MAIN_FORM_DISP)
-                        {
-                            DetailedText = ex.ToString()
-                        });
-                    }
-                };
             }
             catch (Exception ex)
             {
@@ -146,13 +121,38 @@ namespace Regata.Desktop.WinForms.Measurements
         }
 
 
+        private void RemoveCurrentRegisterIfEmpty()
+        {
+            try
+            {
+                // running creates measurement register.
+                // in case of after disposing the form there are not measurements records for register the last one will be deleted
+                using (var r = new RegataContext())
+                {
+                    if (CurrentMeasurementsRegister.SamplesCnt == 0)
+                    {
+                        r.MeasurementsRegisters.Remove(CurrentMeasurementsRegister);
+                    }
+                        r.Measurements.RemoveRange(r.Measurements.Where(m => m.RegId == CurrentMeasurementsRegister.Id && m.FileSpectra == null).ToArray());
+                        r.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_MAIN_FORM_DISP)
+                {
+                    DetailedText = ex.ToString()
+                });
+            }
+        }
+
         private async Task UpdateCurrentReigster()
         {
             try
             {
                 using (var r = new RegataContext())
                 {
-                   var ir  =  r.Irradiations.Where(ir => ir.Id == mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.IrradiationId).Min()).FirstOrDefault();
+                     var ir  =  r.Irradiations.Where(ir => ir.Id == mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.IrradiationId).Min()).FirstOrDefault();
                     CurrentMeasurementsRegister.IrradiationDate = ir.DateTimeStart.Value.Date;
                     CurrentMeasurementsRegister.LoadNumber = ir.LoadNumber;
                     CurrentMeasurementsRegister.DateTimeStart = mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.DateTimeStart).Min();
@@ -180,6 +180,13 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 using (var r = new RegataContext())
                 {
+                    // We can not have Measurement register with duplicate name and type. In case of unhandled stop of app it is possible to 
+                    // Dispose method of the from will not be run. In this case current register will remain in DB with null value of Name and -1 for type
+                    // Here we catch it and remove.
+                    var null_register = r.MeasurementsRegisters.Where(m => m.IrradiationDate == null).FirstOrDefault();
+                    if (null_register != null)
+                        r.MeasurementsRegisters.Remove(null_register);
+
                     r.MeasurementsRegisters.Add(CurrentMeasurementsRegister);
                     r.SaveChanges();
                 }

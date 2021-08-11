@@ -6,16 +6,19 @@
     <UseWindowsForms>true</UseWindowsForms>
     <StartupObject>Regata.Desktop.WinForms.Measurements.Program</StartupObject>
 	<PlatformTarget>x86</PlatformTarget>
-    <Version>0.9.1</Version>
-    <ApplicationIcon>MeasurementsLogoCircle.ico</ApplicationIcon>
-    <Win32Resource />
+    <Version>0.9.9</Version>
+    <ApplicationIcon>Resources\MeasurementsLogoCircle1.ico</ApplicationIcon>
+    <Win32Resource></Win32Resource>
     <Company>FLNP | JINR</Company>
     <Authors>Boris Rumyantsev</Authors>
     <Product>Gamma Spectroscopy Automatisation</Product>
     <PackageProjectUrl>https://github.com/regata-jinr/Measurements.Desktop</PackageProjectUrl>
-    <PackageIcon>MeasurementsLogoCircle_0.2.png</PackageIcon>
+    <PackageIcon>MeasurementsLogoCircle_0.1.png</PackageIcon>
     <PackageIconUrl />
     <RepositoryUrl>https://github.com/regata-jinr/Measurements.Desktop</RepositoryUrl>
+    <AssemblyVersion>0.9.9.0</AssemblyVersion>
+    <FileVersion>0.9.9.0</FileVersion>
+    <RootNamespace>Regata.Desktop.WinForms.Measurements</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,10 +28,6 @@
     <EmbeddedResource Remove="src\Session\**" />
     <None Remove="src\Classes\**" />
     <None Remove="src\Session\**" />
-    <None Include="..\..\..\..\..\..\..\logos\apps\Measurements\MeasurementsLogoCircle_0.2.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -77,9 +76,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="MeasurementsLogoCircle.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 

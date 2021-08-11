@@ -9,8 +9,6 @@
  *                                                                         *
  ***************************************************************************/
 
-using Regata.Core.Hardware;
-
 namespace Regata.Desktop.WinForms.Measurements
 {
     partial class DetectorControlPanel
@@ -43,7 +41,6 @@ namespace Regata.Desktop.WinForms.Measurements
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DetectorControlPanel));
             this.DCPButtonPrevSrc = new System.Windows.Forms.Button();
             this.DCPButtonNextSrc = new System.Windows.Forms.Button();
             this.DCPButtonClear = new System.Windows.Forms.Button();
@@ -468,7 +465,7 @@ namespace Regata.Desktop.WinForms.Measurements
             this.Controls.Add(this.DCPButtonNextSrc);
             this.Controls.Add(this.DCPButtonPrevSrc);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Icon = Properties.Resources.MeasurementsLogoCircle2;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "DetectorControlPanel";
@@ -483,7 +480,6 @@ namespace Regata.Desktop.WinForms.Measurements
             ((System.ComponentModel.ISupportInitialize)(this.DCPNumericUpDownPresetMinutes)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.DCPNumericUpDownPresetHours)).EndInit();
             this.ResumeLayout(false);
-
         }
 
         #endregion

@@ -181,7 +181,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 var m = GetFirstNotMeasuredForDetector(d.Name);
                 if (m == null)
                 {
-                    Report.Notify(new RCM.Message(Codes.WARN_UI_WF_ACQ_START_ALL_MEAS));
+                    //Report.Notify(new RCM.Message(Codes.WARN_UI_WF_ACQ_START_ALL_MEAS));
                     return;
                 }
 

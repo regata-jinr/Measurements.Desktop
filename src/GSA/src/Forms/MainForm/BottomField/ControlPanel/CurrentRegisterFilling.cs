@@ -12,7 +12,6 @@
 using Regata.Core.UI.WinForms.Controls;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace Regata.Desktop.WinForms.Measurements
@@ -21,11 +20,9 @@ namespace Regata.Desktop.WinForms.Measurements
     {
         private ControlsGroupBox buttonsRegForm;
         private Button buttonRemoveSelectedSamples;
-        private Button buttonCancel;
         private Button buttonAddSelectedSamplesToReg;
         private Button buttonClearRegister;
         private Button buttonAddAllSamples;
-        private CancellationTokenSource _cancToken;
 
         private void InitializeRegFormingControls()
         {
@@ -33,13 +30,11 @@ namespace Regata.Desktop.WinForms.Measurements
             buttonAddSelectedSamplesToReg = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonAddSelectedSamplesToReg" };
             buttonClearRegister = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonClearRegister" };
             buttonAddAllSamples = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonAddAllSamples" };
-            buttonCancel = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonCancel" };
             buttonsRegForm = new ControlsGroupBox(new Button[] { buttonAddSelectedSamplesToReg, buttonAddAllSamples, buttonRemoveSelectedSamples, buttonClearRegister }) { Name = "buttonsRegFormBox" };
             buttonsRegForm.groupBoxTitle.Dock = DockStyle.Fill;
 
             FunctionalLayoutPanel.Controls.Add(buttonsRegForm, 0, 0);
 
-            buttonCancel.Click += ButtonCancel_Click;
             buttonAddSelectedSamplesToReg.Click += ButtonAddSelectedSamplesToReg_Click;
             buttonRemoveSelectedSamples.Click += ButtonRemoveSelectedSamples_Click;
             buttonClearRegister.Click += ButtonClearRegister_Click;
@@ -97,16 +92,6 @@ namespace Regata.Desktop.WinForms.Measurements
                 AddRecord(cellId);
             }
             mainForm.MainRDGV.SaveChanges();
-        }
-
-
-
-        private void ButtonCancel_Click(object sender, EventArgs e)
-        {
-            buttonCancel.Enabled = false;
-            _cancToken?.Cancel();
-            buttonCancel.Enabled = true;
-
         }
 
     } //public partial class MainForm
