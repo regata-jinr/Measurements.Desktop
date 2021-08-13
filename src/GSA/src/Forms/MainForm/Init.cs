@@ -18,9 +18,7 @@ using Regata.Core.UI.WinForms;
 using Regata.Core.UI.WinForms.Forms;
 using Regata.Core.UI.WinForms.Items;
 using System;
-using System.ComponentModel;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -49,7 +47,12 @@ namespace Regata.Desktop.WinForms.Measurements
             _chosenIrradiations = new List<Irradiation>();
             _chosenMeasurements = new List<Measurement>();
 
-            Settings<MeasurementsSettings>.CurrentSettings.PropertyChanged += (s,e) => Labels.SetControlsLabels(mainForm);
+            Settings<MeasurementsSettings>.CurrentSettings.PropertyChanged += (s, e) =>
+            {
+                Labels.SetControlsLabels(mainForm);
+                //Labels.SetControlsLabels(_dcp);
+
+            };
 
             //Settings<MeasurementsSettings>.CurrentSettings.MainTableSettings = new MeasurementsSettings().MainTableSettings;
 
@@ -140,6 +143,9 @@ namespace Regata.Desktop.WinForms.Measurements
             }
 
             _circleDetArray = new CircleArray<string>(tmpArr.OrderBy(d => d).ToArray());
+
+            buttonClearRegister.Enabled = true;
+            buttonShowAcqQueue.Enabled = true;
 
             await BackGroundTask();
 

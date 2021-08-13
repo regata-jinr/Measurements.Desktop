@@ -26,7 +26,7 @@ namespace Regata.Desktop.WinForms.Measurements
     {
         private CircleArray<string> _circleDetArray;
 
-        private void AddRecord(int IrradiationId)
+        private void AddRecord(int IrradiationId, string dName = "", int? diskPosition = null)
         {
             try
             {
@@ -38,21 +38,21 @@ namespace Regata.Desktop.WinForms.Measurements
 
                     m = new Measurement(ir);
                 }
-                    m.AcqMode = (int)AcquisitionModeItems.CheckedItem;
-                    m.RegId = CurrentMeasurementsRegister.Id;
-                    m.Duration = (int)DurationControl.Duration.TotalSeconds;
-                    m.Type = (int)MeasurementsTypeItems.CheckedItem;
+                m.AcqMode = (int)AcquisitionModeItems.CheckedItem;
+                m.RegId = CurrentMeasurementsRegister.Id;
+                m.Duration = (int)DurationControl.Duration.TotalSeconds;
+                m.Type = (int)MeasurementsTypeItems.CheckedItem;
+                m.DiskPosition = diskPosition;
+                m.Detector = MeasurementsTypeItems.CheckedItem switch
+                {
+                    MeasurementsType.sli => _circleDetArray?.Current,
+                    _ => string.IsNullOrEmpty(dName) ?  CheckedAvailableDetectorArrayControl.SelectedItem : dName
+                };
 
-                    m.Detector = MeasurementsTypeItems.CheckedItem switch
-                    {
-                        MeasurementsType.sli => _circleDetArray?.Current,
-                        _ => CheckedAvailableDetectorArrayControl.SelectedItem
-                    };
+                _circleDetArray?.MoveForward();
 
-                    _circleDetArray?.MoveForward();
-
-                    m.Height = CheckedHeightArrayControl.SelectedItem;
-                    mainForm.MainRDGV.Add(m);
+                m.Height = CheckedHeightArrayControl.SelectedItem;
+                mainForm.MainRDGV.Add(m);
             }
             catch (Exception ex)
             {
@@ -154,6 +154,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 {
                      var ir  =  r.Irradiations.Where(ir => ir.Id == mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.IrradiationId).Min()).FirstOrDefault();
                     CurrentMeasurementsRegister.IrradiationDate = ir.DateTimeStart.Value.Date;
+                    CurrentMeasurementsRegister.Name = ir.DateTimeStart.Value.Date.ToShortDateString();
                     CurrentMeasurementsRegister.LoadNumber = ir.LoadNumber;
                     CurrentMeasurementsRegister.DateTimeStart = mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.DateTimeStart).Min();
                     CurrentMeasurementsRegister.DateTimeFinish = mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.DateTimeFinish).Max();

@@ -9,8 +9,13 @@
  *                                                                         *
  ***************************************************************************/
 
+using Microsoft.EntityFrameworkCore;
+using Regata.Core.DataBase;
+using Regata.Core.DataBase.Models;
 using Regata.Core.UI.WinForms.Controls;
+using Regata.Core.UI.WinForms.Forms;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -26,10 +31,10 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void InitializeRegFormingControls()
         {
-            buttonRemoveSelectedSamples = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonRemoveSelectedSamples" };
-            buttonAddSelectedSamplesToReg = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonAddSelectedSamplesToReg" };
-            buttonClearRegister = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonClearRegister" };
-            buttonAddAllSamples = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonAddAllSamples" };
+            buttonRemoveSelectedSamples = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonRemoveSelectedSamples", Enabled = false };
+            buttonAddSelectedSamplesToReg = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonAddSelectedSamplesToReg", Enabled = false };
+            buttonClearRegister = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonClearRegister", Enabled = false };
+            buttonAddAllSamples = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonAddAllSamples", Enabled = false };
             buttonsRegForm = new ControlsGroupBox(new Button[] { buttonAddSelectedSamplesToReg, buttonAddAllSamples, buttonRemoveSelectedSamples, buttonClearRegister }) { Name = "buttonsRegFormBox" };
             buttonsRegForm.groupBoxTitle.Dock = DockStyle.Fill;
 
@@ -44,16 +49,48 @@ namespace Regata.Desktop.WinForms.Measurements
         private void ButtonAddAllSamples_Click(object sender, EventArgs e)
         {
             var cti = mainForm.TabsPane.SelectedTabIndex;
-
-            for (int i = 0; i < mainForm.TabsPane[cti, 1].RowCount; ++i)
+            if (MeasurementsTypeItems.CheckedItem == MeasurementsType.sli)
             {
-                int cellId;
-                if (cti == 0)
-                    cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["Id"].Value;
-                else
-                    cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["IrradiationId"].Value;
 
-                AddRecord(cellId);
+                for (int i = 0; i < mainForm.TabsPane[cti, 1].RowCount; ++i)
+                {
+                    int cellId;
+                    if (cti == 0)
+                        cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["Id"].Value;
+                    else
+                        cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["IrradiationId"].Value;
+
+                    AddRecord(cellId);
+                }
+                mainForm.MainRDGV.SaveChanges();
+
+            }
+            else
+            {
+                var ln = (int?)mainForm.TabsPane[cti, 0].SelectedCells[0].Value;
+                if (!ln.HasValue) return;
+                if (_circleDetArray == null || _circleDetArray.Length == 0) return;
+                var sf = new ContainersToDetectorsForm(_circleDetArray.ToArray(), ln.Value);
+                sf.Show();
+                sf.buttonExportToCSV.Visible = false;
+                sf.buttonExportToExcel.Visible = false;
+                sf.buttonFillMeasurementRegister.Click += (s, e) => { ClearCurrentRegister(); AddAllIrradiationsAndAssignDiskPosition(ln.Value, sf.DetCont); };
+            }
+
+        }
+
+        private void AddAllIrradiationsAndAssignDiskPosition(int loadNumber, Dictionary<string, int[]> det_cont)
+        {
+            using (var r = new RegataContext())
+            {
+                foreach (var d in det_cont)
+                {
+                int currPosition = 0;
+                    foreach (var ir in r.Irradiations.AsNoTracking().Where(ir => ir.LoadNumber == loadNumber && d.Value.ToList().Contains(ir.Container.Value)).OrderBy(ir => ir.Container).ThenBy(ir => ir.Position))
+                    {
+                        AddRecord(ir.Id, d.Key, ++currPosition);
+                    }
+                }
             }
             mainForm.MainRDGV.SaveChanges();
 

@@ -42,6 +42,7 @@ namespace Regata.Desktop.WinForms.Measurements
                     Settings<MeasurementsSettings>.CurrentSettings.AcquisitionMode = currentMode;
                     AcquisitionModeItems.CheckItem(currentMode);
                     Labels.SetControlsLabels(mainForm);
+
                 };
 
                 VerbosityItems.CheckItem(Settings<MeasurementsSettings>.CurrentSettings.Verbosity);
@@ -51,7 +52,6 @@ namespace Regata.Desktop.WinForms.Measurements
                     Settings<MeasurementsSettings>.CurrentSettings.Verbosity = VerbosityItems.CheckedItem;
                     Labels.SetControlsLabels(mainForm);
                 };
-
 
                 mainForm.MenuStrip.Items.Add(MeasurementsTypeItems.EnumMenuItem);
                 mainForm.MenuStrip.Items.Add(AcquisitionModeItems.EnumMenuItem);
@@ -80,6 +80,10 @@ namespace Regata.Desktop.WinForms.Measurements
                     await FillMeasurementsRegisters();
 
                     Labels.SetControlsLabels(mainForm);
+
+                    buttonAddAllSamples.Enabled = true;
+                    buttonAddSelectedSamplesToReg.Enabled = true;
+                    buttonRemoveSelectedSamples.Enabled = true;
 
                 };
             }

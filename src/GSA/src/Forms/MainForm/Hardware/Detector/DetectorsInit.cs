@@ -63,7 +63,7 @@ namespace Regata.Desktop.WinForms.Measurements
                                                                 string.IsNullOrEmpty(m.FileSpectra) &&
                                                                 !m.DateTimeFinish.HasValue
                                                           )
-                                                    .LastOrDefault();
+                                                    .FirstOrDefault();
         }
 
         private void Det_ParamChange(Detector det)

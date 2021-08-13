@@ -20,7 +20,7 @@ namespace Regata.Desktop.WinForms.Measurements
     public partial class MainForm
     {
         public ControlsGroupBox controlsMeasParams;
-        public CheckedArrayControl<float> CheckedHeightArrayControl;
+        public CheckedArrayControl<float?> CheckedHeightArrayControl;
         public Button buttonShowAcqQueue;
         public DurationControl DurationControl;
 
@@ -29,14 +29,14 @@ namespace Regata.Desktop.WinForms.Measurements
             try
             {
                 DurationControl = new DurationControl();
-                CheckedHeightArrayControl = new CheckedArrayControl<float>(new float[] { 2.5f, 5f, 10f, 20f }) { Name = "CheckedArrayControlHeights" };
-                buttonShowAcqQueue = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonShowAcqQueue" };
+                CheckedHeightArrayControl = new CheckedArrayControl<float?>(new float?[] { 2.5f, 5f, 10f, 20f }) { Name = "CheckedArrayControlHeights" };
+                buttonShowAcqQueue = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonShowAcqQueue", Enabled = false };
                 controlsMeasParams = new ControlsGroupBox(new Control[] { DurationControl, CheckedHeightArrayControl, buttonShowAcqQueue }) { Name = "controlsMeasParams" };
 
                 FunctionalLayoutPanel.Controls.Add(controlsMeasParams, 1, 0);
 
                 DurationControl.DurationChanged += (s, e) => mainForm.MainRDGV.FillDbSetValues("Duration", (int)DurationControl.Duration.TotalSeconds);
-                CheckedHeightArrayControl.SelectionChanged += () => mainForm.MainRDGV.FillDbSetValues("Height", CheckedHeightArrayControl.SelectedItem);
+                CheckedHeightArrayControl.SelectionChanged += (s,e) => mainForm.MainRDGV.FillDbSetValues("Height", CheckedHeightArrayControl.SelectedItem);
 
                 buttonShowAcqQueue.Click += ButtonShowAcqQueue_Click;
             }
@@ -52,7 +52,7 @@ namespace Regata.Desktop.WinForms.Measurements
         private void ButtonShowAcqQueue_Click(object sender, System.EventArgs e)
         {
             var fq = GenerateSamplesQueueForm();
-            fq.Show();
+            fq?.Show();
         }
 
 

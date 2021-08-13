@@ -12,6 +12,7 @@
 using Regata.Core;
 using Regata.Core.DataBase.Models;
 using RCM = Regata.Core.Messages;
+using RCUW = Regata.Core.UI.WinForms;
 using Regata.Core.UI.WinForms.Controls;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,8 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             Form f = new Form();
             f.Name = "SamplesQueueForm";
-            f.Size = new System.Drawing.Size(1000, 700);
+            f.Size = new System.Drawing.Size(mainForm.Size.Width, 700);
+            f.MinimumSize = new System.Drawing.Size(mainForm.Size.Width, 700);
 
             try
             {
@@ -37,16 +39,17 @@ namespace Regata.Desktop.WinForms.Measurements
                 if (!mainForm.MainRDGV.CurrentDbSet.Local.Where(m => !string.IsNullOrEmpty(m.Detector)).Any())
                     return null;
 
-                var _ctrs = new List<DataGridView>(8);
+                var _ctrs = new List<ControlsGroupBox>(8);
 
                 foreach (var d in mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.Detector).Distinct().OrderBy(d => d))
                 {
                     if (string.IsNullOrEmpty(d)) continue;
-                    _ctrs.Add(GenerateDataGridView(mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.Detector == d).ToArray(), d));
+                    _ctrs.Add(new ControlsGroupBox(new Control[] { GenerateDataGridView(mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.Detector == d).ToArray(), d) }, false) { Name = d, Text = d } );
                 }
 
-                f.Controls.Add(new ControlsGroupBox(_ctrs.ToArray(), false));
+                f.Controls.Add(new ControlsGroupBox(_ctrs.ToArray(), false) { Name = "DetsSampleControlBox" } );
 
+                RCUW.Labels.SetControlsLabels(f);
             }
             catch (Exception ex)
             {
@@ -65,32 +68,46 @@ namespace Regata.Desktop.WinForms.Measurements
             dgv.Name = $"dgv_{dName}";
             dgv.DataSource = meas;
             dgv.RowHeadersVisible = false;
-
-            // TODO: hide redundant columns
-            //dgv.Columns["Id"].Visible = false;
-            //dgv.Columns["IrradiationId"].Visible = false;
-            //dgv.Columns["RegId"].Visible = false;
-            //dgv.Columns["CountryCode"].Visible = false;
-            //dgv.Columns["ClientNumber"].Visible = false;
-            //dgv.Columns["Year"].Visible = false;
-            //dgv.Columns["SetNumber"].Visible = false;
-            //dgv.Columns["SetIndex"].Visible = false;
-            //dgv.Columns["SampleNumber"].Visible = false;
-            //dgv.Columns["Type"].Visible = false;
-            //dgv.Columns["AcqMode"].Visible = false;
-            //dgv.Columns["DateTimeStart"].Visible = false;
-            //dgv.Columns["Duration"].Visible = false;
-            //dgv.Columns["DateTimeFinish"].Visible = false;
-            //dgv.Columns["DeadTime"].Visible = false;
-            //dgv.Columns["FileSpectra"].Visible = false;
-            //dgv.Columns["Assistant"].Visible = false;
-            //dgv.Columns["Note"].Visible = false;
+            dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgv.DataBindingComplete += (s, e) => HideRedundantColumnsAndReorderColumns(dgv);
+            dgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 
             dgv.ReadOnly = true;
 
             return dgv;
-        } 
+        }
 
-       
+        private void HideRedundantColumnsAndReorderColumns(DataGridView dgv)
+        {
+            dgv.Columns["Id"].Visible = false;
+            dgv.Columns["IrradiationId"].Visible = false;
+            dgv.Columns["RegId"].Visible = false;
+            dgv.Columns["CountryCode"].Visible = false;
+            dgv.Columns["ClientNumber"].Visible = false;
+            dgv.Columns["Year"].Visible = false;
+            dgv.Columns["SetNumber"].Visible = false;
+            dgv.Columns["SetIndex"].Visible = false;
+            dgv.Columns["Type"].Visible = false;
+            dgv.Columns["AcqMode"].Visible = false;
+            dgv.Columns["DateTimeStart"].Visible = false;
+            dgv.Columns["Duration"].Visible = false;
+            dgv.Columns["Detector"].Visible = false;
+            dgv.Columns["DateTimeFinish"].Visible = false;
+            dgv.Columns["DeadTime"].Visible = false;
+            dgv.Columns["FileSpectra"].Visible = false;
+            dgv.Columns["Assistant"].Visible = false;
+            dgv.Columns["Note"].Visible = false;
+            dgv.Columns["SampleKey"].Visible = false;
+
+            dgv.Columns["SetKey"].DisplayIndex = 0;
+            dgv.Columns["SampleNumber"].DisplayIndex = 1;
+            dgv.Columns["DiskPosition"].DisplayIndex = 2;
+            dgv.Columns["Height"].DisplayIndex = 3;
+
+            RCUW.Labels.SetControlsLabels(dgv);
+
+        }
+
+
     } //public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements
