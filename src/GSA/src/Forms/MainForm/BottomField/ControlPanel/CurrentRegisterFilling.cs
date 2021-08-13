@@ -49,33 +49,40 @@ namespace Regata.Desktop.WinForms.Measurements
         private void ButtonAddAllSamples_Click(object sender, EventArgs e)
         {
             var cti = mainForm.TabsPane.SelectedTabIndex;
-            if (MeasurementsTypeItems.CheckedItem == MeasurementsType.sli)
-            {
 
-                for (int i = 0; i < mainForm.TabsPane[cti, 1].RowCount; ++i)
+            if (cti == 0) // irradiations tab
+            {
+                if (MeasurementsTypeItems.CheckedItem == MeasurementsType.sli)
                 {
-                    int cellId;
-                    if (cti == 0)
-                        cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["Id"].Value;
-                    else
-                        cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["IrradiationId"].Value;
+                    for (int i = 0; i < mainForm.TabsPane[cti, 1].RowCount; ++i)
+                    {
+                        var cellId = (int)mainForm.TabsPane[cti, 1].Rows[i].Cells["Id"].Value;
+                        AddRecord(cellId);
 
-                    AddRecord(cellId);
+                    }
                 }
-                mainForm.MainRDGV.SaveChanges();
+                else
+                {
+                    var ln = (int?)mainForm.TabsPane[cti, 0].SelectedCells[0].Value;
+                    if (!ln.HasValue) return;
+                    if (_circleDetArray == null || _circleDetArray.Length == 0) return;
+                    var sf = new ContainersToDetectorsForm(_circleDetArray.ToArray(), ln.Value);
+                    sf.Show();
+                    sf.buttonExportToCSV.Visible = false;
+                    sf.buttonExportToExcel.Visible = false;
+                    sf.buttonFillMeasurementRegister.Click += (s, e) => { ClearCurrentRegister(); AddAllIrradiationsAndAssignDiskPosition(ln.Value, sf.DetCont); };
+                }
+            }
+            else // cti = 1 measurements tab
+            { 
+                foreach( var m in _chosenMeasurements)
+                {
+                    AddRecord(m);
+                }
 
             }
-            else
-            {
-                var ln = (int?)mainForm.TabsPane[cti, 0].SelectedCells[0].Value;
-                if (!ln.HasValue) return;
-                if (_circleDetArray == null || _circleDetArray.Length == 0) return;
-                var sf = new ContainersToDetectorsForm(_circleDetArray.ToArray(), ln.Value);
-                sf.Show();
-                sf.buttonExportToCSV.Visible = false;
-                sf.buttonExportToExcel.Visible = false;
-                sf.buttonFillMeasurementRegister.Click += (s, e) => { ClearCurrentRegister(); AddAllIrradiationsAndAssignDiskPosition(ln.Value, sf.DetCont); };
-            }
+
+            mainForm.MainRDGV.SaveChanges();
 
         }
 
@@ -92,7 +99,6 @@ namespace Regata.Desktop.WinForms.Measurements
                     }
                 }
             }
-            mainForm.MainRDGV.SaveChanges();
 
         }
 

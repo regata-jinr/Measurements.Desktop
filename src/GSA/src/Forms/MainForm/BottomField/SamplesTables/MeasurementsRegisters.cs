@@ -41,9 +41,11 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 mainForm.TabsPane[1, 0].SelectionChanged += async (e, s) =>
                 {
+                    _chosenMeasurements.Clear();
+                    _chosenMeasurements.Capacity = 499;
+
+                    mainForm.TabsPane[1, 1].DataSource = null;
                     await FillSelectedMeasurements();
-                    if (mainForm.TabsPane[1, 0].SelectedRows.Count > 0 && mainForm.TabsPane[1, 0].SelectedRows[0].Cells[2].Value != null)
-                        CurrentMeasurementsRegister.IrradiationDate = (DateTime)mainForm.TabsPane[1, 0].SelectedRows[0].Cells[2].Value;
                 };
 
                 mainForm.TabsPane[1, 0].Scroll += async (s, e) =>
@@ -77,8 +79,6 @@ namespace Regata.Desktop.WinForms.Measurements
                                                     .OrderByDescending(m => m.Id)
                                                     .Take(mainForm.TabsPane[1, 0].RowCount + 20)
                                                     .ToArrayAsync();
-                    
-
                 }
 
 
@@ -101,13 +101,8 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 if (mainForm.TabsPane[1, 0].SelectedCells.Count <= 0) return;
 
-                _chosenMeasurements.Clear();
-                _chosenMeasurements.Capacity = 499;
-
-                mainForm.TabsPane[1, 1].DataSource = null;
 
                 var mRegId = mainForm.TabsPane[1, 0].SelectedCells[0].Value as int?;
-                //var date   = mainForm.TabsPane[1, 0].SelectedCells[2].Value as DateTime?;
 
                 if (!mRegId.HasValue) return;
 
@@ -116,14 +111,17 @@ namespace Regata.Desktop.WinForms.Measurements
 
                     CurrentMeasurementsRegister.IrradiationDate = r.MeasurementsRegisters.AsNoTracking().Where(m => m.Id == mRegId.Value).Select(m => m.IrradiationDate).FirstOrDefault();
 
-                    _chosenMeasurements.AddRange(await r.Measurements
+                    var tmp = await r.Measurements
                                                     .AsNoTracking()
                                                     .Where(
                                                              m =>
                                                                     m.Type == (int)MeasurementsTypeItems.CheckedItem &&
                                                                     m.RegId == mRegId.Value
                                                           )
-                                                    .ToArrayAsync());
+                                                    .OrderBy(m => m.Detector)
+                                                    .ThenBy(m => m.DiskPosition)
+                                                    .ToArrayAsync();
+                    _chosenMeasurements.AddRange(tmp);
                 };
 
                 _chosenMeasurements.TrimExcess();

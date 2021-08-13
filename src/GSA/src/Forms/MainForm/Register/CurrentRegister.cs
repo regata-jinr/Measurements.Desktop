@@ -63,6 +63,35 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
+
+        private void AddRecord(Measurement m)
+        {
+            try
+            {
+                m.Id = 0;
+                m.AcqMode = (int)AcquisitionModeItems.CheckedItem;
+                m.RegId = CurrentMeasurementsRegister.Id;
+                m.Duration = (int)DurationControl.Duration.TotalSeconds;
+                m.Type = (int)MeasurementsTypeItems.CheckedItem;
+                m.Height = CheckedHeightArrayControl.SelectedItem;
+
+                m.DateTimeStart = null;
+                m.DateTimeFinish = null;
+                m.FileSpectra = null;
+                m.Note = null;
+                m.DeadTime = null;
+
+                mainForm.MainRDGV.Add(m);
+            }
+            catch (Exception ex)
+            {
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_ADD_MEAS_REC)
+                {
+                    DetailedText = ex.ToString()
+                });
+            }
+        }
+
         private void RemoveRecord(int id)
         {
             try
