@@ -18,6 +18,7 @@ using Regata.Core.UI.WinForms.Controls;
 using System;
 using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Regata.Desktop.WinForms.Measurements
@@ -33,34 +34,44 @@ namespace Regata.Desktop.WinForms.Measurements
         private Button buttonClear;
         private Button buttonPause;
         private Button buttonStart;
+        private Button buttonStopSC;
+        private Button buttonHalt;
 
         private void InitializeMeasurementsControls()
         {
             try
             {
-                buttonStop = new Button() { Name = "buttonStop", Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Red };
-                buttonClear = new Button() { Name = "buttonClear", Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.White };
+                buttonStop  = new Button() { Name = "buttonStop",  Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Red    };
+                buttonClear = new Button() { Name = "buttonClear", Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.White  };
                 buttonPause = new Button() { Name = "buttonPause", Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Yellow };
-                buttonStart = new Button() { Name = "buttonStart", Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Green };
+                buttonStart = new Button() { Name = "buttonStart", Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Green  };
 
-                buttonStop.Click += ButtonStop_Click;
+                buttonStopSC = new Button() { Name = "buttonStopSC", Dock = DockStyle.Fill, Enabled = false};
+                buttonHalt = new Button() { Name = "buttonHalt", Dock = DockStyle.Fill, Enabled = false };
+
+                buttonStop.Click  += ButtonStop_Click;
                 buttonStart.Click += ButtonStart_Click;
                 buttonClear.Click += ButtonClear_Click;
                 buttonPause.Click += ButtonPause_Click;
 
+                buttonHalt.Click += ButtonHalt_Click;
+                buttonStopSC.Click += ButtonStopSC_Click;
                 MeasurementsStartPanel = new TableLayoutPanel();
                 MeasurementsStartPanel.ColumnCount = 2;
                 MeasurementsStartPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
                 MeasurementsStartPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
                 MeasurementsStartPanel.Name = "MeasurementsStartPanel";
-                MeasurementsStartPanel.RowCount = 2;
-                MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-                MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+                MeasurementsStartPanel.RowCount = 3;
+                MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));
+                MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));
+                MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));
                 MeasurementsStartPanel.Dock = DockStyle.Fill;
-                MeasurementsStartPanel.Controls.Add(buttonStop, 0, 0);
-                MeasurementsStartPanel.Controls.Add(buttonClear, 1, 0);
-                MeasurementsStartPanel.Controls.Add(buttonPause, 0, 1);
-                MeasurementsStartPanel.Controls.Add(buttonStart, 1, 1);
+                MeasurementsStartPanel.Controls.Add(buttonStopSC, 0, 0);
+                MeasurementsStartPanel.Controls.Add(buttonHalt, 1, 0);
+                MeasurementsStartPanel.Controls.Add(buttonStop, 0, 1);
+                MeasurementsStartPanel.Controls.Add(buttonClear, 1, 1);
+                MeasurementsStartPanel.Controls.Add(buttonPause, 0, 2);
+                MeasurementsStartPanel.Controls.Add(buttonStart, 1, 2);
 
                 CheckedAvailableDetectorArrayControl = new CheckedArrayControl<string>(new string[0]) { Name = "CheckedAvailableDetectorArrayControl" };
 
@@ -75,6 +86,23 @@ namespace Regata.Desktop.WinForms.Measurements
                 Report.Notify(new RCM.Message(Codes.ERR_UI_WF_INI_MEAS_CONTR) { DetailedText = ex.ToString() });
 
             }
+        }
+
+        private void ButtonStopSC_Click(object sender, EventArgs e)
+        {
+            if (_detectors == null)
+                return;
+
+            _detectors.ForEach(d => CallStop(d.PairedXemoDevice));
+
+        }
+
+        private void ButtonHalt_Click(object sender, EventArgs e)
+        {
+            if (_detectors == null)
+                return;
+
+            _detectors.ForEach(d => CallHalt(d.PairedXemoDevice));
         }
 
         private bool _isMeasurementsPaused = false;
@@ -162,10 +190,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 await InitializeDetectors();
 
 
-            foreach (var d in _detectors)
-            {
-                MStart(d);
-            }
+            await Task.WhenAll(_detectors.Select(d => MStartAsync(d)));
 
             if (_dcp == null || _dcp.IsDisposed)
             {
@@ -174,7 +199,7 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
-        private void MStart(Detector d)
+        private async Task MStartAsync(Detector d)
         {
             try
             {
@@ -196,7 +221,12 @@ namespace Regata.Desktop.WinForms.Measurements
                     }
                 }
 
+                await RunSampleChangerCycle(d);
+
                 d.LoadMeasurementInfoToDevice(m, i);
+
+                await RunSampleChangerCycle(d);
+
                 d.Start();
                 Report.Notify(new RCM.Message(Codes.SUCC_UI_WF_ACQ_START) { Head = $"{d.Name} complete acq for {d.CurrentMeasurement}" });
 
@@ -206,6 +236,37 @@ namespace Regata.Desktop.WinForms.Measurements
                 Det_HardwareError(d);
                 Report.Notify(new RCM.Message(Codes.ERR_UI_WF_ACQ_START) { DetailedText = ex.ToString() });
             }
+        }
+
+        private async Task RunSampleChangerCycle(Detector d)
+        {
+            var sc = d.PairedXemoDevice;
+            if (!_scFlagMenuItem.Checked || sc == null)
+                return;
+
+            if (d.CurrentMeasurement == null)
+                return;
+
+
+            if (!d.CurrentMeasurement.DiskPosition.HasValue)
+                return;
+
+            if (sc.IsSampleCaptured)
+            { 
+                await sc.PutSampleToTheDiskAsync((short)d.CurrentMeasurement.DiskPosition.Value);
+                return;
+            }
+
+            await sc.TakeSampleFromTheCellAsync((short)d.CurrentMeasurement.DiskPosition.Value);
+            var h = d.CurrentMeasurement.Height switch
+            {
+                > 10f  => Heights.h20,
+                > 5f   => Heights.h10,
+                > 2.5f => Heights.h5,
+                _      => Heights.h2p5 
+            };
+            await sc.PutSampleAboveDetectorWithHeightAsync(h);
+
         }
 
         private void ColorizeRDGVRow(Measurement m, Color clr)

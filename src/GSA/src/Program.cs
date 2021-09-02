@@ -10,6 +10,7 @@
  ***************************************************************************/
 
 using Regata.Core.Settings;
+using Regata.Core.UI.WinForms.Forms;
 using System;
 using System.Windows.Forms;
 
@@ -23,9 +24,15 @@ namespace Regata.Desktop.WinForms.Measurements
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            using (var m = new MainForm())
+
+            Settings<MeasurementsSettings>.AssemblyName = "MeasurementsDesktop";
+
+            using (var lf = new LoginForm())
             {
-                Application.Run(m.mainForm);
+            
+                lf.ConnectionSuccessfull += (sqlcs) => 
+                { var m = new MainForm(); m.mainForm.Show(); m.mainForm.FormClosed += (s,e) => lf.Close(); GlobalSettings.User = sqlcs.UserID; };
+                Application.Run(lf);
             }
         }
     }

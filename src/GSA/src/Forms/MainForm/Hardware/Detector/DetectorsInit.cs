@@ -39,7 +39,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 {
                     await Detector.ShowDetectorInMvcgAsync(d);
 
-                    var det = new Detector(d);
+                    var det = new Detector(d, enableXemo: _scFlagMenuItem.Checked);
                     det.AcquireDone += Det_AcquireDone;
                     det.AcquireStart += Det_AcquireStart;
                     det.HardwareError += Det_HardwareError;
@@ -48,6 +48,10 @@ namespace Regata.Desktop.WinForms.Measurements
                     _detectors.Add(det);
                 }
                 _detectors.TrimExcess();
+
+                if (_scFlagMenuItem.Checked)
+                    await Task.WhenAll(_detectors.Select(d => CallHomeAsync(d.PairedXemoDevice)));
+
             }
             catch (Exception ex)
             {
@@ -56,14 +60,30 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
+        private async Task CallHomeAsync(SampleChanger sc)
+        {
+            await sc.HomeAsync();
+        }
+
+        private void CallStop(SampleChanger sc)
+        {
+            sc.Stop();
+        }
+
+        private void CallHalt(SampleChanger sc)
+        {
+            sc.HaltSystem();
+        }
+
         private Measurement GetFirstNotMeasuredForDetector(string detName)
         {
             // FIXME: regataContext.Measurements.Local inversed
             return mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.Detector == detName &&
-                                                                string.IsNullOrEmpty(m.FileSpectra) &&
-                                                                !m.DateTimeFinish.HasValue
-                                                          )
-                                                    .FirstOrDefault();
+                                                                   string.IsNullOrEmpty(m.FileSpectra) &&
+                                                                   !m.DateTimeFinish.HasValue
+                                                             )
+                                                       .OrderBy(m => m.DiskPosition)
+                                                       .FirstOrDefault();
         }
 
         private void Det_ParamChange(Detector det)
@@ -125,7 +145,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 }
                 else
                 {
-                    MStart(det);
+                    await MStartAsync(det);
                 }
             }
         }

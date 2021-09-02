@@ -15,6 +15,7 @@ using Regata.Core.Collections;
 using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
 using RCM = Regata.Core.Messages;
+using Regata.Core.Settings;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -189,7 +190,8 @@ namespace Regata.Desktop.WinForms.Measurements
                     CurrentMeasurementsRegister.DateTimeFinish = mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.DateTimeFinish).Max();
                     CurrentMeasurementsRegister.SamplesCnt = mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.FileSpectra != null).Count();
                     CurrentMeasurementsRegister.Detectors = string.Join(',', mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.Detector).Distinct().ToArray());
-                    // CurrentMeasurementsRegister.Assistant = mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.Assistant.HasValue).FirstOrDefault().Assistant;
+                    // TODO: https://github.com/regata-jinr/Measurements.Desktop/issues/46
+                    //CurrentMeasurementsRegister.Assistant = GlobalSettings.User;
 
                     r.MeasurementsRegisters.Update(CurrentMeasurementsRegister);
                     await r.SaveChangesAsync();
@@ -216,6 +218,7 @@ namespace Regata.Desktop.WinForms.Measurements
                     var null_register = r.MeasurementsRegisters.Where(m => m.IrradiationDate == null).FirstOrDefault();
                     if (null_register != null)
                         r.MeasurementsRegisters.Remove(null_register);
+                    
 
                     r.MeasurementsRegisters.Add(CurrentMeasurementsRegister);
                     r.SaveChanges();

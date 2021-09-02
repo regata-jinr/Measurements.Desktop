@@ -59,20 +59,24 @@
 
   <ItemGroup>
     <Reference Include="base">
-      <HintPath>..\..\..\..\..\..\Core\artifacts\Debug\base\base.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Core\artifacts\$(Configuration)\base\base.dll</HintPath>
     </Reference>
     <Reference Include="collections">
-      <HintPath>..\..\..\..\..\..\Core\artifacts\Debug\collections\collections.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Core\artifacts\$(Configuration)\collections\collections.dll</HintPath>
     </Reference>
     <Reference Include="Detector">
-      <HintPath>..\..\..\..\..\..\Core\artifacts\Debug\Detector\Detector.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Core\artifacts\$(Configuration)\Detector\Detector.dll</HintPath>
     </Reference>
-    <Reference Include="Interop.CanberraDeviceAccessLib">
+	  <Reference Include="SampleChanger">
+		  <HintPath>..\..\..\..\..\..\Core\artifacts\$(Configuration)\SampleChanger\SampleChanger.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Interop.CanberraDeviceAccessLib">
       <HintPath>..\..\..\..\..\..\Core\libs\Interop.CanberraDeviceAccessLib.dll</HintPath>
     </Reference>
     <Reference Include="WinFormsTemplates">
-      <HintPath>..\..\..\..\..\..\Core\artifacts\Debug\WinFormsTemplates\WinFormsTemplates.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Core\artifacts\$(Configuration)\WinFormsTemplates\WinFormsTemplates.dll</HintPath>
     </Reference>
+	  <None Include="D:\GoogleDrive\Job\flnp\dev\regata\Core\libs\XemoDll.dll" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>

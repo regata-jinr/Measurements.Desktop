@@ -26,16 +26,14 @@ namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm : IDisposable
     {
-        public RegisterForm<Measurement> mainForm;
+        public  RegisterForm<Measurement> mainForm;
         private MeasurementsRegister CurrentMeasurementsRegister;
         private EnumItem<MeasurementsType> MeasurementsTypeItems;
         private EnumItem<Status> VerbosityItems;
         private EnumItem<CanberraDeviceAccessLib.AcquisitionModes> AcquisitionModeItems;
-
-
+        
         public MainForm()
         {
-            Settings<MeasurementsSettings>.AssemblyName = "MeasurementsDesktop";
 
             mainForm = new RegisterForm<Measurement>() { Name = "GSAMainForm", Text = "GSAMainForm" };
 
@@ -58,8 +56,6 @@ namespace Regata.Desktop.WinForms.Measurements
 
             mainForm.MainRDGV.RDGV_Set = Settings<MeasurementsSettings>.CurrentSettings.MainTableSettings;
 
-            // Call event only for warnings and errors
-            Settings<MeasurementsSettings>.CurrentSettings.Verbosity = Status.Warning;
             if (Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTime < 30)
                 Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTime = 30;
 

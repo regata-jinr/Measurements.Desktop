@@ -10,15 +10,21 @@
  ***************************************************************************/
 
 using Regata.Core;
-using Regata.Core.Messages;
+using RCM = Regata.Core.Messages;
 using Regata.Core.Settings;
 using Regata.Core.UI.WinForms;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm
     {
+
+        ToolStripMenuItem _scFlagMenuItem;
+        ToolStripMenuItem _scDropDownMenu;
 
         private void InitMenuStrip()
         {
@@ -53,9 +59,20 @@ namespace Regata.Desktop.WinForms.Measurements
                     Labels.SetControlsLabels(mainForm);
                 };
 
-                mainForm.MenuStrip.Items.Add(MeasurementsTypeItems.EnumMenuItem);
-                mainForm.MenuStrip.Items.Add(AcquisitionModeItems.EnumMenuItem);
-                mainForm.MenuStrip.Items.Add(VerbosityItems.EnumMenuItem);
+                _scFlagMenuItem = new ToolStripMenuItem();
+                _scFlagMenuItem.CheckOnClick = true;
+                _scFlagMenuItem.Name = "scFlagMenuItem";
+                _scFlagMenuItem.CheckedChanged += _scFlagMenuItem_CheckedChanged;
+                
+
+                _scDropDownMenu = new ToolStripMenuItem();
+                _scDropDownMenu.Name = "scDropDownMenu";
+                _scDropDownMenu.DropDownItems.Add(_scFlagMenuItem);
+
+                mainForm.MenuStrip.Items.Insert(0,_scDropDownMenu);
+                mainForm.MenuStrip.Items.Insert(0, VerbosityItems.EnumMenuItem);
+                mainForm.MenuStrip.Items.Insert(0, AcquisitionModeItems.EnumMenuItem);
+                mainForm.MenuStrip.Items.Insert(0,MeasurementsTypeItems.EnumMenuItem);
 
                 MeasurementsTypeItems.CheckedChanged += async () =>
                 {
@@ -89,9 +106,37 @@ namespace Regata.Desktop.WinForms.Measurements
             }
             catch (Exception ex)
             {
-                Report.Notify(new Message(Codes.ERR_UI_WF_INI_MENU) { DetailedText = string.Join("--", ex.Message, ex?.InnerException?.Message) });
+                Report.Notify(new RCM.Message(Codes.ERR_UI_WF_INI_MENU) { DetailedText = string.Join("--", ex.Message, ex?.InnerException?.Message) });
             }
         }
 
-    } //public partial class MainForm
+        private async void _scFlagMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            if (_scFlagMenuItem.Checked)
+            {
+                buttonHalt.Enabled   = true;
+                buttonStopSC.Enabled = true;
+            }
+            else
+            {
+                buttonHalt.Enabled   = false;
+                buttonStopSC.Enabled = false;
+            }
+
+            if (_detectors == null)
+                return;
+            foreach (var d in _detectors)
+            {
+                if (!_scFlagMenuItem.Checked)
+                    d.DisableXemo();
+                else
+                    d.EnableXemo();
+            }
+
+            if (_scFlagMenuItem.Checked)
+                await Task.WhenAll(_detectors.Select(d => CallHomeAsync(d.PairedXemoDevice)));
+
+        }
+
+    } // public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements
