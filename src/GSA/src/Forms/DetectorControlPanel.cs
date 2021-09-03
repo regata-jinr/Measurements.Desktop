@@ -45,6 +45,8 @@ namespace Regata.Desktop.WinForms.Measurements
                 Disposed += DetectorControlPanel_Disposed;
 
                 Load += DetectorControlPanel_Load;
+                _timer.Start();
+
             }
             catch (Exception ex)
             {
@@ -95,7 +97,6 @@ namespace Regata.Desktop.WinForms.Measurements
                 if (_dets.Current.CurrentMeasurement.Height.HasValue)
                     DCPComboBoxHeight.SelectedItem = _dets.Current.CurrentMeasurement.Height.Value;
 
-                await Task.Run(() => RefreshTime());
             }
             catch (Exception ex)
             {
@@ -103,15 +104,14 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
-        private async Task RefreshTime()
+
+        private void _timer_Tick(object sender, System.EventArgs e)
         {
             try
             {
-                while (LeftSeconds > 0 && _dets.Current.Status == DetectorStatus.busy)
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(1));
-
-                    var time = TimeSpan.FromSeconds(LeftSeconds);
+                //while (LeftSeconds > 0 && _dets.Current.Status == DetectorStatus.busy)
+                //{
+                var time = TimeSpan.FromSeconds(LeftSeconds);
 
                     DCPNumericUpDownElapsedHours?.Invoke(  new Action(() => { DCPNumericUpDownElapsedHours.Value = time.Hours; }));
                     DCPNumericUpDownElapsedMinutes?.Invoke(new Action(() => { DCPNumericUpDownElapsedMinutes.Value = time.Minutes; }));
@@ -119,7 +119,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
                     DCPLabelDeadTimeValue?.Invoke(new Action(() => { DCPLabelDeadTimeValue.Text = $"{_dets.Current.DeadTime}%"; }));
 
-                }
+                //}
             }
             catch (Exception ex)
             {
@@ -176,14 +176,13 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
-        private async void DetStatusChangedHandler(object sender, EventArgs e)
+        private void DetStatusChangedHandler(object sender, EventArgs e)
         {
             try
             {
                 if (_dets.Current.Status == DetectorStatus.busy)
                 {
                     DCPButtonStartPause.Text = "Пауза";
-                    await Task.Run(() => RefreshTime());
                 }
 
                 if (_dets.Current.Status == DetectorStatus.ready && _dets.Current.IsPaused)

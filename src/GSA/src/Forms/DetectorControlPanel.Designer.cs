@@ -24,6 +24,7 @@ namespace Regata.Desktop.WinForms.Measurements
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
+            _timer.Stop();
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -428,6 +429,12 @@ namespace Regata.Desktop.WinForms.Measurements
             this.label4.Text = "Секунды";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // _timer
+            // 
+            _timer = new System.Windows.Forms.Timer();
+            _timer.Interval = 100;
+            _timer.Tick += _timer_Tick; ;
+            // 
             // DetectorControlPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -482,6 +489,7 @@ namespace Regata.Desktop.WinForms.Measurements
             this.ResumeLayout(false);
         }
 
+
         #endregion
 
         private System.Windows.Forms.Button DCPButtonPrevSrc;
@@ -516,5 +524,6 @@ namespace Regata.Desktop.WinForms.Measurements
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Timer _timer;
     }
 }

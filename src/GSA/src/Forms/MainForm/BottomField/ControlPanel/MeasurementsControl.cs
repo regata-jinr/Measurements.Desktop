@@ -165,13 +165,14 @@ namespace Regata.Desktop.WinForms.Measurements
 
             if (!mainForm.MainRDGV.CurrentDbSet.Local.Any()) return;
 
+            if (!mainForm.MainRDGV.CurrentDbSet.Local.Where(m => !string.IsNullOrEmpty(m.Detector)).Any()) return;
+
             buttonStart.Enabled = false;
             mainForm.ProgressBar.Value = mainForm.MainRDGV.CurrentDbSet.Local.Where(m => !string.IsNullOrEmpty(m.FileSpectra)).Count();
             mainForm.ProgressBar.Maximum = mainForm.MainRDGV.RowCount;
 
             if (_detectors == null || _detectors.Count == 0)
                 await InitializeDetectors();
-
 
             await Task.WhenAll(_detectors.Select(d => MStartAsync(d)));
 

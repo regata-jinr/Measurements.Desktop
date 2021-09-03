@@ -20,12 +20,13 @@ using Regata.Core.UI.WinForms.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm : IDisposable
     {
+        private Timer _timer;
         public  RegisterForm<Measurement> mainForm;
         private MeasurementsRegister CurrentMeasurementsRegister;
         private EnumItem<MeasurementsType> MeasurementsTypeItems;
@@ -76,6 +77,11 @@ namespace Regata.Desktop.WinForms.Measurements
             mainForm.Load += MainForm_Load;
 
             Settings<MeasurementsSettings>.Save();
+
+            _timer = new Timer();
+            _timer.Interval = (int)TimeSpan.FromSeconds(Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTime).TotalMilliseconds;
+            _timer.Tick += RefreshRegisters;
+            _timer.Start();
         }
 
         private void Report_NotificationEvent(Core.Messages.Message msg)
@@ -142,18 +148,11 @@ namespace Regata.Desktop.WinForms.Measurements
 
             buttonClearRegister.Enabled = true;
             buttonShowAcqQueue.Enabled = true;
-
-            await BackGroundTask();
-
         }
 
-        private async Task BackGroundTask()
+        private async void RefreshRegisters(object sender, EventArgs e)
         {
-            while (true)
-            {
-                await Task.Delay(TimeSpan.FromSeconds(Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTime));
                 await FillSelectedIrradiations();
-            }
         }
 
 
