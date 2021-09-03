@@ -34,8 +34,6 @@ namespace Regata.Desktop.WinForms.Measurements
         private Button buttonClear;
         private Button buttonPause;
         private Button buttonStart;
-        private Button buttonStopSC;
-        private Button buttonHalt;
 
         private void InitializeMeasurementsControls()
         {
@@ -46,32 +44,25 @@ namespace Regata.Desktop.WinForms.Measurements
                 buttonPause = new Button() { Name = "buttonPause", Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Yellow };
                 buttonStart = new Button() { Name = "buttonStart", Dock = DockStyle.Fill, UseVisualStyleBackColor = true, BackColor = Color.Green  };
 
-                buttonStopSC = new Button() { Name = "buttonStopSC", Dock = DockStyle.Fill, Enabled = false};
-                buttonHalt = new Button() { Name = "buttonHalt", Dock = DockStyle.Fill, Enabled = false };
-
                 buttonStop.Click  += ButtonStop_Click;
                 buttonStart.Click += ButtonStart_Click;
                 buttonClear.Click += ButtonClear_Click;
                 buttonPause.Click += ButtonPause_Click;
 
-                buttonHalt.Click += ButtonHalt_Click;
-                buttonStopSC.Click += ButtonStopSC_Click;
                 MeasurementsStartPanel = new TableLayoutPanel();
                 MeasurementsStartPanel.ColumnCount = 2;
                 MeasurementsStartPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
                 MeasurementsStartPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
                 MeasurementsStartPanel.Name = "MeasurementsStartPanel";
-                MeasurementsStartPanel.RowCount = 3;
-                MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));
-                MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));
-                MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 33F));
+                MeasurementsStartPanel.RowCount = 2;
+                MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+                MeasurementsStartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
                 MeasurementsStartPanel.Dock = DockStyle.Fill;
-                MeasurementsStartPanel.Controls.Add(buttonStopSC, 0, 0);
-                MeasurementsStartPanel.Controls.Add(buttonHalt, 1, 0);
-                MeasurementsStartPanel.Controls.Add(buttonStop, 0, 1);
-                MeasurementsStartPanel.Controls.Add(buttonClear, 1, 1);
-                MeasurementsStartPanel.Controls.Add(buttonPause, 0, 2);
-                MeasurementsStartPanel.Controls.Add(buttonStart, 1, 2);
+
+                MeasurementsStartPanel.Controls.Add(buttonStop,  0, 0);
+                MeasurementsStartPanel.Controls.Add(buttonClear, 1, 0);
+                MeasurementsStartPanel.Controls.Add(buttonPause, 0, 1);
+                MeasurementsStartPanel.Controls.Add(buttonStart, 1, 1);
 
                 CheckedAvailableDetectorArrayControl = new CheckedArrayControl<string>(new string[0]) { Name = "CheckedAvailableDetectorArrayControl" };
 
@@ -88,23 +79,6 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
-        private void ButtonStopSC_Click(object sender, EventArgs e)
-        {
-            if (_detectors == null)
-                return;
-
-            _detectors.ForEach(d => CallStop(d.PairedXemoDevice));
-
-        }
-
-        private void ButtonHalt_Click(object sender, EventArgs e)
-        {
-            if (_detectors == null)
-                return;
-
-            _detectors.ForEach(d => CallHalt(d.PairedXemoDevice));
-        }
-
         private bool _isMeasurementsPaused = false;
 
         private void ButtonPause_Click(object sender, EventArgs e)
@@ -116,12 +90,18 @@ namespace Regata.Desktop.WinForms.Measurements
                 foreach (var d in _detectors)
                 {
                     if (_isMeasurementsPaused)
+                    {
+                        _isMeasurementsPaused = false;
                         d.Start();
+                    }
                     else
                     {
                         _isMeasurementsPaused = true;
                         d.Pause();
                     }
+
+                    if (d.PairedXemoDevice != null)
+                        d.PairedXemoDevice.IsStopped = _isMeasurementsPaused;
                 }
             }
             catch (Exception ex)
@@ -157,16 +137,19 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
+                _dcp?.Dispose();
+
                 if (_detectors == null) return;
 
                 foreach (var d in _detectors)
                 {
+                    d.PairedXemoDevice?.Stop();
                     d.Stop();
                     d.Dispose();
+                    d.PairedXemoDevice?.Dispose();
                 }
                 _detectors.Clear();
                 buttonStart.Enabled = true;
-                _dcp?.Dispose();
                 mainForm.ProgressBar.Value = 0;
             }
             catch (Exception ex)

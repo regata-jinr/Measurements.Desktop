@@ -40,10 +40,11 @@ namespace Regata.Desktop.WinForms.Measurements
                     await Detector.ShowDetectorInMvcgAsync(d);
 
                     var det = new Detector(d, enableXemo: _scFlagMenuItem.Checked);
-                    det.AcquireDone += Det_AcquireDone;
-                    det.AcquireStart += Det_AcquireStart;
+                    
+                    det.AcquireDone   += Det_AcquireDone;
+                    det.AcquireStart  += Det_AcquireStart;
                     det.HardwareError += Det_HardwareError;
-                    det.ParamChange += Det_ParamChange;
+                    det.ParamChange   += Det_ParamChange;
                     det.StatusChanged += Det_StatusChanged;
                     _detectors.Add(det);
                 }
@@ -56,7 +57,6 @@ namespace Regata.Desktop.WinForms.Measurements
             catch (Exception ex)
             {
                 Report.Notify(new Message(Codes.ERR_UI_WF_INI_DET) { DetailedText = ex.ToString() });
-
             }
         }
 

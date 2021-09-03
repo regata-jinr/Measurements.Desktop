@@ -112,17 +112,6 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private async void _scFlagMenuItem_CheckedChanged(object sender, EventArgs e)
         {
-            if (_scFlagMenuItem.Checked)
-            {
-                buttonHalt.Enabled   = true;
-                buttonStopSC.Enabled = true;
-            }
-            else
-            {
-                buttonHalt.Enabled   = false;
-                buttonStopSC.Enabled = false;
-            }
-
             if (_detectors == null)
                 return;
             foreach (var d in _detectors)
