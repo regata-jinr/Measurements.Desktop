@@ -52,7 +52,6 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 if (_scFlagMenuItem.Checked)
                     await Task.WhenAll(_detectors.Select(d => CallHomeAsync(d.PairedXemoDevice)));
-
             }
             catch (Exception ex)
             {

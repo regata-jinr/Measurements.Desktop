@@ -253,6 +253,20 @@ namespace Regata.Desktop.WinForms.Measurements
 
         }
 
+
+        private void PositionReachedHandler(SampleChanger sc)
+        {
+            switch (sc.PinnedPosition)
+            {
+                case PinnedPositions.Home:
+                    //sc.TakeSampleFromTheCell();
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
         private void ColorizeRDGVRow(Measurement m, Color clr)
         {
             try
