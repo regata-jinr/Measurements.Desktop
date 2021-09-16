@@ -1,98 +1,97 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
-    <StartupObject>Regata.Desktop.WinForms.Measurements.Program</StartupObject>
+	<OutputType>WinExe</OutputType>
+	<TargetFramework>net5.0-windows</TargetFramework>
+	<UseWindowsForms>true</UseWindowsForms>
+	<StartupObject>Regata.Desktop.WinForms.Measurements.Program</StartupObject>
 	<PlatformTarget>x86</PlatformTarget>
-    <Version>0.9.9</Version>
-    <ApplicationIcon>Resources\MeasurementsLogoCircle1.ico</ApplicationIcon>
-    <Win32Resource></Win32Resource>
-    <Company>FLNP | JINR</Company>
-    <Authors>Boris Rumyantsev</Authors>
-    <Product>Gamma Spectroscopy Automatisation</Product>
-    <PackageProjectUrl>https://github.com/regata-jinr/Measurements.Desktop</PackageProjectUrl>
-    <PackageIcon>MeasurementsLogoCircle_0.1.png</PackageIcon>
-    <PackageIconUrl />
-    <RepositoryUrl>https://github.com/regata-jinr/Measurements.Desktop</RepositoryUrl>
-    <AssemblyVersion>0.9.9.0</AssemblyVersion>
-    <FileVersion>0.9.9.0</FileVersion>
-    <RootNamespace>Regata.Desktop.WinForms.Measurements</RootNamespace>
-    <SignAssembly>false</SignAssembly>
+	<Version>0.9.9</Version>
+	<ApplicationIcon>Resources\MeasurementsLogoCircle1.ico</ApplicationIcon>
+	<Company>FLNP | JINR</Company>
+	<Authors>Boris Rumyantsev</Authors>
+	<Product>Gamma Spectroscopy Automatisation</Product>
+	<PackageProjectUrl>https://github.com/regata-jinr/Measurements.Desktop</PackageProjectUrl>
+	<PackageIcon>MeasurementsLogoCircle_0.1.png</PackageIcon>
+	<PackageIconUrl />
+	<RepositoryUrl>https://github.com/regata-jinr/Measurements.Desktop</RepositoryUrl>
+	<AssemblyVersion>0.9.9.0</AssemblyVersion>
+	<FileVersion>0.9.9.0</FileVersion>
+	<RootNamespace>Regata.Desktop.WinForms.Measurements</RootNamespace>
+	<SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="src\Classes\**" />
-    <Compile Remove="src\Session\**" />
-    <EmbeddedResource Remove="src\Classes\**" />
-    <EmbeddedResource Remove="src\Session\**" />
-    <None Remove="src\Classes\**" />
-    <None Remove="src\Session\**" />
+	<Compile Remove="src\Classes\**" />
+	<Compile Remove="src\Session\**" />
+	<EmbeddedResource Remove="src\Classes\**" />
+	<EmbeddedResource Remove="src\Session\**" />
+	<None Remove="src\Classes\**" />
+	<None Remove="src\Session\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="src\Forms\SaveSessionForm.cs" />
-    <Compile Remove="src\Forms\SaveSessionForm.Designer.cs" />
-    <Compile Remove="src\Forms\SessionControlPanel.cs" />
-    <Compile Remove="src\Forms\SessionControlPanel.Designer.cs" />
-    <Compile Remove="src\Forms\SessionFormLLI.cs" />
-    <Compile Remove="src\Forms\SessionFormSLI.cs" />
+	<Compile Remove="src\Forms\SaveSessionForm.cs" />
+	<Compile Remove="src\Forms\SaveSessionForm.Designer.cs" />
+	<Compile Remove="src\Forms\SessionControlPanel.cs" />
+	<Compile Remove="src\Forms\SessionControlPanel.Designer.cs" />
+	<Compile Remove="src\Forms\SessionFormLLI.cs" />
+	<Compile Remove="src\Forms\SessionFormSLI.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Remove="src\Forms\SaveSessionForm.resx" />
-    <EmbeddedResource Remove="src\Forms\SessionControlPanel.resx" />
-    <EmbeddedResource Remove="src\Forms\SessionFormLLI.resx" />
-    <EmbeddedResource Remove="src\Forms\SessionFormSLI.resx" />
+	<EmbeddedResource Remove="src\Forms\SaveSessionForm.resx" />
+	<EmbeddedResource Remove="src\Forms\SessionControlPanel.resx" />
+	<EmbeddedResource Remove="src\Forms\SessionFormLLI.resx" />
+	<EmbeddedResource Remove="src\Forms\SessionFormSLI.resx" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AdysTech.CredentialManager" Version="2.3.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
-    <PackageReference Include="NLog" Version="4.7.10" />
+	<PackageReference Include="AdysTech.CredentialManager" Version="2.3.0" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
+	<PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+	<PackageReference Include="NLog" Version="4.7.10" />
 	  <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="base">
-      <HintPath>..\..\..\..\..\..\Core\artifacts\$(Configuration)\base\base.dll</HintPath>
-    </Reference>
-    <Reference Include="collections">
-      <HintPath>..\..\..\..\..\..\Core\artifacts\$(Configuration)\collections\collections.dll</HintPath>
-    </Reference>
-    <Reference Include="Detector">
-      <HintPath>..\..\..\..\..\..\Core\artifacts\$(Configuration)\Detector\Detector.dll</HintPath>
-    </Reference>
+	<Reference Include="base">
+	  <HintPath>$(ARTIFACTS)\$(Configuration)\base\base.dll</HintPath>
+	</Reference>
+	<Reference Include="collections">
+	  <HintPath>$(ARTIFACTS)\$(Configuration)\collections\collections.dll</HintPath>
+	</Reference>
+	<Reference Include="Detector">
+	  <HintPath>$(ARTIFACTS)\$(Configuration)\Detector\Detector.dll</HintPath>
+	</Reference>
 	  <Reference Include="SampleChanger">
-		  <HintPath>..\..\..\..\..\..\Core\artifacts\$(Configuration)\SampleChanger\SampleChanger.dll</HintPath>
+		  <HintPath>$(ARTIFACTS)\$(Configuration)\SampleChanger\SampleChanger.dll</HintPath>
 	  </Reference>
 	  <Reference Include="Interop.CanberraDeviceAccessLib">
-      <HintPath>..\..\..\..\..\..\Core\libs\Interop.CanberraDeviceAccessLib.dll</HintPath>
-    </Reference>
-    <Reference Include="WinFormsTemplates">
-      <HintPath>..\..\..\..\..\..\Core\artifacts\$(Configuration)\WinFormsTemplates\WinFormsTemplates.dll</HintPath>
-    </Reference>
-	  <None Include="D:\GoogleDrive\Job\flnp\dev\regata\Core\libs\XemoDll.dll" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+	  <HintPath>$(ARTIFACTS)\..\libs\Interop.CanberraDeviceAccessLib.dll</HintPath>
+	</Reference>
+	<Reference Include="WinFormsTemplates">
+	  <HintPath>$(ARTIFACTS)\$(Configuration)\WinFormsTemplates\WinFormsTemplates.dll</HintPath>
+	</Reference>
+	  <None Include="$(ARTIFACTS)\..\libs\XemoDll.dll" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
+	<Compile Update="Properties\Resources.Designer.cs">
+	  <DesignTime>True</DesignTime>
+	  <AutoGen>True</AutoGen>
+	  <DependentUpon>Resources.resx</DependentUpon>
+	</Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+	<EmbeddedResource Update="Properties\Resources.resx">
+	  <Generator>ResXFileCodeGenerator</Generator>
+	  <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	</EmbeddedResource>
   </ItemGroup>
 
 
