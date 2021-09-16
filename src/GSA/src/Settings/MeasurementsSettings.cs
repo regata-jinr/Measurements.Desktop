@@ -18,10 +18,11 @@ namespace Regata.Desktop.WinForms.Measurements
     public class MeasurementsSettings : ASettings
     {
         public int DefaultSLITime { get; set; } = 900;
+        public float DefaultSLIHeight { get; set; } = 20;
         public int DefaultLLI1Time { get; set; } = 7200;
         public int DefaultLLI2Time { get; set; }  = 7200;
-        public int BackgroundRegistersUpdateTime { get; set; } = 60;
-        public int DefaultPopUpMessageTimeout { get; set; } = 5;
+        public int BackgroundRegistersUpdateTimeSeconds { get; set; } = 60;
+        public int DefaultPopUpMessageTimeoutSeconds { get; set; } = 5;
         public CanberraDeviceAccessLib.AcquisitionModes AcquisitionMode { get; set; } = CanberraDeviceAccessLib.AcquisitionModes.aCountToRealTime;
 
         public RDataGridViewSettings MainTableSettings { get; set; } = new RDataGridViewSettings() 

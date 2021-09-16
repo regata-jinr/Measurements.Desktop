@@ -15,8 +15,8 @@ using Regata.Core.DataBase.Models;
 using Regata.Core.Hardware;
 using Regata.Core.Settings;
 using Regata.Core.UI.WinForms;
-using Regata.Core.UI.WinForms.Forms;
 using Regata.Core.UI.WinForms.Items;
+using Regata.Core.UI.WinForms.Forms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,16 +49,15 @@ namespace Regata.Desktop.WinForms.Measurements
             Settings<MeasurementsSettings>.CurrentSettings.PropertyChanged += (s, e) =>
             {
                 Labels.SetControlsLabels(mainForm);
+                // FIXME: dcp npt adopted for new from schema based on regata framework
                 //Labels.SetControlsLabels(_dcp);
 
             };
 
-            //Settings<MeasurementsSettings>.CurrentSettings.MainTableSettings = new MeasurementsSettings().MainTableSettings;
-
             mainForm.MainRDGV.RDGV_Set = Settings<MeasurementsSettings>.CurrentSettings.MainTableSettings;
 
-            if (Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTime < 30)
-                Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTime = 30;
+            if (Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTimeSeconds < 30)
+                Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTimeSeconds = 30;
 
             Report.NotificationEvent += Report_NotificationEvent;
 
@@ -79,14 +78,14 @@ namespace Regata.Desktop.WinForms.Measurements
             Settings<MeasurementsSettings>.Save();
 
             _timer = new Timer();
-            _timer.Interval = (int)TimeSpan.FromSeconds(Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTime).TotalMilliseconds;
+            _timer.Interval = (int)TimeSpan.FromSeconds(Settings<MeasurementsSettings>.CurrentSettings.BackgroundRegistersUpdateTimeSeconds).TotalMilliseconds;
             _timer.Tick += RefreshRegisters;
             _timer.Start();
         }
 
         private void Report_NotificationEvent(Core.Messages.Message msg)
         {
-            PopUpMessage.Show(msg, Settings<MeasurementsSettings>.CurrentSettings.DefaultPopUpMessageTimeout);
+            PopUpMessage.Show(msg, Settings<MeasurementsSettings>.CurrentSettings.DefaultPopUpMessageTimeoutSeconds);
         }
 
         private bool _isDisposed;

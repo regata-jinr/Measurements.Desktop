@@ -18,6 +18,7 @@ using Regata.Core.UI.WinForms.Controls;
 using System;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -87,19 +88,19 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 if (_detectors == null) return;
 
+                if (_isMeasurementsPaused)
+                {
+                    _detectors.ForEach(d => d.Start());
+                    _isMeasurementsPaused = false;
+                }
+                else
+                {
+                    _detectors.ForEach(d => d.Pause());
+                    _isMeasurementsPaused = true;
+                }
+
                 foreach (var d in _detectors)
                 {
-                    if (_isMeasurementsPaused)
-                    {
-                        _isMeasurementsPaused = false;
-                        d.Start();
-                    }
-                    else
-                    {
-                        _isMeasurementsPaused = true;
-                        d.Pause();
-                    }
-
                     if (d.PairedXemoDevice != null)
                         d.PairedXemoDevice.IsStopped = _isMeasurementsPaused;
                 }
@@ -118,11 +119,7 @@ namespace Regata.Desktop.WinForms.Measurements
             try
             {
                 if (_detectors == null) return;
-
-                foreach (var d in _detectors)
-                {
-                    d.Clear();
-                }
+                _detectors.ForEach(d => d.Clear());
             }
             catch (Exception ex)
             {
@@ -146,7 +143,6 @@ namespace Regata.Desktop.WinForms.Measurements
                     d.PairedXemoDevice?.Stop();
                     d.Stop();
                     d.Dispose();
-                    d.PairedXemoDevice?.Dispose();
                 }
                 _detectors.Clear();
                 buttonStart.Enabled = true;
@@ -224,45 +220,45 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private async Task RunSampleChangerCycle(Detector d)
         {
-            var sc = d.PairedXemoDevice;
-            if (!_scFlagMenuItem.Checked || sc == null)
-                return;
+            try
+            {
+                var sc = d.PairedXemoDevice;
+                if (!_scFlagMenuItem.Checked || sc == null)
+                    return;
 
-            if (d.CurrentMeasurement == null)
-                return;
+                if (d.CurrentMeasurement == null)
+                    return;
 
+                if (!d.CurrentMeasurement.DiskPosition.HasValue)
+                    return;
 
-            if (!d.CurrentMeasurement.DiskPosition.HasValue)
-                return;
-
-            if (sc.IsSampleCaptured)
-            { 
-                await sc.PutSampleToTheDiskAsync((short)d.CurrentMeasurement.DiskPosition.Value);
-                return;
+                if (sc.IsSampleCaptured)
+                {
+                    using (var ct = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
+                    {
+                        await sc.PutSampleToTheDiskAsync((short)d.CurrentMeasurement.DiskPosition.Value, ct.Token);
+                    }
+                    return;
+                }
+                using (var ct = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
+                {
+                    await sc.TakeSampleFromTheCellAsync((short)d.CurrentMeasurement.DiskPosition.Value, ct.Token);
+                }
+                var h = d.CurrentMeasurement.Height switch
+                {
+                    > 10f => Heights.h20,
+                    > 5f => Heights.h10,
+                    > 2.5f => Heights.h5,
+                    _ => Heights.h2p5
+                };
+                using (var ct = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
+                {
+                    await sc.PutSampleAboveDetectorWithHeightAsync(h, ct.Token);
+                }
             }
-
-            await sc.TakeSampleFromTheCellAsync((short)d.CurrentMeasurement.DiskPosition.Value);
-            var h = d.CurrentMeasurement.Height switch
+            catch (TaskCanceledException tce)
             {
-                > 10f  => Heights.h20,
-                > 5f   => Heights.h10,
-                > 2.5f => Heights.h5,
-                _      => Heights.h2p5 
-            };
-            await sc.PutSampleAboveDetectorWithHeightAsync(h);
-
-        }
-
-
-        private void PositionReachedHandler(SampleChanger sc)
-        {
-            switch (sc.PinnedPosition)
-            {
-                case PinnedPositions.Home:
-                    //sc.TakeSampleFromTheCell();
-                    break;
-                default:
-                    break;
+                buttonStop.PerformClick();
             }
 
         }

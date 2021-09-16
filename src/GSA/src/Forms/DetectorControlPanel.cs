@@ -45,7 +45,6 @@ namespace Regata.Desktop.WinForms.Measurements
                 Disposed += DetectorControlPanel_Disposed;
 
                 Load += DetectorControlPanel_Load;
-                _timer.Start();
 
             }
             catch (Exception ex)
@@ -58,6 +57,7 @@ namespace Regata.Desktop.WinForms.Measurements
         private async void DetectorControlPanel_Load(object sender, EventArgs e)
         {
             await SourcesInitialize();
+            _timer.Start();
         }
 
         private async void DetectorControlPanel_Disposed(object sender, EventArgs e)
@@ -109,8 +109,6 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
-                //while (LeftSeconds > 0 && _dets.Current.Status == DetectorStatus.busy)
-                //{
                 var time = TimeSpan.FromSeconds(LeftSeconds);
 
                     DCPNumericUpDownElapsedHours?.Invoke(  new Action(() => { DCPNumericUpDownElapsedHours.Value = time.Hours; }));
@@ -119,7 +117,6 @@ namespace Regata.Desktop.WinForms.Measurements
 
                     DCPLabelDeadTimeValue?.Invoke(new Action(() => { DCPLabelDeadTimeValue.Text = $"{_dets.Current.DeadTime}%"; }));
 
-                //}
             }
             catch (Exception ex)
             {

@@ -22,7 +22,7 @@ namespace Regata.Desktop.WinForms.Measurements
             FunctionalLayoutPanel = new TableLayoutPanel();
             FunctionalLayoutPanel.SuspendLayout();
             FunctionalLayoutPanel.ColumnCount = 3;
-            FunctionalLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33));
+            FunctionalLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
             FunctionalLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
             FunctionalLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
             FunctionalLayoutPanel.Dock = DockStyle.Fill;

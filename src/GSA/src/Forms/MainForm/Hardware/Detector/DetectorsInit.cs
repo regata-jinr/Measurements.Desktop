@@ -9,15 +9,16 @@
  *                                                                         *
  ***************************************************************************/
 
+using Microsoft.EntityFrameworkCore;
 using Regata.Core;
 using Regata.Core.DataBase.Models;
 using Regata.Core.Hardware;
 using Regata.Core.Messages;
 using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Regata.Desktop.WinForms.Measurements
@@ -61,17 +62,10 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private async Task CallHomeAsync(SampleChanger sc)
         {
-            await sc.HomeAsync();
-        }
-
-        private void CallStop(SampleChanger sc)
-        {
-            sc.Stop();
-        }
-
-        private void CallHalt(SampleChanger sc)
-        {
-            sc.HaltSystem();
+            using (var ct = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
+            {
+                await sc.HomeAsync(ct.Token);
+            }
         }
 
         private Measurement GetFirstNotMeasuredForDetector(string detName)
@@ -121,7 +115,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 ColorizeRDGVRow(det.CurrentMeasurement, Color.LightGreen);
 
-                Report.Notify(new Message(Codes.SUCC_UI_WF_ACQ_DONE) { Head = $"{det.Name} complete acq for {det.CurrentMeasurement}"});
+                Report.Notify(new Message(Codes.SUCC_UI_WF_ACQ_DONE) { Head = $"{det.Name} complete acq for {det.CurrentMeasurement}" });
 
             }
             catch (DbUpdateException dbe)
@@ -129,17 +123,21 @@ namespace Regata.Desktop.WinForms.Measurements
                 Det_HardwareError(det);
                 Report.Notify(new Message(Codes.ERR_UI_WF_ACQ_DONE_DB) { DetailedText = dbe.ToString() });
             }
-            //catch () 
-            // hardware exception
+            catch (TaskCanceledException tce)
+            {
+                Det_HardwareError(det);
+                await CompleteXemoCycle(det.PairedXemoDevice, det.CurrentMeasurement.DiskPosition);
+            }
             catch (Exception ex)
             {
                 Det_HardwareError(det);
-                Report.Notify(new Message(Codes.ERR_UI_WF_ACQ_DONE_UNREG) { DetailedText = string.Join("--", ex.Message, ex?.InnerException.Message) });
+                Report.Notify(new Message(Codes.ERR_UI_WF_ACQ_DONE_UNREG) { DetailedText = string.Join("--", ex.Message, ex?.InnerException?.Message) });
             }
             finally
             {
-                if (!mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.FileSpectra == null).Any())
+                if (!mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.FileSpectra == null && m.Detector == det.Name).Any())
                 {
+                    await CompleteXemoCycle(det.PairedXemoDevice, det.CurrentMeasurement.DiskPosition);
                     buttonStart.Enabled = true;
                 }
                 else
@@ -148,6 +146,26 @@ namespace Regata.Desktop.WinForms.Measurements
                 }
             }
         }
+
+
+        private async Task CompleteXemoCycle(SampleChanger sc, int? diskPosition)
+        {
+            if (!diskPosition.HasValue || sc == null)
+                return;
+
+            if (sc.IsSampleCaptured)
+            {
+                using (var ct = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
+                {
+                    await sc.PutSampleToTheDiskAsync((short)diskPosition.Value, ct.Token);
+                }
+            }
+            using (var ct = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
+            {
+                await sc.HomeAsync(ct.Token);
+            }
+        }
+
 
         private void Det_StatusChanged(object sender, System.EventArgs e)
         {

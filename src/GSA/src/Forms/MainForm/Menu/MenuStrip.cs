@@ -11,6 +11,7 @@
 
 using Regata.Core;
 using RCM = Regata.Core.Messages;
+using Regata.Core.Hardware;
 using Regata.Core.Settings;
 using Regata.Core.UI.WinForms;
 using System;
@@ -23,8 +24,10 @@ namespace Regata.Desktop.WinForms.Measurements
     public partial class MainForm
     {
 
-        ToolStripMenuItem _scFlagMenuItem;
-        ToolStripMenuItem _scDropDownMenu;
+        private ToolStripMenuItem _scFlagMenuItem;
+        private ToolStripMenuItem _scDropDownMenu;
+        private ToolStripMenuItem _showDevCams;
+
 
         private void InitMenuStrip()
         {
@@ -63,16 +66,22 @@ namespace Regata.Desktop.WinForms.Measurements
                 _scFlagMenuItem.CheckOnClick = true;
                 _scFlagMenuItem.Name = "scFlagMenuItem";
                 _scFlagMenuItem.CheckedChanged += _scFlagMenuItem_CheckedChanged;
-                
+
+                _showDevCams = new ToolStripMenuItem();
+                _showDevCams.Name = "showDevCams";
+                _showDevCams.Click += (s, e) => SampleChanger.ShowDevicesCams();
 
                 _scDropDownMenu = new ToolStripMenuItem();
                 _scDropDownMenu.Name = "scDropDownMenu";
                 _scDropDownMenu.DropDownItems.Add(_scFlagMenuItem);
+                _scDropDownMenu.DropDownItems.Add(_showDevCams);
+
+
 
                 mainForm.MenuStrip.Items.Insert(0,_scDropDownMenu);
                 mainForm.MenuStrip.Items.Insert(0, VerbosityItems.EnumMenuItem);
                 mainForm.MenuStrip.Items.Insert(0, AcquisitionModeItems.EnumMenuItem);
-                mainForm.MenuStrip.Items.Insert(0,MeasurementsTypeItems.EnumMenuItem);
+                mainForm.MenuStrip.Items.Insert(0, MeasurementsTypeItems.EnumMenuItem);
 
                 MeasurementsTypeItems.CheckedChanged += async () =>
                 {
@@ -90,6 +99,16 @@ namespace Regata.Desktop.WinForms.Measurements
                         2 => TimeSpan.FromSeconds(Settings<MeasurementsSettings>.CurrentSettings.DefaultLLI2Time),
                         _ => TimeSpan.FromSeconds(0),
                     };
+
+                    var h = Settings<MeasurementsSettings>.CurrentSettings.DefaultSLIHeight switch
+                    {
+                        <= 2.5f => 2.5f,
+                        <= 5    => 5f,
+                        <= 10   => 10f,
+                        _       => 20f
+                    };
+
+                    CheckedHeightArrayControl.SelectItem(h);
 
                     ClearCurrentRegister();
 

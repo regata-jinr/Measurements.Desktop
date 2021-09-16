@@ -32,7 +32,9 @@ namespace Regata.Desktop.WinForms.Measurements
                 CheckedHeightArrayControl = new CheckedArrayControl<float?>(new float?[] { 2.5f, 5f, 10f, 20f }) { Name = "CheckedArrayControlHeights" };
                 buttonShowAcqQueue = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonShowAcqQueue", Enabled = false };
                 controlsMeasParams = new ControlsGroupBox(new Control[] { DurationControl, CheckedHeightArrayControl, buttonShowAcqQueue }) { Name = "controlsMeasParams" };
-
+                controlsMeasParams._tableLayoutPanel.RowStyles[0].Height = 37.5F;
+                controlsMeasParams._tableLayoutPanel.RowStyles[1].Height = 37.5F;
+                controlsMeasParams._tableLayoutPanel.RowStyles[2].Height = 25F;
                 FunctionalLayoutPanel.Controls.Add(controlsMeasParams, 1, 0);
 
                 DurationControl.DurationChanged += (s, e) => mainForm.MainRDGV.FillDbSetValues("Duration", (int)DurationControl.Duration.TotalSeconds);
