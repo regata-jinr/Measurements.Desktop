@@ -21,30 +21,6 @@
 	<SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
-  <ItemGroup>
-	<Compile Remove="src\Classes\**" />
-	<Compile Remove="src\Session\**" />
-	<EmbeddedResource Remove="src\Classes\**" />
-	<EmbeddedResource Remove="src\Session\**" />
-	<None Remove="src\Classes\**" />
-	<None Remove="src\Session\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-	<Compile Remove="src\Forms\SaveSessionForm.cs" />
-	<Compile Remove="src\Forms\SaveSessionForm.Designer.cs" />
-	<Compile Remove="src\Forms\SessionControlPanel.cs" />
-	<Compile Remove="src\Forms\SessionControlPanel.Designer.cs" />
-	<Compile Remove="src\Forms\SessionFormLLI.cs" />
-	<Compile Remove="src\Forms\SessionFormSLI.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-	<EmbeddedResource Remove="src\Forms\SaveSessionForm.resx" />
-	<EmbeddedResource Remove="src\Forms\SessionControlPanel.resx" />
-	<EmbeddedResource Remove="src\Forms\SessionFormLLI.resx" />
-	<EmbeddedResource Remove="src\Forms\SessionFormSLI.resx" />
-  </ItemGroup>
 
   <ItemGroup>
 	<PackageReference Include="AdysTech.CredentialManager" Version="2.3.0" />
