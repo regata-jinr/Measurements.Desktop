@@ -29,7 +29,6 @@ namespace Regata.Desktop.WinForms.Measurements
 
             using (var lf = new LoginForm())
             {
-            
                 lf.ConnectionSuccessfull += (sqlcs) => 
                 { var m = new MainForm(); m.mainForm.Show(); m.mainForm.FormClosed += (s,e) => lf.Close(); GlobalSettings.User = sqlcs.UserID; };
                 Application.Run(lf);

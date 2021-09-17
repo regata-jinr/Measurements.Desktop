@@ -15,7 +15,7 @@ using Regata.Core.Collections;
 using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
 using RCM = Regata.Core.Messages;
-using Regata.Core.Settings;
+using Regata.Core.UI.WinForms;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -69,18 +69,17 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
-                m.Id = 0;
-                m.AcqMode = (int)AcquisitionModeItems.CheckedItem;
-                m.RegId = CurrentMeasurementsRegister.Id;
-                m.Duration = (int)DurationControl.Duration.TotalSeconds;
-                m.Type = (int)MeasurementsTypeItems.CheckedItem;
-                m.Height = CheckedHeightArrayControl.SelectedItem;
-
-                m.DateTimeStart = null;
+                m.Id             = 0;
+                m.AcqMode        = (int)AcquisitionModeItems.CheckedItem;
+                m.RegId          = CurrentMeasurementsRegister.Id;
+                m.Duration       = (int)DurationControl.Duration.TotalSeconds;
+                m.Type           = (int)MeasurementsTypeItems.CheckedItem;
+                m.Height         = CheckedHeightArrayControl.SelectedItem;
+                m.DateTimeStart  = null;
                 m.DateTimeFinish = null;
-                m.FileSpectra = null;
-                m.Note = null;
-                m.DeadTime = null;
+                m.FileSpectra    = null;
+                m.Note           = null;
+                m.DeadTime       = null;
 
                 mainForm.MainRDGV.Add(m);
             }
@@ -140,6 +139,9 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 mainForm.MainRDGV.SetUpWritableColumns();
 
+                Labels.SetControlsLabels(mainForm);
+
+
             }
             catch (Exception ex)
             {
@@ -149,7 +151,6 @@ namespace Regata.Desktop.WinForms.Measurements
                 });
             }
         }
-
 
         private void RemoveCurrentRegisterIfEmpty()
         {

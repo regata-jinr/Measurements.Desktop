@@ -75,6 +75,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
             mainForm.Load += MainForm_Load;
 
+
             Settings<MeasurementsSettings>.Save();
 
             _timer = new Timer();
@@ -133,6 +134,9 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private async void MainForm_Load(object sender, EventArgs e)
         {
+            Labels.SetControlsLabels(mainForm);
+            mainForm.MainRDGV.HideColumns();
+
             var tmpArr = new List<string>(8);
             await foreach (var d in Detector.GetAvailableDetectorsAsyncStream())
             {
