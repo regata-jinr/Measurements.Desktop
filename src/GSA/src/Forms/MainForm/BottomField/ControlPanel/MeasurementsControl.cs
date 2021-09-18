@@ -69,7 +69,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 controlsMeasControl = new ControlsGroupBox(new Control[] { CheckedAvailableDetectorArrayControl, MeasurementsStartPanel }) { Name = "controlsMeasControl" };
 
-                FunctionalLayoutPanel.Controls.Add(controlsMeasControl, 2, 0);
+                mainForm.FunctionalLayoutPanel.Controls.Add(controlsMeasControl, 2, 0);
 
                 CheckedAvailableDetectorArrayControl.SelectionChanged += (s,e) => mainForm.MainRDGV.FillDbSetValues("Detector", CheckedAvailableDetectorArrayControl.SelectedItem);
             }
@@ -256,7 +256,7 @@ namespace Regata.Desktop.WinForms.Measurements
                     await sc.PutSampleAboveDetectorWithHeightAsync(h, ct.Token);
                 }
             }
-            catch (TaskCanceledException tce)
+            catch (TaskCanceledException)
             {
                 buttonStop.PerformClick();
             }

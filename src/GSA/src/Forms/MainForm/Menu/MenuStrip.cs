@@ -117,9 +117,9 @@ namespace Regata.Desktop.WinForms.Measurements
 
                     Labels.SetControlsLabels(mainForm);
 
-                    buttonAddAllSamples.Enabled = true;
-                    buttonAddSelectedSamplesToReg.Enabled = true;
-                    buttonRemoveSelectedSamples.Enabled = true;
+                    mainForm.buttonAddAllSamples.Enabled = true;
+                    mainForm.buttonAddSelectedSamplesToReg.Enabled = true;
+                    mainForm.buttonRemoveSelectedSamples.Enabled = true;
 
                 };
             }

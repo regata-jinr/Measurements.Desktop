@@ -64,6 +64,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private bool RowIsVisible(DataGridViewRow row)
         {
+            if (row.DataGridView == null) return false;
+
             DataGridView dgv = row.DataGridView;
             int firstVisibleRowIndex = dgv.FirstDisplayedCell.RowIndex;
             int lastVisibleRowIndex = firstVisibleRowIndex + dgv.DisplayedRowCount(false) - 1;

@@ -12,7 +12,6 @@
 using Microsoft.EntityFrameworkCore;
 using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
-using Regata.Core.UI.WinForms.Controls;
 using Regata.Core.UI.WinForms.Forms;
 using System;
 using System.Collections.Generic;
@@ -23,27 +22,13 @@ namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm
     {
-        private ControlsGroupBox buttonsRegForm;
-        private Button buttonRemoveSelectedSamples;
-        private Button buttonAddSelectedSamplesToReg;
-        private Button buttonClearRegister;
-        private Button buttonAddAllSamples;
 
         private void InitializeRegFormingControls()
         {
-            buttonRemoveSelectedSamples = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonRemoveSelectedSamples", Enabled = false };
-            buttonAddSelectedSamplesToReg = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonAddSelectedSamplesToReg", Enabled = false };
-            buttonClearRegister = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonClearRegister", Enabled = false };
-            buttonAddAllSamples = new Button() { AutoSize = false, Dock = DockStyle.Fill, Name = "buttonAddAllSamples", Enabled = false };
-            buttonsRegForm = new ControlsGroupBox(new Button[] { buttonAddSelectedSamplesToReg, buttonAddAllSamples, buttonRemoveSelectedSamples, buttonClearRegister }) { Name = "buttonsRegFormBox" };
-            buttonsRegForm.groupBoxTitle.Dock = DockStyle.Fill;
-
-            FunctionalLayoutPanel.Controls.Add(buttonsRegForm, 0, 0);
-
-            buttonAddSelectedSamplesToReg.Click += ButtonAddSelectedSamplesToReg_Click;
-            buttonRemoveSelectedSamples.Click += ButtonRemoveSelectedSamples_Click;
-            buttonClearRegister.Click += ButtonClearRegister_Click;
-            buttonAddAllSamples.Click += ButtonAddAllSamples_Click;
+            mainForm.buttonAddSelectedSamplesToReg.Click += ButtonAddSelectedSamplesToReg_Click;
+            mainForm.buttonRemoveSelectedSamples.Click += ButtonRemoveSelectedSamples_Click;
+            mainForm.buttonClearRegister.Click += ButtonClearRegister_Click;
+            mainForm.buttonAddAllSamples.Click += ButtonAddAllSamples_Click;
         }
 
         private void ButtonAddAllSamples_Click(object sender, EventArgs e)

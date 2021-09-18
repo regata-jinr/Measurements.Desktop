@@ -35,7 +35,6 @@ namespace Regata.Desktop.WinForms.Measurements
         
         public MainForm()
         {
-
             mainForm = new RegisterForm<Measurement>() { Name = "GSAMainForm", Text = "GSAMainForm" };
 
             mainForm.Icon = Properties.Resources.MeasurementsLogoCircle2;
@@ -66,7 +65,6 @@ namespace Regata.Desktop.WinForms.Measurements
             InitCurrentRegister();
             InitIrradiationsRegisters();
             InitMeasurementsRegisters();
-            InitializeFuntionalField();
             InitializeRegFormingControls();
             InitializeMeasurementsParamsControls();
             InitializeMeasurementsControls();
@@ -149,7 +147,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
             _circleDetArray = new CircleArray<string>(tmpArr.OrderBy(d => d).ToArray());
 
-            buttonClearRegister.Enabled = true;
+            mainForm.buttonClearRegister.Enabled = true;
             buttonShowAcqQueue.Enabled = true;
         }
 

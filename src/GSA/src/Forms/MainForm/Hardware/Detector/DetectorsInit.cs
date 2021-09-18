@@ -123,7 +123,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 Det_HardwareError(det);
                 Report.Notify(new Message(Codes.ERR_UI_WF_ACQ_DONE_DB) { DetailedText = dbe.ToString() });
             }
-            catch (TaskCanceledException tce)
+            catch (TaskCanceledException)
             {
                 Det_HardwareError(det);
                 await CompleteXemoCycle(det.PairedXemoDevice, det.CurrentMeasurement.DiskPosition);

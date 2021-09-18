@@ -35,7 +35,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 controlsMeasParams._tableLayoutPanel.RowStyles[0].Height = 37.5F;
                 controlsMeasParams._tableLayoutPanel.RowStyles[1].Height = 37.5F;
                 controlsMeasParams._tableLayoutPanel.RowStyles[2].Height = 25F;
-                FunctionalLayoutPanel.Controls.Add(controlsMeasParams, 1, 0);
+                mainForm.FunctionalLayoutPanel.Controls.Add(controlsMeasParams, 1, 0);
 
                 DurationControl.DurationChanged += (s, e) => mainForm.MainRDGV.FillDbSetValues("Duration", (int)DurationControl.Duration.TotalSeconds);
                 CheckedHeightArrayControl.SelectionChanged += (s,e) => mainForm.MainRDGV.FillDbSetValues("Height", CheckedHeightArrayControl.SelectedItem);
