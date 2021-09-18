@@ -50,6 +50,12 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 mainForm.TabsPane[1, 0].Scroll += async (s, e) =>
                 {
+                    using (var r = new RegataContext())
+                    {
+                        if (mainForm.TabsPane[1, 0].RowCount == await r.Irradiations.AsNoTracking()
+                                                     .Where(m => m.Type == (int)MeasurementsTypeItems.CheckedItem && m.DateTimeStart.HasValue)
+                                                    .Distinct().CountAsync()) return;
+                    }
                     if (RowIsVisible(mainForm.TabsPane[1, 0].Rows[mainForm.TabsPane[1, 0].RowCount - 1]))
                         await FillMeasurementsRegisters();
                 };

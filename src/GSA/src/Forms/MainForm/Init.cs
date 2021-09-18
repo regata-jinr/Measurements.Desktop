@@ -134,6 +134,8 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             Labels.SetControlsLabels(mainForm);
             mainForm.MainRDGV.HideColumns();
+            //mainForm.MainRDGV.SetUpReadOnlyColumns();
+            mainForm.MainRDGV.SetUpWritableColumns();
 
             var tmpArr = new List<string>(8);
             await foreach (var d in Detector.GetAvailableDetectorsAsyncStream())

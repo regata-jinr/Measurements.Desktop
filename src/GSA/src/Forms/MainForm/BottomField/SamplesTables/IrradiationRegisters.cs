@@ -44,9 +44,22 @@ namespace Regata.Desktop.WinForms.Measurements
                         CurrentMeasurementsRegister.IrradiationDate = (DateTime)mainForm.TabsPane[0, 0].SelectedRows[0].Cells[1].Value;
                 };
 
+                
 
                 mainForm.TabsPane[0, 0].Scroll += async (s, e) =>
                 {
+                    var type = MeasurementsTypeItems.CheckedItem switch
+                    {
+                        MeasurementsType.sli => 0,
+                        MeasurementsType.bckg => 3,
+                        _ => 1
+                    };
+                    using (var r = new RegataContext())
+                    {
+                        if (mainForm.TabsPane[0, 0].RowCount == await r.Irradiations.AsNoTracking()
+                                                    .Where(ir => ir.Type == type && ir.DateTimeStart != null)
+                                                    .Distinct().CountAsync()) return;
+                    }
                     if (RowIsVisible(mainForm.TabsPane[0, 0].Rows[mainForm.TabsPane[0, 0].RowCount - 1]))
                         await FillIrradiationRegisters();
                 };
