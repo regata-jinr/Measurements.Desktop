@@ -52,7 +52,10 @@
 	<Reference Include="WinFormsTemplates">
 	  <HintPath>$(ARTIFACTS)\$(Configuration)\WinFormsTemplates\WinFormsTemplates.dll</HintPath>
 	</Reference>
+	  <None Include="$(ARTIFACTS)\$(Configuration)\base\targets.json" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+	  <None Include="$(ARTIFACTS)\$(Configuration)\base\NLog.config" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
 	  <None Include="$(ARTIFACTS)\..\libs\XemoDll.dll" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+	  <None Include="labels.json" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>
