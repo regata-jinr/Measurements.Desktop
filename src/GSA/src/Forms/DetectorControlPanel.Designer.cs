@@ -112,7 +112,7 @@ namespace Regata.Desktop.WinForms.Measurements
             this.DCPButtonClear.Name = "DCPButtonClear";
             this.DCPButtonClear.Size = new System.Drawing.Size(111, 23);
             this.DCPButtonClear.TabIndex = 2;
-            this.DCPButtonClear.Text = "Отчистить";
+            this.DCPButtonClear.Text = "Очистить";
             this.DCPButtonClear.UseVisualStyleBackColor = true;
             this.DCPButtonClear.Click += new System.EventHandler(this.DCPButtonClear_Click);
             // 
