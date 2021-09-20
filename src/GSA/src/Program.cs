@@ -25,12 +25,14 @@ namespace Regata.Desktop.WinForms.Measurements
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            Settings<MeasurementsSettings>.AssemblyName = "MeasurementsDesktop";
 
             using (var lf = new LoginForm())
             {
                 lf.ConnectionSuccessfull += (sqlcs) => 
                 { var m = new MainForm(); m.mainForm.Show(); m.mainForm.FormClosed += (s,e) => lf.Close(); GlobalSettings.User = sqlcs.UserID; };
+
+                Settings<MeasurementsSettings>.AssemblyName = "MeasurementsDesktop";
+
                 Application.Run(lf);
             }
         }
