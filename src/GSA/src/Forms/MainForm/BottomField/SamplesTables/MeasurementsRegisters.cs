@@ -133,6 +133,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 _chosenMeasurements.TrimExcess();
                 mainForm.TabsPane[1, 1].DataSource = _chosenMeasurements;
                 HideMeasurementsRedundantColumns();
+                _SLIShowAlreadyAdded_CheckedChanged(null, null);
                 Labels.SetControlsLabels(mainForm);
             }
             catch (Exception ex)

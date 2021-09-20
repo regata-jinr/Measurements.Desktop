@@ -149,8 +149,15 @@ namespace Regata.Desktop.WinForms.Measurements
 
             _circleDetArray = new CircleArray<string>(tmpArr.OrderBy(d => d).ToArray());
 
+            mainForm.MainRDGV.Sorted += MainRDGV_Sorted;
+
             mainForm.buttonClearRegister.Enabled = true;
             buttonShowAcqQueue.Enabled = true;
+        }
+
+        private void MainRDGV_Sorted(object sender, EventArgs e)
+        {
+            ColorizeRDGV();
         }
 
         private async void RefreshRegisters(object sender, EventArgs e)

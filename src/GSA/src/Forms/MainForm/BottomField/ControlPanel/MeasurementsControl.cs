@@ -279,5 +279,24 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
+        private void ColorizeRDGV()
+        {
+            foreach (var m in mainForm.MainRDGV.CurrentDbSet.Local)
+            {
+                if (m.FileSpectra != null)
+                {
+                    ColorizeRDGVRow(m, Color.LightGreen);
+                    continue;
+                }
+
+                if (m.DateTimeStart.HasValue && !m.DateTimeFinish.HasValue)
+                {
+                    ColorizeRDGVRow(m, Color.LightYellow);
+                    continue;
+                }
+
+            }
+        }
+
     } // public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements

@@ -25,6 +25,8 @@ namespace Regata.Desktop.WinForms.Measurements
     {
 
         private ToolStripMenuItem _scFlagMenuItem;
+        private ToolStripMenuItem _SLIShowAlreadyAdded;
+        private ToolStripMenuItem _SLIMenuItem;
         private ToolStripMenuItem _scDropDownMenu;
         private ToolStripMenuItem _showDevCams;
 
@@ -77,9 +79,19 @@ namespace Regata.Desktop.WinForms.Measurements
                 _scDropDownMenu.DropDownItems.Add(_showDevCams);
 
 
+                _SLIShowAlreadyAdded= new ToolStripMenuItem();
+                _SLIShowAlreadyAdded.CheckOnClick = true;
+                _SLIShowAlreadyAdded.Name = "SLIShowAlreadyAdded";
+                _SLIShowAlreadyAdded.CheckedChanged += _SLIShowAlreadyAdded_CheckedChanged;
+
+                _SLIMenuItem = new ToolStripMenuItem();
+                _SLIMenuItem.Name = "SLIMenuItem";
+                _SLIMenuItem.Visible = false;
+                _SLIMenuItem.DropDownItems.Add(_SLIShowAlreadyAdded);
 
                 mainForm.MenuStrip.Items.Insert(0,_scDropDownMenu);
                 mainForm.MenuStrip.Items.Insert(0, VerbosityItems.EnumMenuItem);
+                mainForm.MenuStrip.Items.Insert(0, _SLIMenuItem);
                 mainForm.MenuStrip.Items.Insert(0, AcquisitionModeItems.EnumMenuItem);
                 mainForm.MenuStrip.Items.Insert(0, MeasurementsTypeItems.EnumMenuItem);
 
@@ -90,7 +102,17 @@ namespace Regata.Desktop.WinForms.Measurements
                     mainForm.TabsPane[0, 1].DataSource = null;
                     mainForm.TabsPane[1, 1].DataSource = null;
 
+
                     CurrentMeasurementsRegister.Type = (int)MeasurementsTypeItems.CheckedItem;
+
+                    if (MeasurementsTypeItems.CheckedItem == Core.DataBase.Models.MeasurementsType.sli)
+                    { 
+                        _SLIMenuItem.Visible = true;
+                    }
+                    else
+                    {
+                        _SLIMenuItem.Visible = false;
+                    }
 
                     DurationControl.Duration = CurrentMeasurementsRegister.Type switch
                     {
@@ -126,6 +148,29 @@ namespace Regata.Desktop.WinForms.Measurements
             catch (Exception ex)
             {
                 Report.Notify(new RCM.Message(Codes.ERR_UI_WF_INI_MENU) { DetailedText = string.Join("--", ex.Message, ex?.InnerException?.Message) });
+            }
+        }
+
+        private void _SLIShowAlreadyAdded_CheckedChanged(object sender, EventArgs e)
+        {
+            if (mainForm.MainRDGV == null || mainForm.MainRDGV.DataSource == null) return;
+
+            var added_ids = mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.IrradiationId).ToList();
+            var cti = mainForm.TabsPane.SelectedTabIndex;
+
+            var nameId = cti == 0 ? "Id" : "IrradiationId";
+
+            mainForm.TabsPane[cti, 1].ClearSelection();
+            mainForm.TabsPane[cti, 1].CurrentCell = null;
+
+            foreach (DataGridViewRow row in mainForm.TabsPane[cti, 1].Rows)
+            {
+                if (_SLIShowAlreadyAdded.Checked && added_ids.Contains((int)row.Cells[nameId].Value))
+                {
+                    row.Visible = false;
+                    continue;
+                }
+                row.Visible = true;
             }
         }
 

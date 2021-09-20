@@ -46,14 +46,14 @@ namespace Regata.Desktop.WinForms.Measurements
                 m.DiskPosition = diskPosition;
                 m.Detector = MeasurementsTypeItems.CheckedItem switch
                 {
-                    MeasurementsType.sli => _circleDetArray?.Current,
+                    MeasurementsType.sli => GetDetectorForSLISample(m),
                     _ => string.IsNullOrEmpty(dName) ?  CheckedAvailableDetectorArrayControl.SelectedItem : dName
                 };
 
-                _circleDetArray?.MoveForward();
-
                 m.Height = CheckedHeightArrayControl.SelectedItem;
                 mainForm.MainRDGV.Add(m);
+
+                _SLIShowAlreadyAdded_CheckedChanged(null, null);
             }
             catch (Exception ex)
             {
@@ -82,6 +82,8 @@ namespace Regata.Desktop.WinForms.Measurements
                 m.DeadTime       = null;
 
                 mainForm.MainRDGV.Add(m);
+                _SLIShowAlreadyAdded_CheckedChanged(null, null);
+
             }
             catch (Exception ex)
             {
@@ -233,6 +235,38 @@ namespace Regata.Desktop.WinForms.Measurements
                 });
             }
         }
+
+
+        private string GetDetectorForSLISample(Measurement currM)
+        {
+            if (currM.SetKey.Contains("s-") || currM.SetKey.Contains("m-"))
+                return string.Empty;
+
+            if (!mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.CountryCode  == currM.CountryCode && 
+                                                           m.ClientNumber == currM.ClientNumber && 
+                                                           m.Year         == currM.Year &&
+                                                           m.SetNumber    == currM.SetNumber &&
+                                                           m.SetIndex     == currM.SetIndex
+                                                     ).Any()) return string.Empty;
+
+            int curSamNum = 0;
+            int.TryParse(currM.SampleNumber, out curSamNum);
+
+            if (curSamNum == 0) return string.Empty;
+
+            var prevM = mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.CountryCode  == currM.CountryCode &&
+                                                                  m.ClientNumber == currM.ClientNumber &&
+                                                                  m.Year         == currM.Year &&
+                                                                  m.SetNumber    == currM.SetNumber &&
+                                                                  m.SetIndex     == currM.SetIndex &&
+                                                                  m.SampleNumber == (curSamNum - 1).ToString("d2")
+                                                            ).FirstOrDefault();
+
+            if (prevM == null) return string.Empty;
+
+            return prevM.Detector;
+        }
+
 
     } // public partial class MainForm
 }     // namespace Regata.Desktop.WinForms.Measurements

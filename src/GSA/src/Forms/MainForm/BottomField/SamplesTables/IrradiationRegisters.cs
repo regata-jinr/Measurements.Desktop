@@ -173,6 +173,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 mainForm.TabsPane[0, 1].DataSource = _chosenIrradiations;
                 _chosenIrradiations.TrimExcess();
                 HideIrradiationsRedundantColumns();
+                _SLIShowAlreadyAdded_CheckedChanged(null, null);
                 Labels.SetControlsLabels(mainForm);
 
             }

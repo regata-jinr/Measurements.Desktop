@@ -43,6 +43,9 @@
 	<Reference Include="Detector">
 	  <HintPath>$(ARTIFACTS)\$(Configuration)\Detector\Detector.dll</HintPath>
 	</Reference>
+	  <Reference Include="Cloud">
+		  <HintPath>$(ARTIFACTS)\$(Configuration)\cloud\Cloud.dll</HintPath>
+	  </Reference>
 	  <Reference Include="SampleChanger">
 		  <HintPath>$(ARTIFACTS)\$(Configuration)\SampleChanger\SampleChanger.dll</HintPath>
 	  </Reference>
