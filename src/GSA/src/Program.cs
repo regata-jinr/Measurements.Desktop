@@ -31,8 +31,6 @@ namespace Regata.Desktop.WinForms.Measurements
                 lf.ConnectionSuccessfull += (sqlcs) => 
                 { var m = new MainForm(); m.mainForm.Show(); m.mainForm.FormClosed += (s,e) => lf.Close(); GlobalSettings.User = sqlcs.UserID; };
 
-                Settings<MeasurementsSettings>.AssemblyName = "MeasurementsDesktop";
-
                 Application.Run(lf);
             }
         }

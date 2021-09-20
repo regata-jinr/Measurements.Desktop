@@ -35,6 +35,8 @@ namespace Regata.Desktop.WinForms.Measurements
         
         public MainForm()
         {
+            Settings<MeasurementsSettings>.AssemblyName = "MeasurementsDesktop";
+
             mainForm = new RegisterForm<Measurement>() { Name = "GSAMainForm", Text = "GSAMainForm" };
 
             mainForm.Icon = Properties.Resources.MeasurementsLogoCircle2;
