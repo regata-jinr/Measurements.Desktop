@@ -101,9 +101,18 @@ namespace Regata.Desktop.WinForms.Measurements
             try
             {
                 // FIXME: A random AcquireDone generated events?
-                if (Math.Abs((DateTime.Now - det.CurrentMeasurement.DateTimeStart.Value).TotalSeconds) < (det.CurrentMeasurement.Duration - 3)) return;
-                
-                //if (Math.Abs(det.Counts - det.ElapsedRealTime) > 3) return;
+                //if (Math.Abs((DateTime.Now - det.CurrentMeasurement.DateTimeStart.Value).TotalSeconds) < (det.CurrentMeasurement.Duration - 3)) return;
+
+                if (det.Counts == 0) return;
+                if (det.ElapsedRealTime < 10) return;
+
+                //if (Math.Abs(det.Counts - det.ElapsedRealTime) > 15)
+                //{
+                //    // FIXME: Spectra will not save after pause
+                //    //det.Pause();
+                //    //det.Start();
+                //    return;
+                //}
 
                 det.CurrentMeasurement.FileSpectra = await Detector.GenerateSpectraFileNameFromDBAsync(det.Name, det.CurrentMeasurement.Type);
                 det.CurrentMeasurement.DeadTime = det.DeadTime;
