@@ -134,6 +134,7 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
+                _dcp.FormClosing -= (s, e) => { ButtonStop_Click(null, null); };
                 _dcp?.Dispose();
 
                 if (_detectors == null) return;
@@ -176,8 +177,10 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 _dcp = new DetectorControlPanel(_detectors);
                 _dcp.Show();
+                _dcp.FormClosing += (s,e) => { ButtonStop_Click(null, null); };
             }
         }
+
 
         private async Task MStartAsync(Detector d)
         {

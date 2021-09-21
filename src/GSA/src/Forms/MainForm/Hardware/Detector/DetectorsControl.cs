@@ -104,7 +104,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 //if (Math.Abs((DateTime.Now - det.CurrentMeasurement.DateTimeStart.Value).TotalSeconds) < (det.CurrentMeasurement.Duration - 3)) return;
 
                 if (det.Counts == 0) return;
-                if (det.ElapsedRealTime < 10) return;
+                if (det.ElapsedRealTime < det.Counts - 10) return;
 
                 //if (Math.Abs(det.Counts - det.ElapsedRealTime) > 15)
                 //{

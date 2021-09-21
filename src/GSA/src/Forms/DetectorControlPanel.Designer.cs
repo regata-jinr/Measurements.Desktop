@@ -25,6 +25,7 @@ namespace Regata.Desktop.WinForms.Measurements
         protected override void Dispose(bool disposing)
         {
             _timer.Stop();
+
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -474,7 +475,7 @@ namespace Regata.Desktop.WinForms.Measurements
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = Properties.Resources.MeasurementsLogoCircle2;
             this.MaximizeBox = false;
-            this.MinimizeBox = false;
+            this.MinimizeBox = true;
             this.Name = "DetectorControlPanel";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
