@@ -101,7 +101,9 @@ namespace Regata.Desktop.WinForms.Measurements
             try
             {
                 // FIXME: A random AcquireDone generated events?
-                if (Math.Abs(det.ElapsedRealTime - det.Counts) > 3) return;
+                if (Math.Abs((DateTime.Now - det.CurrentMeasurement.DateTimeStart.Value).TotalSeconds) < (det.CurrentMeasurement.Duration - 3)) return;
+                
+                //if (Math.Abs(det.Counts - det.ElapsedRealTime) > 3) return;
 
                 det.CurrentMeasurement.FileSpectra = await Detector.GenerateSpectraFileNameFromDBAsync(det.Name, det.CurrentMeasurement.Type);
                 det.CurrentMeasurement.DeadTime = det.DeadTime;
