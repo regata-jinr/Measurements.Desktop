@@ -111,7 +111,7 @@ namespace Regata.Desktop.WinForms.Measurements
             {
                 var time = TimeSpan.FromSeconds(LeftSeconds);
 
-                    DCPNumericUpDownElapsedHours?.Invoke(  new Action(() => { DCPNumericUpDownElapsedHours.Value = time.Hours; }));
+                    DCPNumericUpDownElapsedHours?.Invoke(new Action(() => { DCPNumericUpDownElapsedHours.Value = time.Hours; }));
                     DCPNumericUpDownElapsedMinutes?.Invoke(new Action(() => { DCPNumericUpDownElapsedMinutes.Value = time.Minutes; }));
                     DCPNumericUpDownElapsedSeconds?.Invoke(new Action(() => { DCPNumericUpDownElapsedSeconds.Value = time.Seconds; }));
 

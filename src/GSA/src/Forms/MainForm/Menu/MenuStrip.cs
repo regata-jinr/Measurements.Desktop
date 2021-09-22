@@ -83,7 +83,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 _SLIShowAlreadyAdded.CheckOnClick = true;
                 _SLIShowAlreadyAdded.Name = "SLIShowAlreadyAdded";
                 _SLIShowAlreadyAdded.CheckedChanged += _SLIShowAlreadyAdded_CheckedChanged;
-
+                    
                 _SLIMenuItem = new ToolStripMenuItem();
                 _SLIMenuItem.Name = "SLIMenuItem";
                 _SLIMenuItem.Visible = false;

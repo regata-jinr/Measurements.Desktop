@@ -81,6 +81,8 @@ namespace Regata.Desktop.WinForms.Measurements
 
         private void Det_ParamChange(Detector det)
         {
+            det.CurrentMeasurement.DateTimeStart = det.AcquisitionStartDateTime;
+            det.CurrentMeasurement.Height = det.Sample.Height;
         }
 
         private void Det_HardwareError(Detector det)
@@ -149,11 +151,19 @@ namespace Regata.Desktop.WinForms.Measurements
                 if (!mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.FileSpectra == null && m.Detector == det.Name).Any())
                 {
                     await CompleteXemoCycle(det.PairedXemoDevice, det.CurrentMeasurement.DiskPosition);
-                    buttonStart.Enabled = true;
                 }
                 else
                 {
                     await MStartAsync(det);
+                }
+                if (!mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.FileSpectra == null).Any())
+                {
+                    mainForm.WindowState = mainForm.WindowState;
+                    if (_dcp != null)
+                        _dcp.WindowState = System.Windows.Forms.FormWindowState.Minimized;
+                    buttonStart.Enabled = true;
+                    mainForm.BringToFront();
+                    mainForm.Focus();
                 }
             }
         }

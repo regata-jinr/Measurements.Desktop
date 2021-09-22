@@ -134,8 +134,11 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
-                _dcp.FormClosing -= (s, e) => { ButtonStop_Click(null, null); };
-                _dcp?.Dispose();
+                if (_dcp != null && !_dcp.IsDisposed)
+                {
+                    _dcp.FormClosing -= (s, e) => { ButtonStop_Click(null, null); };
+                    _dcp?.Dispose();
+                }
 
                 if (_detectors == null) return;
 
@@ -179,6 +182,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 _dcp.Show();
                 _dcp.FormClosing += (s,e) => { ButtonStop_Click(null, null); };
             }
+
         }
 
 
