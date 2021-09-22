@@ -139,6 +139,29 @@ namespace Regata.Desktop.WinForms.Measurements
             //mainForm.MainRDGV.SetUpReadOnlyColumns();
             mainForm.MainRDGV.SetUpWritableColumns();
 
+
+            mainForm.MainRDGV.Sorted += MainRDGV_Sorted;
+
+            mainForm.MainRDGV.Columns["DateTimeStart"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm:ss";
+            mainForm.MainRDGV.Columns["DateTimeFinish"].DefaultCellStyle.Format = "dd.MM.yyyy HH:mm:ss";
+
+            var w = mainForm.MainRDGV.Width;
+            var typW = 0.05;
+
+            mainForm.MainRDGV.Columns["CountryCode"].Width = (int)(w * typW);
+            mainForm.MainRDGV.Columns["ClientNumber"].Width = (int)(w * typW);
+            mainForm.MainRDGV.Columns["Year"].Width = (int)(w * typW);
+            mainForm.MainRDGV.Columns["SetNumber"].Width = (int)(w * typW);
+            mainForm.MainRDGV.Columns["SetIndex"].Width = (int)(w * typW);
+            mainForm.MainRDGV.Columns["SampleNumber"].Width = (int)(w * typW);
+            mainForm.MainRDGV.Columns["DiskPosition"].Width = (int)(w * typW);
+            mainForm.MainRDGV.Columns["DateTimeStart"].Width = (int)(w * 0.1);
+            mainForm.MainRDGV.Columns["Duration"].Width = (int)(w * 0.1);
+            mainForm.MainRDGV.Columns["FileSpectra"].Width = (int)(w * typW);
+            mainForm.MainRDGV.Columns["Height"].Width = (int)(w * typW);
+            mainForm.MainRDGV.Columns["Detector"].Width = (int)(w * typW);
+            mainForm.MainRDGV.Columns["DeadTime"].Width = (int)(w * typW);
+
             var tmpArr = new List<string>(8);
             await foreach (var d in Detector.GetAvailableDetectorsAsyncStream())
             {
@@ -150,8 +173,6 @@ namespace Regata.Desktop.WinForms.Measurements
             }
 
             _circleDetArray = new CircleArray<string>(tmpArr.OrderBy(d => d).ToArray());
-
-            mainForm.MainRDGV.Sorted += MainRDGV_Sorted;
 
             mainForm.buttonClearRegister.Enabled = true;
             buttonShowAcqQueue.Enabled = true;

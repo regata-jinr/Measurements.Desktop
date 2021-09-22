@@ -27,7 +27,8 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             mainForm.buttonAddSelectedSamplesToReg.Click += ButtonAddSelectedSamplesToReg_Click;
             mainForm.buttonRemoveSelectedSamples.Click += ButtonRemoveSelectedSamples_Click;
-            mainForm.buttonClearRegister.Click += ButtonClearRegister_Click;
+            //mainForm.buttonClearRegister.Click += ButtonClearRegister_Click;
+            mainForm.buttonClearRegister.Visible = false;
             mainForm.buttonAddAllSamples.Click += ButtonAddAllSamples_Click;
         }
 

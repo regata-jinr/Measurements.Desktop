@@ -162,8 +162,9 @@ namespace Regata.Desktop.WinForms.Measurements
                     if (_dcp != null)
                         _dcp.WindowState = System.Windows.Forms.FormWindowState.Minimized;
                     buttonStart.Enabled = true;
-                    mainForm.BringToFront();
-                    mainForm.Focus();
+                    mainForm.WindowState = System.Windows.Forms.FormWindowState.Minimized;
+                    mainForm.Show();
+                    mainForm.WindowState = System.Windows.Forms.FormWindowState.Normal;
                 }
             }
         }
