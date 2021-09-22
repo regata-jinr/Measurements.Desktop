@@ -165,7 +165,11 @@ namespace Regata.Desktop.WinForms.Measurements
                 }
 
                 if (_dets.Current.Status == DetectorStatus.ready)
+                {
+                    if (!_dets.Current.IsPaused)
+                        _dets.Current.CurrentMeasurement.DateTimeStart = DateTime.Now;
                     _dets.Current.Start();
+                }
             }
             catch (Exception ex)
             {
