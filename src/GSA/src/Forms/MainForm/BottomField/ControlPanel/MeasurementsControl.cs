@@ -178,6 +178,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
             if (_dcp == null || _dcp.IsDisposed)
             {
+                await Task.Delay(TimeSpan.FromSeconds(1));
                 _dcp = new DetectorControlPanel(_detectors);
                 _dcp.Show();
                 _dcp.FormClosing += (s,e) => { ButtonStop_Click(null, null); };

@@ -34,8 +34,11 @@ namespace Regata.Desktop.WinForms.Measurements
                 // https://github.com/regata-jinr/Measurements.Desktop/issues/40
                 //await Detector.RunMvcgAsync();
                 _ = Task.Run(async () => { await Detector.RunMvcgAsync(); });
+                if (_detectors != null)
+                    _detectors.Clear();
+                else
+                    _detectors = new List<Detector>(8);
 
-                _detectors = new List<Detector>(8);
                 foreach (var d in mainForm.MainRDGV.CurrentDbSet.Local.Select(m => m.Detector).Distinct().OrderBy(n => n))
                 {
                     await Detector.ShowDetectorInMvcgAsync(d);
