@@ -134,6 +134,10 @@ namespace Regata.Desktop.WinForms.Measurements
                 Report.Notify(new Message(Codes.SUCC_UI_WF_ACQ_DONE) { Head = $"{det.Name} complete acq for {det.CurrentMeasurement}" });
 
             }
+            //catch (DbUpdateConcurrencyException dbce)
+            //{
+                
+            //}
             catch (DbUpdateException dbe)
             {
                 Det_HardwareError(det);

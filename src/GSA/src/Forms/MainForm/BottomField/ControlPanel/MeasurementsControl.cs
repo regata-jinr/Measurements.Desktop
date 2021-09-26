@@ -186,7 +186,6 @@ namespace Regata.Desktop.WinForms.Measurements
 
         }
 
-
         private async Task MStartAsync(Detector d)
         {
             try

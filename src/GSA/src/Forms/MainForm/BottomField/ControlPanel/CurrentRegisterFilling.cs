@@ -56,7 +56,7 @@ namespace Regata.Desktop.WinForms.Measurements
                     sf.Show();
                     sf.buttonExportToCSV.Visible = false;
                     sf.buttonExportToExcel.Visible = false;
-                    sf.buttonFillMeasurementRegister.Click += (s, e) => { ClearCurrentRegister(); AddAllIrradiationsAndAssignDiskPosition(ln.Value, sf.DetCont); };
+                    sf.buttonFillMeasurementRegister.Click += (s, e) => { ClearCurrentRegister(); AddAllIrradiationsAndAssignDiskPosition(ln.Value, sf.DetCont); sf.Close(); };
                 }
             }
             else // cti = 1 measurements tab

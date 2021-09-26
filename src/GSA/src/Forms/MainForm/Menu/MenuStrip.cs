@@ -116,6 +116,7 @@ namespace Regata.Desktop.WinForms.Measurements
                         _SLIMenuItem.Visible = false;
                         mainForm.MainRDGV.Columns["DateTimeFinish"].Visible = true;
                         mainForm.MainRDGV.Columns["DiskPosition"].Visible = true;
+                        _scFlagMenuItem.Checked = true;
                     }
 
                     DurationControl.Duration = CurrentMeasurementsRegister.Type switch
