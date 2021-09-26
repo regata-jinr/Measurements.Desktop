@@ -110,6 +110,8 @@ namespace Regata.Desktop.WinForms.Measurements
                         _SLIMenuItem.Visible = true;
                         mainForm.MainRDGV.Columns["DateTimeFinish"].Visible = false;
                         mainForm.MainRDGV.Columns["DiskPosition"].Visible = false;
+                        _scFlagMenuItem.Checked = false;
+
                     }
                     else
                     {

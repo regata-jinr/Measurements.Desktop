@@ -38,10 +38,6 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 DesktopLocation = new Point(Screen.PrimaryScreen.Bounds.Left + 10, Screen.PrimaryScreen.Bounds.Bottom - Size.Height - 50);
 
-                DCPNumericUpDownPresetHours.ValueChanged += ChangePresetTimeHandler;
-                DCPNumericUpDownPresetMinutes.ValueChanged += ChangePresetTimeHandler;
-                DCPNumericUpDownPresetSeconds.ValueChanged += ChangePresetTimeHandler;
-
                 Disposed += DetectorControlPanel_Disposed;
 
                 Load += DetectorControlPanel_Load;
@@ -58,6 +54,10 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             await SourcesInitialize();
             _timer.Start();
+
+            DCPNumericUpDownPresetHours.ValueChanged += ChangePresetTimeHandler;
+            DCPNumericUpDownPresetMinutes.ValueChanged += ChangePresetTimeHandler;
+            DCPNumericUpDownPresetSeconds.ValueChanged += ChangePresetTimeHandler;
         }
 
         private async void DetectorControlPanel_Disposed(object sender, EventArgs e)
