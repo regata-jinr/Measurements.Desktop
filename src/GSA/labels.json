@@ -520,5 +520,46 @@
     "ComponentName": "Height",
     "RusText": "Высота",
     "EngText": "Height"
+  },
+  {
+    "FormName": "GSAMainForm",
+    "ComponentName": "ShareSpectraMenuItem",
+    "RusText": "Загрузка спектров в облако",
+    "EngText": "Share spectra"
+  },
+  {
+    "FormName": "ShareSpectraForm",
+    "ComponentName": "ShareSpectraForm",
+    "RusText": "Загрузка спектров в облачное хранилище",
+    "EngText": "Upload chosen spectra into the cloud storage"
+  },
+
+  {
+    "FormName": "ShareSpectraForm",
+    "ComponentName": "CancelMenuButton",
+    "RusText": "Отменить загрузку",
+    "EngText": "Cancel uploading"
+  },
+
+  {
+    "FormName": "ShareSpectraForm",
+    "ComponentName": "uploadNotExistButton",
+    "RusText": "Загрузить недостающие спектры",
+    "EngText": "Upload only not existed spectra"
+  },
+
+
+  {
+    "FormName": "ShareSpectraForm",
+    "ComponentName": "uploadAllButton",
+    "RusText": "Загрузить всё",
+    "EngText": "Upload all"
+  },
+
+  {
+    "FormName": "ShareSpectraForm",
+    "ComponentName": "chooseFilesButton",
+    "RusText": "Выберите файлы спектров",
+    "EngText": "Choose spectra files"
   }
 ]

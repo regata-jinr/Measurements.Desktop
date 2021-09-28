@@ -14,8 +14,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
-using Regata.Core.Hardware;
 using Regata.Core;
+using Regata.Core.Hardware;
 using RCM=Regata.Core.Messages;
 using Regata.Core.Collections;
 
@@ -223,7 +223,7 @@ namespace Regata.Desktop.WinForms.Measurements
             }
         }
 
-        private void DCPButtonSave_Click(object sender, EventArgs e)
+        private async void DCPButtonSave_Click(object sender, EventArgs e)
         {
             try
             {
@@ -236,7 +236,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 var dr = saveFileDialogSaveCurrentSpectra.ShowDialog();
                 if (dr == DialogResult.OK)
-                    _dets.Current.Save(saveFileDialogSaveCurrentSpectra.FileName);
+                    await _dets.Current.SaveAsync(saveFileDialogSaveCurrentSpectra.FileName);
 
                 if (itWasBusy)
                     _dets.Current.Start();

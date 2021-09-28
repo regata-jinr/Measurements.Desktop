@@ -14,6 +14,7 @@ using RCM = Regata.Core.Messages;
 using Regata.Core.Hardware;
 using Regata.Core.Settings;
 using Regata.Core.UI.WinForms;
+using Regata.Core.UI.WinForms.Forms;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,6 +30,7 @@ namespace Regata.Desktop.WinForms.Measurements
         private ToolStripMenuItem _SLIMenuItem;
         private ToolStripMenuItem _scDropDownMenu;
         private ToolStripMenuItem _showDevCams;
+        private ToolStripMenuItem _shareSpectraMenuItem;
 
 
         private void InitMenuStrip()
@@ -89,6 +91,11 @@ namespace Regata.Desktop.WinForms.Measurements
                 _SLIMenuItem.Visible = false;
                 _SLIMenuItem.DropDownItems.Add(_SLIShowAlreadyAdded);
 
+                _shareSpectraMenuItem = new ToolStripMenuItem();
+                _shareSpectraMenuItem.Name = "ShareSpectraMenuItem";
+                _shareSpectraMenuItem.Click += (s, e) => { var ss = new ShareSpectra(); ss.Show(); Labels.SetControlsLabels(ss);};
+
+                mainForm.MenuStrip.Items.Insert(0, _shareSpectraMenuItem);
                 mainForm.MenuStrip.Items.Insert(0,_scDropDownMenu);
                 mainForm.MenuStrip.Items.Insert(0, VerbosityItems.EnumMenuItem);
                 mainForm.MenuStrip.Items.Insert(0, _SLIMenuItem);

@@ -119,7 +119,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 det.CurrentMeasurement.FileSpectra = await Detector.GenerateSpectraFileNameFromDBAsync(det.Name, det.CurrentMeasurement.Type);
                 det.CurrentMeasurement.DeadTime = det.DeadTime;
-                det.Save();
+                await det.SaveAsync();
 
                 mainForm.ProgressBar.Value++;
                 mainForm.MainRDGV.Update(det.CurrentMeasurement);
