@@ -73,7 +73,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 _showDevCams = new ToolStripMenuItem();
                 _showDevCams.Name = "showDevCams";
-                _showDevCams.Click += (s, e) => SampleChanger.ShowDevicesCams();
+                _showDevCams.Click += (s, e) => Shell.ShowXemoDevicesCams();
 
                 _scDropDownMenu = new ToolStripMenuItem();
                 _scDropDownMenu.Name = "scDropDownMenu";
