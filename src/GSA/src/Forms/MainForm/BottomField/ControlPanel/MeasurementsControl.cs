@@ -163,10 +163,22 @@ namespace Regata.Desktop.WinForms.Measurements
             // TODO: check correcntess of measurements info
             // TODO: detectors availability
 
-            if (!mainForm.MainRDGV.CurrentDbSet.Local.Any()) return;
+            if (!mainForm.MainRDGV.CurrentDbSet.Local.Any())
+            {
+                Report.Notify(new RCM.Message(Codes.WARN_UI_WF_ACQ_START_EMPTY_REG));
+                return;
+            }
 
-            if (!mainForm.MainRDGV.CurrentDbSet.Local.Where(m => !string.IsNullOrEmpty(m.Detector)).Any()) return;
-
+            if (mainForm.MainRDGV.CurrentDbSet.Local.Where(m => string.IsNullOrEmpty(m.Detector)).Any())
+            {
+                Report.Notify(new RCM.Message(Codes.WARN_UI_WF_ACQ_START_EMPTY_DET));
+                return;
+            }
+            if (_scFlagMenuItem.Checked && mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.DiskPosition == null).Any())
+            {
+                Report.Notify(new RCM.Message(Codes.WARN_UI_WF_ACQ_START_EMPTY_POS));
+                return;
+            }
             buttonStart.Enabled = false;
             mainForm.ProgressBar.Value = mainForm.MainRDGV.CurrentDbSet.Local.Where(m => !string.IsNullOrEmpty(m.FileSpectra)).Count();
             mainForm.ProgressBar.Maximum = mainForm.MainRDGV.RowCount;
