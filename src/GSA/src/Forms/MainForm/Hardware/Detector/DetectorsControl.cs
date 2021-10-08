@@ -55,7 +55,10 @@ namespace Regata.Desktop.WinForms.Measurements
                 _detectors.TrimExcess();
 
                 if (_scFlagMenuItem.Checked)
-                    await Task.WhenAll(_detectors.Select(d => CallHomeAsync(d.PairedXemoDevice)));
+                {
+                    Core.GRPC.Xemo.Server.Run();
+                    //await Task.WhenAll(_detectors.Select(d => CallHomeAsync(d.PairedXemoDevice)));
+                }
             }
             catch (Exception ex)
             {
@@ -175,23 +178,23 @@ namespace Regata.Desktop.WinForms.Measurements
         }
 
 
-        private async Task CompleteXemoCycle(SampleChanger sc, int? diskPosition)
-        {
-            if (!diskPosition.HasValue || sc == null)
-                return;
+        //private async Task CompleteXemoCycle(SampleChanger sc, int? diskPosition)
+        //{
+        //    if (!diskPosition.HasValue || sc == null)
+        //        return;
 
-            if (sc.IsSampleCaptured)
-            {
-                using (var ct = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
-                {
-                    await sc.PutSampleToTheDiskAsync((short)diskPosition.Value, ct.Token);
-                }
-            }
-            using (var ct = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
-            {
-                await sc.HomeAsync(ct.Token);
-            }
-        }
+        //    if (sc.IsSampleCaptured)
+        //    {
+        //        using (var ct = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
+        //        {
+        //            await sc.PutSampleToTheDiskAsync((short)diskPosition.Value, ct.Token);
+        //        }
+        //    }
+        //    using (var ct = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
+        //    {
+        //        await sc.HomeAsync(ct.Token);
+        //    }
+        //}
 
 
         private void Det_StatusChanged(object sender, System.EventArgs e)

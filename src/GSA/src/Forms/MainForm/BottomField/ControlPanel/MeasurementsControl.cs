@@ -220,12 +220,20 @@ namespace Regata.Desktop.WinForms.Measurements
                     }
                 }
 
-                await RunSampleChangerCycle(d);
-
                 d.LoadMeasurementInfoToDevice(m, i);
 
-                await RunSampleChangerCycle(d);
+                var sc = d.PairedXemoDevice;
 
+                if (d.CurrentMeasurement == null)
+                    return;
+
+                if (!d.CurrentMeasurement.DiskPosition.HasValue)
+                    return;
+
+                if (!_scFlagMenuItem.Checked || sc == null)
+                {
+                    Core.GRPC.Xemo.Services.XemoService.DevCells[sc.SerialNumber] = d.CurrentMeasurement.DiskPosition.Value;
+                }
                 d.Start();
                 Report.Notify(new RCM.Message(Codes.SUCC_UI_WF_ACQ_START) { Head = $"{d.Name} complete acq for {d.CurrentMeasurement}" });
 
@@ -241,7 +249,10 @@ namespace Regata.Desktop.WinForms.Measurements
         {
             try
             {
+
                 var sc = d.PairedXemoDevice;
+              
+
                 if (!_scFlagMenuItem.Checked || sc == null)
                     return;
 
@@ -251,14 +262,9 @@ namespace Regata.Desktop.WinForms.Measurements
                 if (!d.CurrentMeasurement.DiskPosition.HasValue)
                     return;
 
-                if (sc.IsSampleCaptured)
-                {
-                    using (var ct = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
-                    {
-                        await sc.PutSampleToTheDiskAsync((short)d.CurrentMeasurement.DiskPosition.Value, ct.Token);
-                    }
-                    return;
-                }
+                Core.GRPC.Xemo.Services.XemoService.DevCells[sc.SerialNumber] = d.CurrentMeasurement.DiskPosition.Value;
+
+                
                 using (var ct = new CancellationTokenSource(TimeSpan.FromMinutes(2)))
                 {
                     await sc.TakeSampleFromTheCellAsync((short)d.CurrentMeasurement.DiskPosition.Value, ct.Token);
