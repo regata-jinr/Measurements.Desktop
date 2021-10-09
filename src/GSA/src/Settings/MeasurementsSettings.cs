@@ -23,6 +23,7 @@ namespace Regata.Desktop.WinForms.Measurements
         public int DefaultLLI2Time { get; set; }  = 7200;
         public int BackgroundRegistersUpdateTimeSeconds { get; set; } = 60;
         public int DefaultPopUpMessageTimeoutSeconds { get; set; } = 5;
+        public string PathToXemoClient { get; set; } = @"D:\GoogleDrive\Job\flnp\dev\regata\Core\artifacts\Debug\XemoClient\XemoClient.exe";
         public CanberraDeviceAccessLib.AcquisitionModes AcquisitionMode { get; set; } = CanberraDeviceAccessLib.AcquisitionModes.aCountToRealTime;
 
         public RDataGridViewSettings MainTableSettings { get; set; } = new RDataGridViewSettings() 

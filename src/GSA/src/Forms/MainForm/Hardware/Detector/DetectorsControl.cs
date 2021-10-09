@@ -11,9 +11,11 @@
 
 using Microsoft.EntityFrameworkCore;
 using Regata.Core;
+using Regata.Core.GRPC.Xemo.Services;
 using Regata.Core.DataBase.Models;
 using Regata.Core.Hardware;
 using Regata.Core.Messages;
+using Regata.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -43,8 +45,9 @@ namespace Regata.Desktop.WinForms.Measurements
                 {
                     await Detector.ShowDetectorInMvcgAsync(d);
 
-                    var det = new Detector(d, enableXemo: _scFlagMenuItem.Checked);
-                    
+                    //var det = new Detector(d, enableXemo: _scFlagMenuItem.Checked);
+                    var det = new Detector(d);
+
                     det.AcquireDone   += Det_AcquireDone;
                     det.AcquireStart  += Det_AcquireStart;
                     det.HardwareError += Det_HardwareError;
@@ -57,7 +60,8 @@ namespace Regata.Desktop.WinForms.Measurements
                 if (_scFlagMenuItem.Checked)
                 {
                     Core.GRPC.Xemo.Server.Run();
-                    //await Task.WhenAll(_detectors.Select(d => CallHomeAsync(d.PairedXemoDevice)));
+                    await Task.Delay(TimeSpan.FromSeconds(3));
+                    await Task.WhenAll(_detectors.Select(async d => await Shell.ExecuteCommandAsync(Settings<MeasurementsSettings>.CurrentSettings.PathToXemoClient, PairedXemoSN[d.Name].ToString())));
                 }
             }
             catch (Exception ex)
@@ -129,7 +133,7 @@ namespace Regata.Desktop.WinForms.Measurements
                 mainForm.MainRDGV.SaveChanges();
 
                 await UpdateCurrentReigster();
-
+             
                 ColorizeRDGVRow(det.CurrentMeasurement, Color.LightGreen);
 
                 Report.Notify(new Message(Codes.SUCC_UI_WF_ACQ_DONE) { Head = $"{det.Name} complete acq for {det.CurrentMeasurement}" });
@@ -147,7 +151,7 @@ namespace Regata.Desktop.WinForms.Measurements
             catch (TaskCanceledException)
             {
                 Det_HardwareError(det);
-                await CompleteXemoCycle(det.PairedXemoDevice, det.CurrentMeasurement.DiskPosition);
+                //await CompleteXemoCycle(det.PairedXemoDevice, det.CurrentMeasurement.DiskPosition);
             }
             catch (Exception ex)
             {
@@ -156,9 +160,13 @@ namespace Regata.Desktop.WinForms.Measurements
             }
             finally
             {
+                XemoService.DevBusy[PairedXemoSN[det.Name]] = false;
+                XemoService.SampleIsAboveDet[PairedXemoSN[det.Name]] = false;
+
                 if (!mainForm.MainRDGV.CurrentDbSet.Local.Where(m => m.FileSpectra == null && m.Detector == det.Name).Any())
                 {
-                    await CompleteXemoCycle(det.PairedXemoDevice, det.CurrentMeasurement.DiskPosition);
+                    XemoService.LastMeas[PairedXemoSN[det.Name]] = true;
+                    //await CompleteXemoCycle(det.PairedXemoDevice, det.CurrentMeasurement.DiskPosition);
                 }
                 else
                 {

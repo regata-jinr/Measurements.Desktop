@@ -10,12 +10,14 @@
  ***************************************************************************/
 
 using Regata.Core;
+using Regata.Core.GRPC.Xemo.Services;
 using Regata.Core.DataBase;
 using Regata.Core.DataBase.Models;
 using Regata.Core.Hardware;
 using RCM = Regata.Core.Messages;
 using Regata.Core.UI.WinForms.Controls;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
@@ -26,6 +28,15 @@ namespace Regata.Desktop.WinForms.Measurements
 {
     public partial class MainForm
     {
+
+
+        private IReadOnlyDictionary<string, int> PairedXemoSN = new Dictionary<string, int>()
+        {
+            { "D1", 107374 },
+            { "D2", 107375 },
+            { "D3", 107376 },
+            { "D4", 114005 },
+        };
         private ControlsGroupBox controlsMeasControl;
         private CheckedArrayControl<string> CheckedAvailableDetectorArrayControl;
         private DetectorControlPanel _dcp;
@@ -222,7 +233,7 @@ namespace Regata.Desktop.WinForms.Measurements
 
                 d.LoadMeasurementInfoToDevice(m, i);
 
-                var sc = d.PairedXemoDevice;
+                var sc = PairedXemoSN[d.Name];
 
                 if (d.CurrentMeasurement == null)
                     return;
@@ -230,12 +241,22 @@ namespace Regata.Desktop.WinForms.Measurements
                 if (!d.CurrentMeasurement.DiskPosition.HasValue)
                     return;
 
-                if (!_scFlagMenuItem.Checked || sc == null)
+                if (_scFlagMenuItem.Checked)
                 {
-                    Core.GRPC.Xemo.Services.XemoService.DevCells[sc.SerialNumber] = d.CurrentMeasurement.DiskPosition.Value;
+                    XemoService.DevCells[sc] = d.CurrentMeasurement.DiskPosition.Value;
+                    XemoService.DevH[sc] = d.CurrentMeasurement.Height switch
+                    {
+                        > 10f => Gxemo.PutSampleAboveDetReply.Types.Height.H20,
+                        > 5f => Gxemo.PutSampleAboveDetReply.Types.Height.H10,
+                        > 2.5f => Gxemo.PutSampleAboveDetReply.Types.Height.H5,
+                        _ => Gxemo.PutSampleAboveDetReply.Types.Height.H2P5
+                    };
+
+                    XemoService.DevBusy[sc] = true;
+                    await Task.Run(async () => { while (!XemoService.SampleIsAboveDet[sc]) { await Task.Delay(TimeSpan.FromSeconds(2)); }; } );
                 }
                 d.Start();
-                Report.Notify(new RCM.Message(Codes.SUCC_UI_WF_ACQ_START) { Head = $"{d.Name} complete acq for {d.CurrentMeasurement}" });
+                    Report.Notify(new RCM.Message(Codes.SUCC_UI_WF_ACQ_START) { Head = $"{d.Name} complete acq for {d.CurrentMeasurement}" });
 
             }
             catch (Exception ex)
